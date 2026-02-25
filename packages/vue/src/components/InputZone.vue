@@ -1,0 +1,225 @@
+<script setup lang="ts">
+import { computed, nextTick, ref, useSlots, VNode, watch } from 'vue';
+import {
+  ConfigTreeNode,
+  InputZoneConfig,
+  InputZoneCore,
+  InputZoneState,
+  LayoutBox,
+  resolveLayoutStyle,
+  TYPES,
+} from '@omnipad/core';
+import { useCoreEntity } from '../composables/useCoreEntity';
+import { getComponent } from '../utils/componentRegistry';
+import VirtualLayerBase from './VirtualLayerBase.vue';
+import { useWidgetConfig } from '../composables/useWidgetConfig';
+
+interface InputZoneProps {
+  /** The runtime tree node for automatic setup. */
+  treeNode?: ConfigTreeNode;
+
+  /** Unique configuration ID (CID) for this zone. Used for profile serialization. */
+  widgetId?: string;
+
+  /** Spatial layout configuration (position, size, anchor). */
+  layout?: LayoutBox;
+
+  /** If true, prevents the browser focus from leaving the game area when touching this zone. */
+  preventFocusLoss?: {
+    type: boolean;
+    default: undefined; // 防止自动赋值为 false
+  };
+}
+const props = defineProps<InputZoneProps>();
+
+const slots = useSlots() as {
+  default?: () => VNode[];
+  dynamicWidget?: () => VNode[];
+};
+const dynamicWidgetRef = ref<any>(null);
+
+// 整合配置
+const { uid, config } = useWidgetConfig<InputZoneConfig>(TYPES.INPUT_ZONE, props);
+const { core, state, elementRef } = useCoreEntity<InputZoneCore, InputZoneState>(
+  () => new InputZoneCore(uid.value, config.value),
+);
+
+const fixedChildren = computed(() => {
+  const targetUid = props.treeNode?.config?.dynamicWidgetId;
+  return props.treeNode?.children?.filter((child) => child.uid !== targetUid) || [];
+});
+
+// 唯一性校验与 VNode 过滤逻辑
+const dynamicControlInfo = computed(() => {
+  const slotNodes = slots.dynamicWidget?.() || [];
+
+  // 过滤掉注释和纯文本，只留下真正的组件或 HTML 元素
+  const validSlotNodes = slotNodes.filter((node) => {
+    if (node.type === Comment || node.type === Text) return false;
+    // 如果是 Fragment (比如使用 v-for 生成的)，需要视情况处理，这里简化为只取顶层直接子件
+    return true;
+  });
+
+  const configTemplate = props.treeNode?.children?.find(
+    (child) => child.uid === props.treeNode?.config?.dynamicWidgetId,
+  );
+  const hasSlot = validSlotNodes.length > 0;
+
+  // 冲突与唯一性处理策略：
+  // 1. 若 Slot 内部有多个组件，只取第一个
+  if (validSlotNodes.length > 1) {
+    console.error(
+      `[OmniPad-Validation] InputZone ${uid.value} has multiple dynamic widgets in slot. Only the first one will be activated.`,
+    );
+  }
+
+  // 2. 若 Slot 和 Config 同时存在，Slot 胜出，Config 被忽略
+  if (hasSlot && configTemplate) {
+    console.warn(
+      `[OmniPad-Validation] InputZone ${uid.value} has both Slot and Config dynamic widgets. Config ignored.`,
+    );
+  }
+
+  return {
+    nodeToRender: hasSlot ? validSlotNodes[0] : configTemplate || null,
+    isFromSlot: hasSlot,
+  };
+});
+
+// --- 同步动态组件 ID 给 Core ---
+watch(
+  dynamicWidgetRef,
+  (newWidgetInstance) => {
+    nextTick(() => {
+      if (newWidgetInstance && newWidgetInstance?.uid) {
+        // 将表现层确定的唯一动态组件 UID 同步回 Core 的配置快照中
+        core.value?.updateConfig({
+          dynamicWidgetId: newWidgetInstance.uid,
+        });
+      }
+    });
+  },
+  { immediate: true },
+);
+
+// 样式计算
+const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
+
+const dynamicWrapperStyle = computed(() => {
+  if (!state.value?.isDynamicActive) return { display: 'none' };
+  return {
+    position: 'absolute' as const,
+    left: `${state.value.dynamicPosition.x}%`,
+    top: `${state.value.dynamicPosition.y}%`,
+    zIndex: 100,
+    pointerEvents: 'auto' as const,
+  };
+});
+
+// 事件下发
+const onPointerDown = (e: PointerEvent) => {
+  if (!core.value) return;
+  core.value.onPointerDown(e);
+
+  if (state.value?.isDynamicActive && dynamicWidgetRef.value) {
+    // 触发动态控件暴露的接口
+    if (typeof dynamicWidgetRef.value.onPointerDown === 'function') {
+      dynamicWidgetRef.value.onPointerDown(e);
+    }
+  }
+};
+
+const onPointerMove = (e: PointerEvent) => {
+  if (!core.value) return;
+  core.value.onPointerMove(e);
+
+  if (state.value?.isDynamicActive && dynamicWidgetRef.value) {
+    // 触发动态控件暴露的接口
+    if (typeof dynamicWidgetRef.value.onPointerMove === 'function') {
+      dynamicWidgetRef.value.onPointerMove(e);
+    }
+  }
+};
+
+const onPointerUp = (e: PointerEvent) => {
+  // 如果先执行输入分区的抬起事件，动态控件会被禁用，从而无法执行动态控件的抬起事件
+  if (state.value?.isDynamicActive && dynamicWidgetRef.value) {
+    // 触发动态控件暴露的接口
+    if (typeof dynamicWidgetRef.value.onPointerUp === 'function') {
+      dynamicWidgetRef.value.onPointerUp(e);
+    }
+  }
+
+  if (!core.value) return;
+  core.value.onPointerUp(e);
+};
+</script>
+
+<template>
+  <div
+    :id="uid"
+    ref="elementRef"
+    class="omnipad-input-zone omnipad-prevent"
+    :style="containerStyle"
+  >
+    <!-- 基础层：VirtualLayerBase 处理静态 Children -->
+    <VirtualLayerBase :nodes="fixedChildren">
+      <slot />
+    </VirtualLayerBase>
+
+    <div
+      v-if="core?.isInterceptorRequired"
+      class="omnipad-input-zone-trigger"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointercancel="onPointerUp"
+      @lostpointercapture="onPointerUp"
+      @pointerleave="onPointerUp"
+    >
+      <!-- 动态控件层：通过计算出的 nodeToRender 进行唯一渲染 -->
+      <div class="dynamic-widget-mount" :style="dynamicWrapperStyle">
+        <!-- 情况 A: 渲染来自插槽的 VNode -->
+        <template v-if="dynamicControlInfo.isFromSlot">
+          <!-- 
+          [关键点]：直接渲染 VNode 并绑定 Ref。
+          即使 slot 传入了 3 个组件，这里通过 dynamicControlInfo.nodeToRender 
+          也只会渲染数组中的第一个。
+        -->
+          <component
+            :is="dynamicControlInfo.nodeToRender"
+            :ref="(el: any) => (dynamicWidgetRef = el)"
+          />
+        </template>
+
+        <!-- 情况 B: 根据 Config 渲染 -->
+        <template v-else-if="dynamicControlInfo.nodeToRender">
+          <component
+            :is="getComponent((dynamicControlInfo.nodeToRender as ConfigTreeNode).type)"
+            :ref="(el: any) => (dynamicWidgetRef = el)"
+            :tree-node="dynamicControlInfo.nodeToRender"
+          />
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.omnipad-input-zone {
+  position: absolute;
+  pointer-events: none;
+}
+
+.omnipad-input-zone-trigger {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+  touch-action: none;
+}
+
+.dynamic-widget-mount {
+  pointer-events: none;
+}
+</style>

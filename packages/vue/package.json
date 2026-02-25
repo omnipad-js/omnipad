@@ -1,0 +1,37 @@
+{
+  "name": "@omnipad/vue",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./dist/omnipad-vue.umd.js",
+  "module": "./dist/omnipad-vue.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/omnipad-vue.mjs",
+      "require": "./dist/omnipad-vue.umd.js"
+    },
+    "./style.css": "./dist/omnipad-vue.css"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.28.2",
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vue": "^3.5.27"
+  },
+  "dependencies": {
+    "@omnipad/core": "workspace:*"
+  }
+}

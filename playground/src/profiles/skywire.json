@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "name": "Exported Profile",
+    "version": "1.0",
+    "author": "Playground"
+  },
+  "rootId": "$managed-root",
+  "items": [
+    {
+      "id": "$managed-root",
+      "type": "root-layer",
+      "config": {
+        "layout": {}
+      }
+    },
+    {
+      "id": "node_1",
+      "type": "input-zone",
+      "parentId": "$managed-root",
+      "config": {
+        "layout": {
+          "left": 0,
+          "bottom": 0,
+          "width": "30%",
+          "height": "70%"
+        },
+        "preventFocusLoss": false
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "input-zone",
+      "parentId": "$managed-root",
+      "config": {
+        "layout": {
+          "right": 0,
+          "bottom": 0,
+          "width": "30%",
+          "height": "70%"
+        },
+        "dynamicWidgetId": "node_6",
+        "preventFocusLoss": false
+      }
+    },
+    {
+      "id": "node_3",
+      "type": "keyboard-button",
+      "parentId": "node_1",
+      "config": {
+        "label": "LEFT",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "ArrowLeft",
+          "code": "ArrowLeft",
+          "keyCode": 37
+        },
+        "layout": {
+          "left": "30%",
+          "top": "70%",
+          "width": "80px",
+          "height": "80px",
+          "anchor": "center"
+        }
+      }
+    },
+    {
+      "id": "node_4",
+      "type": "keyboard-button",
+      "parentId": "node_1",
+      "config": {
+        "label": "RIGHT",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "ArrowRight",
+          "code": "ArrowRight",
+          "keyCode": 39
+        },
+        "layout": {
+          "left": "55%",
+          "top": "70%",
+          "width": "80px",
+          "height": "80px",
+          "anchor": "center"
+        }
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "keyboard-button",
+      "parentId": "node_2",
+      "config": {
+        "label": "UP",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "ArrowUp",
+          "code": "ArrowUp",
+          "keyCode": 38
+        },
+        "layout": {
+          "left": "60%",
+          "top": "70%",
+          "width": "80px",
+          "height": "80px",
+          "anchor": "center"
+        }
+      }
+    },
+    {
+      "id": "node_6",
+      "type": "keyboard-button",
+      "parentId": "node_2",
+      "config": {
+        "label": "SPACE",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": " ",
+          "code": "Space",
+          "keyCode": 32
+        },
+        "layout": {
+          "width": "80px",
+          "height": "80px",
+          "anchor": "center"
+        }
+      }
+    }
+  ]
+}

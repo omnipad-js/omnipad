@@ -1,0 +1,59 @@
+:root {
+  /* --- Basic Button Variables --- */
+  --omnipad-btn-bg: rgba(255, 255, 255, 0.2);
+  --omnipad-btn-border-color: rgba(255, 255, 255, 0.4);
+  --omnipad-btn-border-width: 2px;
+  --omnipad-btn-border-style: solid;
+  --omnipad-btn-radius: 8px;
+  
+  /* --- Labels and Fonts --- */
+  --omnipad-btn-label-color: #ffffff;
+  --omnipad-btn-font-family: 'Upheaval', 'monacoregular', sans-serif;
+  --omnipad-btn-font-size: 18px;
+  --omnipad-btn-font-weight: bold;
+
+  /* --- Interactive State (Pressed) --- */
+  --omnipad-btn-pressed-bg: rgba(255, 186, 67, 0.6);
+  --omnipad-btn-pressed-border-color: #ffba43;
+  --omnipad-btn-pressed-scale: 0.92;
+  --omnipad-btn-pressed-opacity: 1;
+
+  /* --- Animation Control --- */
+  --omnipad-btn-transition-duration: 0.1s;
+  --omnipad-btn-transition-timing: ease-out;
+}
+
+/* Basic Button Style Class */
+.omnipad-button-base {
+  background: var(--omnipad-btn-bg);
+  border: var(--omnipad-btn-border-width) var(--omnipad-btn-border-style) var(--omnipad-btn-border-color);
+  border-radius: var(--omnipad-btn-radius);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--omnipad-btn-transition-duration) var(--omnipad-btn-transition-timing);
+}
+
+/* Specialized Processing for Hollow Labels */
+.omnipad-button-label-hollow {
+  font-family: var(--omnipad-btn-font-family);
+  font-size: var(--omnipad-btn-font-size);
+  color: var(--omnipad-btn-label-color);
+  font-weight: var(--omnipad-btn-font-weight);
+  
+  background: inherit;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: invert(1) grayscale(1) contrast(9);
+  mix-blend-mode: destination-out;
+}
+
+/* Disable default touch interactions and text selection behavior for elements */
+.omnipad-prevent {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

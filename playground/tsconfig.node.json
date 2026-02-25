@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false,
+    "types": ["node"],
+    "baseUrl": "."
+    // "paths": {
+    //   "@omnipad/core": ["packages/core/src/index.ts"],
+    //   "@omnipad/vue": ["packages/vue/src/index.ts"]
+    // }
+  },
+  "include": ["vite.config.ts"]
+}
