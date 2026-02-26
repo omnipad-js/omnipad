@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useSlots, VNode, watch } from 'vue';
+import { computed, nextTick, ref, useSlots, VNode, watch } from 'vue';
 import {
   ConfigTreeNode,
   InputZoneConfig,
@@ -221,6 +221,8 @@ const onPointerCancel = (e: PointerEvent) => {
 .omnipad-input-zone {
   position: absolute;
   pointer-events: none;
+  user-select: none;
+  touch-action: none;
 }
 
 .omnipad-input-zone-trigger {

@@ -70,23 +70,27 @@ const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
     @lostpointercapture="onPointerCancel"
   >
     <!-- Slot: 自定义焦点回归反馈 -->
-    <slot name="focus-feedback" :state="state" :is-returning="state?.isFocusReturning">
-      <Transition name="pulse">
-        <div
-          v-if="state?.isFocusReturning"
-          class="focus-feedback-ring"
-          :style="{
-            left: `${state.position.x}%`,
-            top: `${state.position.y}%`,
-          }"
-        ></div>
+    <slot
+      name="focus-feedback"
+      :state="state"
+      :is-returning="state?.isFocusReturning"
+      :cursor-pos="state?.position"
+    >
+      <Transition name="omnipad-default-focus-fade">
+        <!-- 默认反馈：一个与容器同大的边框层 -->
+        <div v-if="state?.isFocusReturning" class="omnipad-default-focus-border-feedback"></div>
       </Transition>
     </slot>
     <!-- Slot: 自定义虚拟光标渲染 -->
     <div v-if="config.cursorEnabled" class="omnipad-virtual-cursor" :style="cursorStyle">
-      <slot name="cursor" :state="state" :is-down="state?.isPointerDown">
+      <slot
+        name="cursor"
+        :state="state"
+        :is-down="state?.isPointerDown"
+        :cursor-pos="state?.position"
+      >
         <!-- 默认红色准星 -->
-        <div class="cursor-dot" :class="{ 'is-down': state?.isPointerDown }"></div>
+        <div class="omnipad-default-cursor-dot" :class="{ 'is-down': state?.isPointerDown }"></div>
       </slot>
     </div>
   </div>
@@ -94,59 +98,19 @@ const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
 
 <style scoped>
 .omnipad-target-zone {
+  user-select: none;
+  touch-action: none;
   pointer-events: auto;
   overflow: hidden;
 }
 
 .omnipad-virtual-cursor {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: var(--omnipad-default-cursor-width);
+  height: var(--omnipad-default-cursor-height);
   transform: translate(-50%, -50%);
   pointer-events: none;
-  transition: opacity 0.2s;
+  transition: var(--omnipad-default-cursor-transition);
   z-index: 10;
-}
-
-.cursor-dot {
-  width: 100%;
-  height: 100%;
-  border: 2px solid white;
-  border-radius: 50%;
-  background: rgba(255, 0, 0, 0.5);
-}
-
-.cursor-dot.is-down {
-  transform: scale(0.8);
-  background: red;
-}
-
-/* 焦点回归波纹样式 */
-.focus-feedback-ring {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  transform: translate(-50%, -50%);
-  border: 2px solid rgba(100, 200, 255, 0.8);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 5;
-}
-
-/* 波纹动画 */
-.pulse-enter-active {
-  animation: ripple-out 0.5s ease-out forwards;
-}
-
-@keyframes ripple-out {
-  0% {
-    transform: translate(-50%, -50%) scale(0.2);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate(-50%, -50%) scale(1.5);
-    opacity: 0;
-  }
 }
 </style>

@@ -6,21 +6,42 @@
   --omnipad-btn-border-style: solid;
   --omnipad-btn-radius: 8px;
   
-  /* --- Labels and Fonts --- */
+  /* --- Button Labels and Fonts --- */
   --omnipad-btn-label-color: #ffffff;
   --omnipad-btn-font-family: 'Upheaval', 'monacoregular', sans-serif;
   --omnipad-btn-font-size: 18px;
   --omnipad-btn-font-weight: bold;
 
-  /* --- Interactive State (Pressed) --- */
+  /* --- Button Interactive State (Pressed) --- */
   --omnipad-btn-pressed-bg: rgba(255, 186, 67, 0.6);
   --omnipad-btn-pressed-border-color: #ffba43;
   --omnipad-btn-pressed-scale: 0.92;
   --omnipad-btn-pressed-opacity: 1;
 
-  /* --- Animation Control --- */
+  /* --- Button Animation Control --- */
   --omnipad-btn-transition-duration: 0.1s;
   --omnipad-btn-transition-timing: ease-out;
+
+  /* --- Default Cursor Variables --- */
+  --omnipad-default-cursor-height: 20px;
+  --omnipad-default-cursor-width: 20px;
+  --omnipad-default-cursor-transition: var(--omnipad-default-cursor-transition-mode)
+    var(--omnipad-default-cursor-transition-time);
+  --omnipad-default-cursor-transition-mode: opacity;
+  --omnipad-default-cursor-transition-time: 0.2s;
+
+  /* --- Default Cursor Dot --- */
+  --omnipad-default-cursor-dot-background: #ff000080;
+  --omnipad-default-cursor-dot-border-color: #ffffff;
+  --omnipad-default-cursor-dot-border-radius: 50%;
+  --omnipad-default-cursor-dot-border-style: solid;
+  --omnipad-default-cursor-dot-border-width: 2px;
+  --omnipad-default-cursor-dot-down-background: #ff0000;
+  --omnipad-default-cursor-dot-down-scale: 0.8;
+
+  /* --- Focus Variables --- */
+  --omnipad-focus-color: rgba(100, 200, 255, 0.8);
+  --omnipad-focus-bg-color: rgba(100, 200, 255, 0.05);
 }
 
 /* Basic Button Style Class */
@@ -48,6 +69,56 @@
   color: transparent;
   filter: invert(1) grayscale(1) contrast(9);
   mix-blend-mode: destination-out;
+}
+
+/* The visual representation of the virtual pointer (the "red dot") */
+.omnipad-default-cursor-dot {
+  width: 100%;
+  height: 100%;
+  border-width: var(--omnipad-default-cursor-dot-border-width);
+  border-style: var(--omnipad-default-cursor-dot-border-style);
+  border-color: var(--omnipad-default-cursor-dot-border-color);
+  border-radius: var(--omnipad-default-cursor-dot-border-radius);
+  background: var(--omnipad-default-cursor-dot-background);
+}
+
+/* Visual state when the virtual cursor is "pressed" or "clicking" */
+.omnipad-default-cursor-dot.is-down {
+  transform: scale(var(--omnipad-default-cursor-dot-down-scale));
+  background: var(--omnipad-default-cursor-dot-down-background);
+}
+
+/**
+ * Focus Border Feedback Layer
+ * 
+ * An overlay shown when the TargetZone reclaims focus from the browser.
+ * It provides a visual notification that the player is re-activated.
+ */
+.omnipad-default-focus-border-feedback {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+
+  /* Glowing inner-border visual effect */
+  border: 2px solid var(--omnipad-focus-color);
+  background-color: var(--omnipad-focus-bg-color);
+  box-shadow: inset 0 0 10px var(--omnipad-focus-color);
+
+  box-sizing: border-box;
+}
+
+.omnipad-default-focus-fade-enter-active {
+  transition: opacity 0.05s ease-in;
+}
+
+.omnipad-default-focus-fade-leave-active {
+  transition: opacity 0.2s ease-out;
+}
+
+.omnipad-default-focus-fade-enter-from,
+.omnipad-default-focus-fade-leave-to {
+  opacity: 0;
 }
 
 /* Disable default touch interactions and text selection behavior for elements */

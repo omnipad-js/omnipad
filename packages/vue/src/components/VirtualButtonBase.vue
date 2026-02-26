@@ -17,7 +17,7 @@ const containerStyle = computed(() => {
 <template>
   <div
     class="omnipad-button-base"
-    :class="{ 'omnipad-is-active': isActive }"
+    :class="{ 'is-active': isActive }"
     :style="containerStyle"
     tabindex="-1"
   >
@@ -36,7 +36,7 @@ const containerStyle = computed(() => {
   pointer-events: auto;
 }
 
-.omnipad-button-base.omnipad-is-active {
+.omnipad-button-base.is-active {
   background: var(--omnipad-btn-pressed-bg);
   border-color: var(--omnipad-btn-pressed-border-color);
   opacity: var(--omnipad-btn-pressed-opacity);

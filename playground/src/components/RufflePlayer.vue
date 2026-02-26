@@ -77,14 +77,14 @@ onMounted(() => {
         :layout="stageLayout"
         class="player-overlay"
       >
-        <template #focus-feedback="{ state, isReturning }">
+        <template #focus-feedback="{ isReturning, cursorPos }">
           <Transition name="pulse">
             <div
               v-if="isReturning"
               class="focus-feedback-ring"
               :style="{
-                left: `${state?.position.x}%`,
-                top: `${state?.position.y}%`,
+                left: `${cursorPos?.x}%`,
+                top: `${cursorPos?.y}%`,
               }"
             ></div>
           </Transition>
