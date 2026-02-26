@@ -35,7 +35,7 @@ const defaultProps = {
 
 // 整合配置
 const { uid, config } = useWidgetConfig<TargetZoneConfig>(TYPES.TARGET_ZONE, props, defaultProps);
-const { state, elementRef } = useCoreEntity<TargetZoneCore, CursorState>(
+const { core, state, elementRef } = useCoreEntity<TargetZoneCore, CursorState>(
   () => new TargetZoneCore(uid.value, config.value),
 );
 
@@ -50,25 +50,44 @@ const cursorStyle = computed(() => {
     opacity: state.value.isVisible ? 1 : 0,
   };
 });
+
+const onPointerDown = (e: PointerEvent) => core.value?.onPointerDown(e);
+const onPointerMove = (e: PointerEvent) => core.value?.onPointerMove(e);
+const onPointerUp = (e: PointerEvent) => core.value?.onPointerUp(e);
+const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
 </script>
 
 <template>
-  <div :id="uid" ref="elementRef" class="omnipad-target-zone" :style="containerStyle">
-    <!-- 焦点回归反馈 (波纹效果) -->
-    <Transition name="pulse">
-      <div
-        v-if="state?.isFocusReturning"
-        class="focus-feedback-ring"
-        :style="{
-          left: `${state.position.x}%`,
-          top: `${state.position.y}%`,
-        }"
-      ></div>
-    </Transition>
-    <!-- 虚拟光标渲染 -->
+  <div
+    :id="uid"
+    ref="elementRef"
+    class="omnipad-target-zone"
+    :style="containerStyle"
+    @pointerdown="onPointerDown"
+    @pointermove="onPointerMove"
+    @pointerup="onPointerUp"
+    @pointercancel="onPointerCancel"
+    @lostpointercapture="onPointerCancel"
+  >
+    <!-- Slot: 自定义焦点回归反馈 -->
+    <slot name="focus-feedback" :state="state" :is-returning="state?.isFocusReturning">
+      <Transition name="pulse">
+        <div
+          v-if="state?.isFocusReturning"
+          class="focus-feedback-ring"
+          :style="{
+            left: `${state.position.x}%`,
+            top: `${state.position.y}%`,
+          }"
+        ></div>
+      </Transition>
+    </slot>
+    <!-- Slot: 自定义虚拟光标渲染 -->
     <div v-if="config.cursorEnabled" class="omnipad-virtual-cursor" :style="cursorStyle">
-      <!-- 这里未来可以放十字准星图片 -->
-      <div class="cursor-dot" :class="{ 'is-down': state?.isPointerDown }"></div>
+      <slot name="cursor" :state="state" :is-down="state?.isPointerDown">
+        <!-- 默认红色准星 -->
+        <div class="cursor-dot" :class="{ 'is-down': state?.isPointerDown }"></div>
+      </slot>
     </div>
   </div>
 </template>
@@ -78,6 +97,7 @@ const cursorStyle = computed(() => {
   pointer-events: auto;
   overflow: hidden;
 }
+
 .omnipad-virtual-cursor {
   position: absolute;
   width: 20px;
@@ -85,7 +105,9 @@ const cursorStyle = computed(() => {
   transform: translate(-50%, -50%);
   pointer-events: none;
   transition: opacity 0.2s;
+  z-index: 10;
 }
+
 .cursor-dot {
   width: 100%;
   height: 100%;
@@ -93,6 +115,7 @@ const cursorStyle = computed(() => {
   border-radius: 50%;
   background: rgba(255, 0, 0, 0.5);
 }
+
 .cursor-dot.is-down {
   transform: scale(0.8);
   background: red;
@@ -120,14 +143,10 @@ const cursorStyle = computed(() => {
     transform: translate(-50%, -50%) scale(0.2);
     opacity: 1;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1.5);
     opacity: 0;
   }
-}
-
-.omnipad-virtual-cursor {
-  /* 确保准星在波纹之上 */
-  z-index: 10;
 }
 </style>

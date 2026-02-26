@@ -3,7 +3,7 @@ import { TargetZoneConfig } from '../types/configs';
 import { CursorState } from '../types/state';
 import { ISignalReceiver } from '../types/traits';
 import * as DOM from '../utils/dom';
-import { percentToPx } from '../utils/math';
+import { percentToPx, pxToPercent } from '../utils/math';
 import { BaseEntity } from './BaseEntity';
 
 /**
@@ -31,6 +31,49 @@ export class TargetZoneCore
 
   constructor(uid: string, config: TargetZoneConfig) {
     super(uid, TYPES.TARGET_ZONE, config, INITIAL_STATE);
+  }
+
+  // --- IPointerHandler Implementation ---
+
+  public onPointerDown(e: PointerEvent): void {
+    this.processPhysicalEvent(e, ACTION_TYPES.MOUSEDOWN);
+  }
+
+  public onPointerMove(e: PointerEvent): void {
+    this.processPhysicalEvent(e, ACTION_TYPES.MOUSEMOVE);
+  }
+
+  public onPointerUp(e: PointerEvent): void {
+    this.processPhysicalEvent(e, ACTION_TYPES.MOUSEUP);
+    // Physical clicks also require reissuing "click"
+    this.processPhysicalEvent(e, ACTION_TYPES.CLICK);
+  }
+
+  public onPointerCancel(e: PointerEvent): void {
+    this.processPhysicalEvent(e, ACTION_TYPES.MOUSEUP);
+  }
+
+  /**
+   * Convert physical DOM events into internal signals
+   */
+  private processPhysicalEvent(e: PointerEvent, type: string) {
+    if (e.cancelable) e.preventDefault();
+    e.stopPropagation();
+
+    if (!this.rect) return;
+
+    // Physical coord -> percent coord
+    const point = {
+      x: pxToPercent(e.clientX - this.rect.left, this.rect.width),
+      y: pxToPercent(e.clientY - this.rect.top, this.rect.height),
+    };
+
+    // Physical inputs are converted into virtual signals for processing by the system.
+    this.handleSignal({
+      targetStageId: this.uid,
+      type: type,
+      payload: { point, button: e.button as any },
+    });
   }
 
   // --- ISignalReceiver Implementation ---
