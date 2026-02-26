@@ -73,6 +73,11 @@ export interface LayerState {
 export interface KeyboardButtonState extends InteractionState, ButtonLogicState {}
 
 /**
+ * Combined state for Mouse Button components.
+ */
+export interface MouseButtonState extends InteractionState, ButtonLogicState {}
+
+/**
  * Combined state for Analog Stick components.
  */
 export interface JoystickState extends InteractionState, JoystickLogicState {}

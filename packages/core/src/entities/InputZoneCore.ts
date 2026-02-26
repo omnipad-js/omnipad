@@ -35,6 +35,8 @@ export class InputZoneCore
 
     if (e.cancelable) e.preventDefault();
 
+    e.stopPropagation();
+
     // 3. 计算相对于本分区的百分比坐标 / Calculate percentage coordinates relative to this zone
     const pos = this.calculateRelativePosition(e.clientX, e.clientY);
 
@@ -59,6 +61,7 @@ export class InputZoneCore
   }
 
   public onPointerUp(e: PointerEvent): void {
+    if (e.cancelable) e.preventDefault();
     this.handleRelease(e);
   }
 

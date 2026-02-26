@@ -20,7 +20,7 @@ export default defineConfig({
       output: {
         globals: {
           vue: 'Vue',
-          '@omnipad/core': 'OmniPadCore'
+          '@omnipad/core': 'OmniPadCore',
         },
       },
     },

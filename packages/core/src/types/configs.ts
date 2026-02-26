@@ -1,4 +1,4 @@
-import { AnchorPoint, FlexibleLength, TYPES } from '.';
+import { AnchorPoint, FlexibleLength, TYPES, Vec2 } from '.';
 import { KeyMapping } from './keys';
 
 /**
@@ -60,6 +60,27 @@ export interface KeyboardButtonConfig extends BaseConfig {
    * CID of the TargetZone where signals should be dispatched.
    */
   targetStageId?: string;
+}
+
+/**
+ * Mouse Button Configuration
+ */
+export interface MouseButtonConfig extends BaseConfig {
+  type: typeof TYPES.MOUSE_BUTTON;
+  /** Label displayed on the button */
+  label: string;
+  /**
+   * 0: Left (Main), 1: Middle, 2: Right (Context)
+   * @default 0
+   */
+  button: 0 | 1 | 2;
+  /** ID of the target Stage to receive clicks */
+  targetStageId?: string;
+  /**
+   * Optional: Fixed coordinate to click on (0-100 percentage).
+   * If provided, the click always hits this spot regardless of cursor position.
+   */
+  fixedPoint?: Vec2;
 }
 
 /**

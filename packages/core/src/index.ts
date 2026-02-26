@@ -9,6 +9,7 @@ export { Registry } from './registry';
 export { BaseEntity } from './entities/BaseEntity';
 export { InputZoneCore } from './entities/InputZoneCore';
 export { KeyboardButtonCore } from './entities/KeyboardButtonCore';
+export { MouseButtonCore } from './entities/MouseButtonCore';
 export { RootLayerCore } from './entities/RootLayerCore';
 export { TargetZoneCore } from './entities/TargetZoneCore';
 

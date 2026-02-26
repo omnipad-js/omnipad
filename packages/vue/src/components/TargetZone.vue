@@ -75,7 +75,7 @@ const cursorStyle = computed(() => {
 
 <style scoped>
 .omnipad-target-zone {
-  pointer-events: none; /* 穿透 */
+  pointer-events: auto;
   overflow: hidden;
 }
 .omnipad-virtual-cursor {

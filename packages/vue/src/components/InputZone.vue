@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useSlots, VNode, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, useSlots, VNode, watch } from 'vue';
 import {
   ConfigTreeNode,
   InputZoneConfig,
@@ -153,6 +153,19 @@ const onPointerUp = (e: PointerEvent) => {
   if (!core.value) return;
   core.value.onPointerUp(e);
 };
+
+const onPointerCancel = (e: PointerEvent) => {
+  // 如果先执行输入分区的抬起事件，动态控件会被禁用，从而无法执行动态控件的抬起事件
+  if (state.value?.isDynamicActive && dynamicWidgetRef.value) {
+    // 触发动态控件暴露的接口
+    if (typeof dynamicWidgetRef.value.onPointerCancel === 'function') {
+      dynamicWidgetRef.value.onPointerCancel(e);
+    }
+  }
+
+  if (!core.value) return;
+  core.value.onPointerCancel(e);
+};
 </script>
 
 <template>
@@ -168,14 +181,13 @@ const onPointerUp = (e: PointerEvent) => {
     </VirtualLayerBase>
 
     <div
-      v-if="core?.isInterceptorRequired"
+      v-if="dynamicControlInfo.nodeToRender || core?.isInterceptorRequired"
       class="omnipad-input-zone-trigger"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
-      @pointercancel="onPointerUp"
-      @lostpointercapture="onPointerUp"
-      @pointerleave="onPointerUp"
+      @pointercancel="onPointerCancel"
+      @lostpointercapture="onPointerCancel"
     >
       <!-- 动态控件层：通过计算出的 nodeToRender 进行唯一渲染 -->
       <div class="dynamic-widget-mount" :style="dynamicWrapperStyle">

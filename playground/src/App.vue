@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { RootLayer, InputZone, VirtualKeyboardButton } from '@omnipad/vue';
+import { RootLayer, InputZone, VirtualKeyboardButton, VirtualMouseButton } from '@omnipad/vue';
 import {
   exportProfile,
   InputManager,
@@ -96,38 +96,44 @@ const toggleFullscreen = () => {
     </main>
 
     <div class="main-root-layer">
-      <RootLayer :tree-node="treeRoot || undefined" widget-id="$managed-root">
-        <!-- <InputZone :layout="{ left: 0, bottom: 0, width: '30%', height: '70%' }">
-        <VirtualKeyboardButton
-          label="LEFT"
+      <RootLayer widget-id="$managed-root">
+        <VirtualMouseButton
           target-stage-id="$ruffle-player"
-          :mapping=" OmniPad.Keys.ArrowLeft"
-          :layout="{ left: '30%', top: '70%', width: '80px', height: '80px', anchor: 'center' }"
-        ></VirtualKeyboardButton>
-        <VirtualKeyboardButton
-          label="RIGHT"
-          target-stage-id="$ruffle-player"
-          :mapping=" OmniPad.Keys.ArrowRight"
-          :layout="{ left: '55%', top: '70%', width: '80px', height: '80px', anchor: 'center' }"
-        ></VirtualKeyboardButton>
-      </InputZone>
-
-      <InputZone :layout="{ right: 0, bottom: 0, width: '30%', height: '70%' }">
-        <VirtualKeyboardButton
-          label="UP"
-          target-stage-id="$ruffle-player"
-          :mapping=" OmniPad.Keys.ArrowUp"
-          :layout="{ left: '70%', top: '70%', width: '80px', height: '80px', anchor: 'center' }"
-        ></VirtualKeyboardButton>
-        <template #dynamicWidget>
+          label="PAUSE"
+          :fixed-point="{ x: 95, y: 5 }"
+          :layout="{ left: '10%', top: '20%', width: '80px', height: '80px', anchor: 'center' }"
+        />
+        <InputZone :layout="{ left: 0, bottom: 0, width: '30%', height: '70%' }">
           <VirtualKeyboardButton
-            label="SPACE"
+            label="LEFT"
             target-stage-id="$ruffle-player"
-            :mapping=" OmniPad.Keys.Space"
-            :layout="{ width: '80px', height: '80px', anchor: 'center' }"
+            :mapping="OmniPad.Keys.ArrowLeft"
+            :layout="{ left: '30%', top: '70%', width: '80px', height: '80px', anchor: 'center' }"
           ></VirtualKeyboardButton>
-        </template>
-</InputZone> -->
+          <VirtualKeyboardButton
+            label="RIGHT"
+            target-stage-id="$ruffle-player"
+            :mapping="OmniPad.Keys.ArrowRight"
+            :layout="{ left: '55%', top: '70%', width: '80px', height: '80px', anchor: 'center' }"
+          ></VirtualKeyboardButton>
+        </InputZone>
+
+        <InputZone :layout="{ right: 0, bottom: 0, width: '30%', height: '70%' }">
+          <VirtualKeyboardButton
+            label="UP"
+            target-stage-id="$ruffle-player"
+            :mapping="OmniPad.Keys.ArrowUp"
+            :layout="{ left: '70%', top: '70%', width: '80px', height: '80px', anchor: 'center' }"
+          ></VirtualKeyboardButton>
+          <template #dynamicWidget>
+            <VirtualKeyboardButton
+              label="SPACE"
+              target-stage-id="$ruffle-player"
+              :mapping="OmniPad.Keys.Space"
+              :layout="{ width: '80px', height: '80px', anchor: 'center' }"
+            ></VirtualKeyboardButton>
+          </template>
+        </InputZone>
       </RootLayer>
     </div>
 

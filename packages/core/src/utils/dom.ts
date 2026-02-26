@@ -8,19 +8,29 @@ import { AnchorPoint, Vec2 } from '../types';
  *
  * @param x - Viewport X coordinate (px)
  * @param y - Viewport Y coordinate (px)
+ * @param ignoreClass - Style class of DOM elements to be ignored
  * @returns The deepmost Element or null if none found at the position.
  */
-export const getDeepElement = (x: number, y: number): Element | null => {
-  let el = document.elementFromPoint(x, y);
+export const getDeepElement = (x: number, y: number, ignoreClass: string = 'omnipad-target-zone'): Element | null => {
+  // Get all elements beneath the point
+  const elements = document.elementsFromPoint(x, y);
+
+  // Find the first element without ignoreClass (To skip elements like TargetZone)
+  let target = elements.find(el => !el.classList.contains(ignoreClass));
+
+  if (!target) return null;
 
   // Drill down into shadowRoot if the current element is a host
-  while (el && el.shadowRoot) {
-    const nested = el.shadowRoot.elementFromPoint(x, y);
+  while (target && target.shadowRoot) {
+    const nestedElements = target.shadowRoot.elementsFromPoint(x, y);
+    const nestedTarget = nestedElements.find(el => !el.classList.contains(ignoreClass));
+    
     // If no nested element found or the same element returned, break recursion
-    if (!nested || nested === el) break;
-    el = nested;
+    if (!nestedTarget || nestedTarget === target) break;
+    target = nestedTarget;
   }
-  return el;
+
+  return target;
 };
 
 /**
@@ -111,7 +121,7 @@ export const dispatchPointerEventAtPos = (
     target.dispatchEvent(
       new PointerEvent(type, {
         isPrimary: true,
-        pointerId: 1,
+        pointerId: 9999,
         pointerType: 'mouse', // Emulate mouse behavior for Flash MouseOver/Down logic
         ...commonProps,
       }),

@@ -39,6 +39,8 @@ export class KeyboardButtonCore
     // 阻止默认行为以防止焦点丢失和浏览器手势干扰 / Prevent default behavior to avoid focus loss and browser gestures
     if (e.cancelable) e.preventDefault();
 
+    e.stopPropagation();
+
     // 锁定指针捕获，确保手指移出按钮范围时事件依然能被触发 / Set pointer capture to ensure events trigger even if the finger moves outside
     (e.target as Element).setPointerCapture(e.pointerId);
 
@@ -119,7 +121,7 @@ export class KeyboardButtonCore
     } else {
       // 在开发环境下对缺失的目标抛出警告 / Log warning in dev environment if target is missing
       if (import.meta.env?.DEV) {
-        console.warn(`[OmniPad-Core] Button ${this.uid} target not found: ${targetId}`);
+        console.warn(`[OmniPad-Core] KeyboardButton ${this.uid} target not found: ${targetId}`);
       }
     }
   }
