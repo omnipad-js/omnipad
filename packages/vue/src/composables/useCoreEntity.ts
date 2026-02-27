@@ -6,13 +6,10 @@ export function useCoreEntity<T extends ICoreEntity, S>(createCore: () => T) {
   const state = ref<S>();
   const elementRef = ref<any>(null);
 
-  // 1. 统一处理状态订阅
+  // 统一处理状态订阅
   const syncState = (newState: S) => {
     state.value = newState;
   };
-
-  // 2. 统一处理尺寸监听
-  let resizeObserver: ResizeObserver | null = null;
 
   onMounted(() => {
     const instance = createCore();
@@ -41,21 +38,14 @@ export function useCoreEntity<T extends ICoreEntity, S>(createCore: () => T) {
     }
 
     // 尺寸监听 (ISpatial 接口对接)
-    if (domEl && 'updateRect' in instance) {
-      resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          (instance as unknown as ISpatial).updateRect(entry.target.getBoundingClientRect());
-        }
-      });
-      resizeObserver.observe(domEl);
-
-      // 初始化时主动调用一次，防止 Observer 第一次触发前坐标为空
-      (instance as unknown as ISpatial).updateRect(domEl.getBoundingClientRect());
+    if (elementRef.value && 'bindRectProvider' in instance) {
+      (instance as unknown as ISpatial).bindRectProvider(() =>
+        elementRef.value!.getBoundingClientRect(),
+      );
     }
   });
 
   onUnmounted(() => {
-    if (resizeObserver) resizeObserver.disconnect();
     if (core.value) {
       core.value.destroy(); // 内部会处理 Registry.unregister
     }

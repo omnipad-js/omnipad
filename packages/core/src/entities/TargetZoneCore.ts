@@ -72,12 +72,13 @@ export class TargetZoneCore
    * Convert physical DOM events into internal signals
    */
   private processPhysicalEvent(e: PointerEvent, type: string) {
-    if (!this.rect) return;
+    const rect = this.getRect();
+    if (!rect) return;
 
     // Physical coord -> percent coord
     const point = {
-      x: pxToPercent(e.clientX - this.rect.left, this.rect.width),
-      y: pxToPercent(e.clientY - this.rect.top, this.rect.height),
+      x: pxToPercent(e.clientX - rect.left, rect.width),
+      y: pxToPercent(e.clientY - rect.top, rect.height),
     };
 
     // Physical inputs are converted into virtual signals for processing by the system.
@@ -114,6 +115,9 @@ export class TargetZoneCore
       case ACTION_TYPES.MOUSEDOWN:
       case ACTION_TYPES.MOUSEUP:
       case ACTION_TYPES.CLICK:
+        if (payload.point) {
+          this.updateCursorPosition(payload.point);
+        }
         if (this.config.cursorEnabled) this.showCursor();
         this.executeMouseAction(
           type.startsWith(ACTION_TYPES.MOUSE)
@@ -135,7 +139,8 @@ export class TargetZoneCore
    */
   private executeMouseAction(pointerType: string, payload: any) {
     // 若适配层尚未汇报 DOM 尺寸，则无法进行坐标换算 / Skip if DOM rect is not reported yet
-    if (!this.rect) return;
+    const rect = this.getRect();
+    if (!rect) return;
 
     // 更新本地按下状态记录 / Update local pointer down state for visual feedback
     if (pointerType === ACTION_TYPES.POINTERDOWN) this.setState({ isPointerDown: true });
@@ -145,8 +150,8 @@ export class TargetZoneCore
     const target = payload.point || this.state.position;
 
     // 换算为屏幕绝对像素坐标 / Convert percentage to absolute pixel coordinates
-    const px = this.rect.left + percentToPx(target.x, this.rect.width);
-    const py = this.rect.top + percentToPx(target.y, this.rect.height);
+    const px = rect.left + percentToPx(target.x, rect.width);
+    const py = rect.top + percentToPx(target.y, rect.height);
 
     // 调用驱动层派发合成事件 / Call DOM driver to dispatch synthetic events
     DOM.dispatchPointerEventAtPos(pointerType, px, py, {
@@ -161,11 +166,12 @@ export class TargetZoneCore
    * Checks if the target element under the virtual cursor has focus, and reclaims it if lost.
    */
   private ensureFocus() {
-    if (!this.rect) return;
+    const rect = this.getRect();
+    if (!rect) return;
 
     // 换算当前光标所在的绝对像素点 / Calculate absolute pixel point of current cursor
-    const px = this.rect.left + percentToPx(this.state.position.x, this.rect.width);
-    const py = this.rect.top + percentToPx(this.state.position.y, this.rect.height);
+    const px = rect.left + percentToPx(this.state.position.x, rect.width);
+    const py = rect.top + percentToPx(this.state.position.y, rect.height);
 
     // 穿透 Shadow DOM 查找该位置最深层的元素 / Find deepest element including Shadow DOM
     const target = DOM.getDeepElement(px, py) as HTMLElement;
@@ -193,7 +199,9 @@ export class TargetZoneCore
    * Updates the internal virtual cursor coordinates.
    */
   private updateCursorPosition(point: Vec2) {
-    this.setState({ position: { ...point } });
+    if (point.x !== this.state.position.x || point.y !== this.state.position.y) {
+      this.setState({ position: { ...point } });
+    }
   }
 
   /**

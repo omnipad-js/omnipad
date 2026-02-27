@@ -29,10 +29,9 @@ export interface ICoreEntity extends IIdentifiable, ILifecycle {}
  */
 export interface ISpatial {
   /**
-   * Updates the physical boundary rect, usually called by a ResizeObserver in the adapter layer.
-   * @param rect - The new DOMRect of the element.
+   * Dynamically obtain dimensions and position to ensure the most precise real-time screen coordinates are obtained during each interaction.
    */
-  updateRect(rect: DOMRect): void;
+  bindRectProvider(provider: () => DOMRect): void;
 }
 
 /**

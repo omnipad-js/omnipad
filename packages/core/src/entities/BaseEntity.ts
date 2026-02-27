@@ -17,6 +17,7 @@ export abstract class BaseEntity<TConfig, TState>
   protected config: TConfig;
   protected state: TState;
   protected rect: DOMRect | null = null;
+  protected rectProvider: (() => DOMRect) | null = null;
 
   // 内部状态发射器，负责处理状态订阅逻辑 / Internal emitter for state subscription logic
   protected stateEmitter = new SimpleEmitter<TState>();
@@ -74,9 +75,15 @@ export abstract class BaseEntity<TConfig, TState>
 
   public abstract reset(): void;
 
-  public updateRect(rect: DOMRect): void {
-    // 更新物理边界信息 / Update physical boundary information
-    this.rect = rect;
+  public bindRectProvider(provider: () => DOMRect): void {
+    this.rectProvider = provider;
+  }
+
+  /**
+   * Called when triggering interactions, this subclass fetches the latest boundaries in real time.
+   */
+  protected getRect(): DOMRect | null {
+    return this.rectProvider ? this.rectProvider() : null;
   }
 
   public updateConfig(newConfig: Partial<TConfig>): void {
