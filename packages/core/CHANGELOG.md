@@ -1,5 +1,11 @@
 # @omnipad/core
 
+## 0.2.0-alpha.2
+
+### Minor Changes
+
+- feat: implement Trackpad with gesture support, optimized focus handling.
+
 ## 0.1.1-alpha.1
 
 ### Patch Changes

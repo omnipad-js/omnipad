@@ -1,5 +1,16 @@
 # @omnipad/vue
 
+## 0.2.0-alpha.2
+
+### Minor Changes
+
+- feat: implement Trackpad with gesture support, optimized focus handling.
+
+### Patch Changes
+
+- Updated dependencies
+  - @omnipad/core@0.2.0-alpha.2
+
 ## 0.1.1-alpha.1
 
 ### Patch Changes
