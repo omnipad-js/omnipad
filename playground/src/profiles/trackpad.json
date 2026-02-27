@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "name": "Trackpad Demo",
+    "version": "1.0",
+    "author": "Playground"
+  },
+  "rootId": "$managed-root",
+  "items": [
+    {
+      "id": "$managed-root",
+      "type": "root-layer",
+      "config": {
+        "layout": {}
+      }
+    },
+    {
+      "id": "node_1",
+      "type": "trackpad",
+      "parentId": "$managed-root",
+      "config": {
+        "label": "TRACKPAD",
+        "sensitivity": 1,
+        "targetStageId": "$ruffle-player",
+        "layout": {
+          "left": "80%",
+          "top": "80%",
+          "width": "200px",
+          "height": "200px",
+          "anchor": "center"
+        }
+      }
+    }
+  ]
+}

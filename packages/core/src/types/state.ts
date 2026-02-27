@@ -78,6 +78,11 @@ export interface KeyboardButtonState extends InteractionState, ButtonLogicState 
 export interface MouseButtonState extends InteractionState, ButtonLogicState {}
 
 /**
+ * Combined state for Trackpad components.
+ */
+export interface TrackpadState extends InteractionState, ButtonLogicState {}
+
+/**
  * Combined state for Analog Stick components.
  */
 export interface JoystickState extends InteractionState, JoystickLogicState {}

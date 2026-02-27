@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { RootLayer, InputZone, VirtualKeyboardButton, VirtualMouseButton } from '@omnipad/vue';
+import {
+  RootLayer,
+  InputZone,
+  VirtualKeyboardButton,
+  VirtualMouseButton,
+  VirtualTrackpad,
+} from '@omnipad/vue';
 import {
   exportProfile,
   InputManager,
@@ -60,7 +66,7 @@ const saveConfig = () => {
   console.log('[Playground] Profile Serialized from Registry.');
 };
 
-import demoRaw from './profiles/skywire.json';
+import demoRaw from './profiles/trackpad.json';
 onMounted(() => {
   InputManager.getInstance().init();
   jsonText.value = JSON.stringify(demoRaw, null, 2);
@@ -96,14 +102,9 @@ const toggleFullscreen = () => {
     </main>
 
     <div class="main-root-layer">
-      <RootLayer widget-id="$managed-root">
-        <VirtualMouseButton
-          target-stage-id="$ruffle-player"
-          label="PAUSE"
-          :fixed-point="{ x: 95, y: 5 }"
-          :layout="{ left: '10%', top: '20%', width: '80px', height: '80px', anchor: 'center' }"
-        />
-        <InputZone :layout="{ left: 0, bottom: 0, width: '30%', height: '70%' }">
+      <RootLayer widget-id="$managed-root" :tree-node="treeRoot" />
+      <!-- <RootLayer widget-id="$managed-root"> -->
+        <!-- <InputZone :layout="{ left: 0, bottom: 0, width: '30%', height: '70%' }">
           <VirtualKeyboardButton
             label="LEFT"
             target-stage-id="$ruffle-player"
@@ -133,8 +134,8 @@ const toggleFullscreen = () => {
               :layout="{ width: '80px', height: '80px', anchor: 'center' }"
             ></VirtualKeyboardButton>
           </template>
-        </InputZone>
-      </RootLayer>
+        </InputZone> -->
+      <!-- </RootLayer> -->
     </div>
 
     <ConfigConsole

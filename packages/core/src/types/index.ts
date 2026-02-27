@@ -144,6 +144,8 @@ export interface InputActionSignal {
     keyCode?: number;
     /** Coordinate point in percentage (0-100) */
     point?: Vec2;
+    /** Relative displacement in percentage (0-100) */
+    delta?: Vec2;
     /** Mouse button index (0: Left, 1: Middle, 2: Right) */
     button?: 0 | 1 | 2;
     /** Input pressure or force (0.0 to 1.0) */
@@ -165,5 +167,6 @@ export const CONTEXT = {
 // Export sub-modules
 export * from './configs';
 export * from './keys';
+export * from './registry';
 export * from './state';
 export * from './traits';

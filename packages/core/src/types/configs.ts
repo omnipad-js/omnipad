@@ -74,13 +74,23 @@ export interface MouseButtonConfig extends BaseConfig {
    * @default 0
    */
   button: 0 | 1 | 2;
-  /** ID of the target Stage to receive clicks */
+  /** CID of the target Stage to receive clicks */
   targetStageId?: string;
   /**
-   * Optional: Fixed coordinate to click on (0-100 percentage).
+   * Fixed coordinate to click on (0-100 percentage).
    * If provided, the click always hits this spot regardless of cursor position.
    */
   fixedPoint?: Vec2;
+}
+
+export interface TrackpadConfig extends BaseConfig {
+  type: typeof TYPES.TRACKPAD;
+  /** Label displayed on the trackpad */
+  label: string;
+  /** Simulation sensitivity, e.g. 0.5 - 2.0 */
+  sensitivity: number;
+  /** CID of the target Stage to receive clicks */
+  targetStageId?: string;
 }
 
 /**

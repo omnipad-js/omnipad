@@ -3,7 +3,7 @@ import { TargetZoneConfig } from '../types/configs';
 import { CursorState } from '../types/state';
 import { IPointerHandler, ISignalReceiver } from '../types/traits';
 import * as DOM from '../utils/dom';
-import { percentToPx, pxToPercent } from '../utils/math';
+import { clamp, isVec2Equal, percentToPx, pxToPercent } from '../utils/math';
 import { createRafThrottler } from '../utils/performance';
 import { BaseEntity } from './BaseEntity';
 
@@ -107,9 +107,11 @@ export class TargetZoneCore
       case ACTION_TYPES.MOUSEMOVE:
         if (payload.point) {
           this.updateCursorPosition(payload.point);
-          if (this.config.cursorEnabled) this.showCursor();
-          this.executeMouseAction(ACTION_TYPES.POINTERMOVE, payload);
+        } else if (payload.delta) {
+          this.updateCursorPositionByDelta(payload.delta);
         }
+        if (this.config.cursorEnabled) this.showCursor();
+        this.executeMouseAction(ACTION_TYPES.POINTERMOVE, payload);
         break;
 
       case ACTION_TYPES.MOUSEDOWN:
@@ -199,9 +201,26 @@ export class TargetZoneCore
    * Updates the internal virtual cursor coordinates.
    */
   private updateCursorPosition(point: Vec2) {
-    if (point.x !== this.state.position.x || point.y !== this.state.position.y) {
-      this.setState({ position: { ...point } });
-    }
+    if (isVec2Equal(point, this.state.position)) return;
+    this.setState({ position: { ...point } });
+  }
+
+  /**
+   * Updates the internal virtual cursor coordinates by delta.
+   */
+  private updateCursorPositionByDelta(delta: Vec2) {
+    if (isVec2Equal(delta, { x: 0, y: 0 })) return;
+
+    const rect = this.getRect();
+    if (!rect) return;
+
+    const dxPercent = pxToPercent(delta.x, rect.width);
+    const dyPercent = pxToPercent(delta.y, rect.height);
+
+    this.updateCursorPosition({
+      x: clamp(this.state.position.x + dxPercent, 0, 100),
+      y: clamp(this.state.position.y + dyPercent, 0, 100),
+    });
   }
 
   /**

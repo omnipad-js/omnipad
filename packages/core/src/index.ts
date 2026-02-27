@@ -12,6 +12,7 @@ export { KeyboardButtonCore } from './entities/KeyboardButtonCore';
 export { MouseButtonCore } from './entities/MouseButtonCore';
 export { RootLayerCore } from './entities/RootLayerCore';
 export { TargetZoneCore } from './entities/TargetZoneCore';
+export { TrackpadCore } from './entities/TrackpadCore';
 
 export const OmniPad = {
   Context: CONTEXT,

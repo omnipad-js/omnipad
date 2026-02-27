@@ -38,10 +38,8 @@ export function useCoreEntity<T extends ICoreEntity, S>(createCore: () => T) {
     }
 
     // 尺寸监听 (ISpatial 接口对接)
-    if (elementRef.value && 'bindRectProvider' in instance) {
-      (instance as unknown as ISpatial).bindRectProvider(() =>
-        elementRef.value!.getBoundingClientRect(),
-      );
+    if (domEl && 'bindRectProvider' in instance) {
+      (instance as unknown as ISpatial).bindRectProvider(() => domEl!.getBoundingClientRect());
     }
   });
 
