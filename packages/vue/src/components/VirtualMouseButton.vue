@@ -16,7 +16,7 @@ interface VirtualMouseButtonProps {
   /** The runtime tree node for automatic setup. */
   treeNode?: ConfigTreeNode;
 
-  /** Unique configuration ID (CID) for this zone. Used for profile serialization. */
+  /** Unique configuration ID (CID) for this button. Used for profile serialization. */
   widgetId?: string;
 
   /** The text or symbol displayed on the button surface. */

@@ -104,7 +104,7 @@ const toggleFullscreen = () => {
     <div class="main-root-layer">
       <RootLayer widget-id="$managed-root" :tree-node="treeRoot" />
       <!-- <RootLayer widget-id="$managed-root"> -->
-        <!-- <InputZone :layout="{ left: 0, bottom: 0, width: '30%', height: '70%' }">
+      <!-- <InputZone :layout="{ left: 0, bottom: 0, width: '30%', height: '70%' }">
           <VirtualKeyboardButton
             label="LEFT"
             target-stage-id="$ruffle-player"

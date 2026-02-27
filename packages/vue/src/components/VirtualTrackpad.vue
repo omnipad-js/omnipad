@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   ConfigTreeNode,
+  LayoutBox,
   type TrackpadConfig,
   TrackpadCore,
   type TrackpadState,
@@ -10,14 +11,27 @@ import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 import VirtualButtonBase from './VirtualButtonBase.vue';
 
-const props = defineProps<{
+interface VirtualTrackpadProps {
+  /** The runtime tree node for automatic setup. */
   treeNode?: ConfigTreeNode;
+
+  /** Unique configuration ID (CID) for this trackpad. Used for profile serialization. */
   widgetId?: string;
+
+  /** The text or symbol displayed on the trackpad surface. */
   label?: string;
+
+  /** Determines the mapping ratio between the physical displacement of the trackpad and the movement of the screen cursor. */
   sensitivity?: number;
+
+  /** The ID (CID) of the TargetZone this trackpad sends signals to. */
   targetStageId?: string;
-  layout?: any;
-}>();
+
+  /** Spatial layout configuration relative to its parent zone. */
+  layout?: LayoutBox;
+}
+
+const props = defineProps<VirtualTrackpadProps>();
 
 const { uid, config } = useWidgetConfig<TrackpadConfig>(TYPES.TRACKPAD, props, {
   label: 'TRACKPAD',
@@ -61,19 +75,12 @@ defineExpose({
 
 <style scoped>
 .omnipad-trackpad {
-  /* 重写按钮样式变量，使其看起来更像触摸板 */
-  --wvg-btn-border-style: dashed;
-  --wvg-btn-bg-color: rgba(255, 255, 255, 0.05);
-  cursor: crosshair;
-}
+  user-select: none;
+  touch-action: none;
+  overflow: hidden;
 
-/* 可以在这里添加一个简单的网格背景，视觉上暗示这是触摸区 */
-.omnipad-trackpad::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  pointer-events: none;
+  --omnipad-btn-border-style: var(--omnipad-trackpad-border-style);
+  --omnipad-btn-bg: var(--omnipad-trackpad-bg);
+  cursor: var(--omnipad-trackpad-cursor);
 }
 </style>
