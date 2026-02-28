@@ -83,8 +83,8 @@ onMounted(() => {
               v-if="isReturning"
               class="focus-feedback-ring"
               :style="{
-                left: `${cursorPos?.x}px`,
-                top: `${cursorPos?.y}px`,
+                '--x': `${cursorPos?.x}px`,
+                '--y': `${cursorPos?.y}px`,
               }"
             ></div>
           </Transition>
@@ -147,16 +147,22 @@ onMounted(() => {
 
 /* 自定义焦点唤回样式 */
 .focus-feedback-ring {
-  position: absolute;
   width: 60px;
   height: 60px;
   border: 2px solid #ffba43;
   border-radius: 50%;
 
-  transform: translate(-50%, -50%);
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate3d(var(--x), var(--y), 0) translate(-50%, -50%);
+
   will-change: transform;
   pointer-events: none;
   z-index: 5;
+
+  --x: 0px;
+  --y: 0px;
 }
 
 /* 波纹动画 */
@@ -166,12 +172,12 @@ onMounted(() => {
 
 @keyframes ripple-out {
   0% {
-    transform: translate(-50%, -50%) scale(0.2);
+    transform: translate3d(var(--x), var(--y), 0) translate(-50%, -50%) scale(0.2);
     opacity: 1;
   }
 
   100% {
-    transform: translate(-50%, -50%) scale(1.5);
+    transform: translate3d(var(--x), var(--y), 0) translate(-50%, -50%) scale(1.5);
     opacity: 0;
   }
 }

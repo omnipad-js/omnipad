@@ -60,7 +60,8 @@ const cursorPositionPx = computed(() => {
 const cursorStyle = computed(() => {
   if (!state.value) return { display: 'none' };
   return {
-    transform: `translate3d(${cursorPositionPx.value.x}px, ${cursorPositionPx.value.y}px, 0) translate(-50%, -50%)`,
+    "--omnipad-virtual-cursor-x": `${cursorPositionPx.value.x}px`,
+    "--omnipad-virtual-cursor-y": `${cursorPositionPx.value.y}px`,
     opacity: state.value.isVisible ? 1 : 0,
   };
 });
@@ -129,5 +130,10 @@ const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
   will-change: transform;
   transition: var(--omnipad-default-cursor-transition);
   z-index: 10;
+  
+  transform: translate3d(var(--omnipad-virtual-cursor-x, 0px), var(--omnipad-virtual-cursor-y, 0px), 0) translate(-50%, -50%);
+  
+  --omnipad-virtual-cursor-x: 0px;
+  --omnipad-virtual-cursor-y: 0px;
 }
 </style>
