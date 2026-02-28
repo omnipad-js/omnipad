@@ -83,8 +83,8 @@ onMounted(() => {
               v-if="isReturning"
               class="focus-feedback-ring"
               :style="{
-                left: `${cursorPos?.x}%`,
-                top: `${cursorPos?.y}%`,
+                left: `${cursorPos?.x}px`,
+                top: `${cursorPos?.y}px`,
               }"
             ></div>
           </Transition>
@@ -128,10 +128,7 @@ onMounted(() => {
 
 .player-overlay {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
 }
 
 /* 自定义光标样式 */
@@ -153,9 +150,11 @@ onMounted(() => {
   position: absolute;
   width: 60px;
   height: 60px;
-  transform: translate(-50%, -50%);
   border: 2px solid #ffba43;
   border-radius: 50%;
+
+  transform: translate(-50%, -50%);
+  will-change: transform;
   pointer-events: none;
   z-index: 5;
 }

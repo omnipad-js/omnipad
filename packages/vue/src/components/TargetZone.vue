@@ -8,6 +8,7 @@ import {
   TargetZoneCore,
   CMP_TYPES,
   resolveLayoutStyle,
+  remap,
 } from '@omnipad/core';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
@@ -46,11 +47,20 @@ const { core, state, elementRef } = useCoreEntity<TargetZoneCore, CursorState>(
 const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
 
 // 光标位置
+const cursorPositionPx = computed(() => {
+  const rect = core?.value?.getRect();
+  const pos = state?.value?.position;
+  return {
+    x: remap(pos?.x || 0, 0, 100, 0, rect?.width || 0),
+    y: remap(pos?.y || 0, 0, 100, 0, rect?.height || 0),
+  };
+});
+
+// 光标位置样式
 const cursorStyle = computed(() => {
   if (!state.value) return { display: 'none' };
   return {
-    left: `${state.value.position.x}%`,
-    top: `${state.value.position.y}%`,
+    transform: `translate3d(${cursorPositionPx.value.x}px, ${cursorPositionPx.value.y}px, 0) translate(-50%, -50%)`,
     opacity: state.value.isVisible ? 1 : 0,
   };
 });
@@ -78,7 +88,7 @@ const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
       name="focus-feedback"
       :state="state"
       :is-returning="state?.isFocusReturning"
-      :cursor-pos="state?.position"
+      :cursor-pos="cursorPositionPx"
     >
       <Transition name="omnipad-default-focus-fade">
         <!-- 默认反馈：一个与容器同大的边框层 -->
@@ -91,7 +101,7 @@ const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
         name="cursor"
         :state="state"
         :is-down="state?.isPointerDown"
-        :cursor-pos="state?.position"
+        :cursor-pos="cursorPositionPx"
       >
         <!-- 默认红色准星 -->
         <div class="omnipad-default-cursor-dot" :class="{ 'is-down': state?.isPointerDown }"></div>
@@ -110,10 +120,13 @@ const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
 
 .omnipad-virtual-cursor {
   position: absolute;
+  top: 0;
+  left: 0;
   width: var(--omnipad-default-cursor-width);
   height: var(--omnipad-default-cursor-height);
-  transform: translate(-50%, -50%);
+
   pointer-events: none;
+  will-change: transform;
   transition: var(--omnipad-default-cursor-transition);
   z-index: 10;
 }

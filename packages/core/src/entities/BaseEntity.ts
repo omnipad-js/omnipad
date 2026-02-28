@@ -81,7 +81,7 @@ export abstract class BaseEntity<TConfig, TState>
   /**
    * Called when triggering interactions, this subclass fetches the latest boundaries in real time.
    */
-  protected getRect(): DOMRect | null {
+  public getRect(): DOMRect | null {
     return this.rectProvider ? this.rectProvider() : null;
   }
 
