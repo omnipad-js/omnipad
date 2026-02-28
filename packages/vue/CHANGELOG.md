@@ -1,5 +1,13 @@
 # @omnipad/vue
 
+## 0.2.0-alpha.3
+
+### Patch Changes
+
+- Perf: Displacement Optimization
+- Updated dependencies
+  - @omnipad/core@0.2.0-alpha.3
+
 ## 0.2.0-alpha.2
 
 ### Minor Changes
