@@ -9,6 +9,7 @@ import {
   resolveLayoutStyle,
   CMP_TYPES,
   remap,
+  supportsContainerQueries,
 } from '@omnipad/core';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { getComponent } from '../utils/componentRegistry';
@@ -106,22 +107,26 @@ watch(
 // 样式计算
 const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
 
-const dynamicPositionPx = computed(() => {
-  const rect = core?.value?.getRect();
-  const pos = state?.value?.dynamicPosition;
-  return {
-    x: remap(pos?.x || 0, 0, 100, 0, rect?.width || 0),
-    y: remap(pos?.y || 0, 0, 100, 0, rect?.height || 0),
-  };
-});
+// Whether browser supports Container Queries
+const canUseNativeCQ = supportsContainerQueries();
 
 const dynamicWrapperStyle = computed(() => {
   if (!state.value) return { display: 'none' };
   if (!state.value?.isDynamicActive) return { visibility: 'hidden' as const, opacity: 0 };
+  let cursorX, cursorY;
+  const pos = state?.value?.dynamicPosition;
+  if (canUseNativeCQ) {
+    cursorX = `${pos.x}cqw`;
+    cursorY = `${pos.y}cqh`;
+  } else {
+    const rect = core?.value?.getRect();
+    cursorX = `${remap(pos?.x || 0, 0, 100, 0, rect?.width || 0)}px`;
+    cursorY = `${remap(pos?.y || 0, 0, 100, 0, rect?.height || 0)}px`;
+  }
   return {
     zIndex: 100,
-    '--dynamic-widget-mount-x': `${dynamicPositionPx.value.x}px`,
-    '--dynamic-widget-mount-y': `${dynamicPositionPx.value.y}px`,
+    '--dynamic-widget-mount-x': cursorX,
+    '--dynamic-widget-mount-y': cursorY,
     visibility: 'visible' as const,
     opacity: 1,
     pointerEvents: 'auto' as const,
@@ -235,6 +240,9 @@ const onPointerCancel = (e: PointerEvent) => {
   pointer-events: none;
   user-select: none;
   touch-action: none;
+
+  /* for Container Queries */
+  container-type: size;
 }
 
 .omnipad-input-zone-trigger {

@@ -35,9 +35,6 @@ const defaultProps = {
   cursorAutoDelay: 2500,
 };
 
-// Whether browser supports Container Queries
-const canUseNativeCQ = supportsContainerQueries();
-
 // 整合配置
 const { uid, config } = useWidgetConfig<TargetZoneConfig>(
   CMP_TYPES.TARGET_ZONE,
@@ -50,28 +47,27 @@ const { core, state, elementRef } = useCoreEntity<TargetZoneCore, CursorState>(
 
 const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
 
+// Whether browser supports Container Queries
+const canUseNativeCQ = supportsContainerQueries();
+
 // 光标位置样式
 const cursorStyle = computed(() => {
   if (!state.value) return { display: 'none' };
+  let cursorX, cursorY;
+  const pos = state?.value?.position;
   if (canUseNativeCQ) {
-    return {
-      '--omnipad-virtual-cursor-x': `${state?.value?.position.x}cqw`,
-      '--omnipad-virtual-cursor-y': `${state?.value?.position.y}cqh`,
-      opacity: state.value.isVisible ? 1 : 0,
-    };
+    cursorX = `${pos.x}cqw`;
+    cursorY = `${pos.y}cqh`;
   } else {
     const rect = core?.value?.getRect();
-    const pos = state?.value?.position;
-    const cursorPositionPx = {
-      x: remap(pos?.x || 0, 0, 100, 0, rect?.width || 0),
-      y: remap(pos?.y || 0, 0, 100, 0, rect?.height || 0),
-    };
-    return {
-      '--omnipad-virtual-cursor-x': `${cursorPositionPx.x}px`,
-      '--omnipad-virtual-cursor-y': `${cursorPositionPx.y}px`,
-      opacity: state.value.isVisible ? 1 : 0,
-    };
+    cursorX = `${remap(pos?.x || 0, 0, 100, 0, rect?.width || 0)}px`;
+    cursorY = `${remap(pos?.y || 0, 0, 100, 0, rect?.height || 0)}px`;
   }
+  return {
+    '--omnipad-virtual-cursor-x': cursorX,
+    '--omnipad-virtual-cursor-y': cursorY,
+    opacity: state.value.isVisible ? 1 : 0,
+  };
 });
 
 const onPointerDown = (e: PointerEvent) => core.value?.onPointerDown(e);
