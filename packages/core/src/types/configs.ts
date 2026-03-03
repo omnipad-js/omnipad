@@ -1,4 +1,4 @@
-import { AnchorPoint, FlexibleLength, CMP_TYPES, Vec2 } from '.';
+import { AnchorPoint, FlexibleLength, CMP_TYPES } from '.';
 import { ActionMapping, KeyMapping } from './keys';
 
 /**
@@ -58,42 +58,6 @@ export interface ButtonConfig extends BaseConfig {
   targetStageId?: string;
   /** Keyboard event metadata to be emitted when triggered. */
   action: ActionMapping;
-}
-
-/**
- * Configuration for a virtual keyboard button.
- */
-export interface KeyboardButtonConfig extends BaseConfig {
-  type: typeof CMP_TYPES.KEYBOARD_BUTTON;
-  /** Visual text displayed on the button. */
-  label: string;
-  /** Keyboard event metadata to be emitted when triggered. */
-  mapping: KeyMapping;
-  /**
-   * CID of the TargetZone where signals should be dispatched.
-   */
-  targetStageId?: string;
-}
-
-/**
- * Configuration for a virtual mouse button.
- */
-export interface MouseButtonConfig extends BaseConfig {
-  type: typeof CMP_TYPES.MOUSE_BUTTON;
-  /** Label displayed on the button */
-  label: string;
-  /**
-   * 0: Left (Main), 1: Middle, 2: Right (Context)
-   * @default 0
-   */
-  button: 0 | 1 | 2;
-  /** CID of the target Stage to receive clicks */
-  targetStageId?: string;
-  /**
-   * Fixed coordinate to click on (0-100 percentage).
-   * If provided, the click always hits this spot regardless of cursor position.
-   */
-  fixedPoint?: Vec2;
 }
 
 /**
@@ -162,7 +126,7 @@ export interface TargetZoneConfig extends BaseConfig {
 /**
  * Union type representing any valid component configuration.
  */
-export type AnyConfig = KeyboardButtonConfig | InputZoneConfig | TargetZoneConfig | any;
+export type AnyConfig = ButtonConfig | InputZoneConfig | TargetZoneConfig | TrackpadConfig | DPadConfig | any;
 
 /**
  * Representation of a single item in a flattened configuration profile.
