@@ -72,7 +72,7 @@ export interface TrackpadConfig extends BaseConfig {
   /** CID of the target Stage to receive clicks */
   targetStageId?: string;
   /** Optional: Mouse or keyboard event metadata to be emitted when triggered. */
-  action?: ActionMapping;
+  mapping?: ActionMapping;
 }
 
 /**

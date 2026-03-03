@@ -49,7 +49,7 @@ export class TrackpadCore
     super(uid, CMP_TYPES.TRACKPAD, config, INITIAL_STATE);
 
     // 初始化动作发射器：默认模拟鼠标左键 / Initialize emitter, default to Left Mouse Button
-    const mouseAction = config.action || { type: 'mouse', button: 0 };
+    const mouseAction = config.mapping || { type: 'mouse' };
     this.emitter = new ActionEmitter(config.targetStageId, mouseAction);
 
     // Initialize throttler to align signal emission with screen refresh rate
