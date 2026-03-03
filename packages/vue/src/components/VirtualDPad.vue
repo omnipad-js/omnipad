@@ -20,18 +20,15 @@ interface VirtualDPadProps {
   targetStageId?: string;
   mapping?: DPadConfig['mapping'];
   threshold?: number;
-  showStick?: boolean;
+  showStick?: {
+    type: boolean;
+    default: undefined;
+  };
   layout?: LayoutBox;
 }
 
 const props = defineProps<VirtualDPadProps>();
 const defaultProps = {
-  mapping: {
-    up: KEYS.ArrowUp,
-    down: KEYS.ArrowDown,
-    left: KEYS.ArrowLeft,
-    right: KEYS.ArrowRight,
-  },
   showStick: false,
   threshold: 0.3,
 };

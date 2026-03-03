@@ -24,7 +24,8 @@
           "width": "30%",
           "height": "70%"
         },
-        "preventFocusLoss": false
+        "preventFocusLoss": false,
+        "dynamicWidgetId": "node_4"
       }
     },
     {
@@ -48,16 +49,6 @@
       "parentId": "node_1",
       "config": {
         "mapping": {
-          "up": {
-            "key": "ArrowUp",
-            "code": "ArrowUp",
-            "keyCode": 38
-          },
-          "down": {
-            "key": "ArrowDown",
-            "code": "ArrowDown",
-            "keyCode": 40
-          },
           "left": {
             "key": "ArrowLeft",
             "code": "ArrowLeft",
@@ -73,8 +64,6 @@
         "threshold": 0.3,
         "targetStageId": "$ruffle-player",
         "layout": {
-          "left": "50%",
-          "top": "70%",
           "width": "180px",
           "height": "180px",
           "anchor": "center"
@@ -111,8 +100,6 @@
         "sensitivity": 1,
         "targetStageId": "$ruffle-player",
         "layout": {
-          "left": "80%",
-          "top": "80%",
           "width": "200px",
           "height": "200px",
           "anchor": "center"
