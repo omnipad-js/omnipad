@@ -79,7 +79,7 @@
       "config": {
         "label": "UP",
         "targetStageId": "$ruffle-player",
-        "action": {
+        "mapping": {
           "type": "keyboard",
           "key": "ArrowUp",
           "code": "ArrowUp",

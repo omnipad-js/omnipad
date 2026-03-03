@@ -101,7 +101,7 @@ const toggleFullscreen = () => {
         <VirtualButton
           label="UP"
           target-stage-id="$ruffle-player"
-          :action="{
+          :mapping="{
             type: 'keyboard',
             button: 0,
             fixedPoint: { x: 90, y: 10 },

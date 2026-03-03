@@ -10,12 +10,12 @@ import * as DOM from '../utils/dom';
 const INITIAL_STATE: DPadState = {
   isActive: false,
   pointerId: null,
-  vector: { x: 0, y: 0 }
+  vector: { x: 0, y: 0 },
 };
 
 /**
  * Core logic for a virtual D-Pad widget.
- * 
+ *
  * Acts as a spatial distributor that maps a single touch point to 4 independent ActionEmitters.
  * Supports 8-way input by allowing simultaneous activation of orthogonal directions.
  */
@@ -34,10 +34,10 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     // 为每个方向初始化发射器 / Initialize emitters for each direction
     const target = config.targetStageId;
     this.emitters = {
-      up:    new ActionEmitter(target, config.mapping?.up),
-      down:  new ActionEmitter(target, config.mapping?.down),
-      left:  new ActionEmitter(target, config.mapping?.left),
-      right: new ActionEmitter(target, config.mapping?.right)
+      up: new ActionEmitter(target, config.mapping?.up),
+      down: new ActionEmitter(target, config.mapping?.down),
+      left: new ActionEmitter(target, config.mapping?.left),
+      right: new ActionEmitter(target, config.mapping?.right),
     };
   }
 
@@ -95,7 +95,7 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
 
     // 3. 驱动 4 个发射器。由于 ActionEmitter 内部有防抖，这里直接调用是安全的
     // Drive emitters. Internal deduplication in ActionEmitter makes this safe.
-    
+
     // Y 轴处理
     if (normY < -threshold) {
       this.emitters.up.press();
@@ -125,7 +125,7 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     if (this.state.pointerId !== e.pointerId) return;
 
     DOM.safeReleaseCapture(e.target, e.pointerId);
-    
+
     // 释放所有发射器并重置状态 / Release all emitters and reset state
     this.reset();
   }
@@ -139,10 +139,6 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     this.emitters.left.reset();
     this.emitters.right.reset();
 
-    this.setState({ 
-      isActive: false, 
-      pointerId: null, 
-      vector: { x: 0, y: 0 } 
-    });
+    this.setState(INITIAL_STATE);
   }
 }

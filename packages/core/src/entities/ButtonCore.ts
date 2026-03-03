@@ -30,7 +30,7 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
   constructor(uid: string, config: ButtonConfig) {
     super(uid, CMP_TYPES.BUTTON, config, INITIAL_STATE);
     // 初始化发射器 / initialize the emitter
-    this.emitter = new ActionEmitter(config.targetStageId, config.action);
+    this.emitter = new ActionEmitter(config.targetStageId, config.mapping);
   }
 
   // --- IPointerHandler Implementation ---

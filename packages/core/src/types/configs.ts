@@ -57,7 +57,7 @@ export interface ButtonConfig extends BaseConfig {
   /** CID of the TargetZone where signals should be dispatched. */
   targetStageId?: string;
   /** Keyboard or mouse event metadata to be emitted when triggered. */
-  action: ActionMapping;
+  mapping: ActionMapping;
 }
 
 /**
