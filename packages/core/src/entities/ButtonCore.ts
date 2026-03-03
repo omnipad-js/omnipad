@@ -64,9 +64,30 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
     if (e.cancelable) e.preventDefault();
   }
 
+  // --- IResettable Implementation ---
+
+  public reset(): void {
+    // 重置所有内部交互状态 / Reset all internal interaction states
+    this.setState(INITIAL_STATE);
+
+    // 重置发射器内部状态 / Reset internal state of emitter
+    this.emitter.reset();
+  }
+
+  // --- IConfigurable Implementation ---
+
+  public override updateConfig(newConfig: Partial<ButtonConfig>): void {
+    super.updateConfig(newConfig);
+
+    // 同步更新发射器配置 / sync update configuration of emitter
+    this.emitter.update(this.config.targetStageId, this.config.mapping);
+  }
+
   // --- Internal Logic ---
 
-  // Common logic for releasing the button state.
+  /**
+   * Clean up pointer capture and reset interaction state.
+   */
   private handleRelease(e: PointerEvent, isNormalRelease: boolean) {
     // 验证 pointerId 匹配，防止多指操作冲突 / Validate pointerId to prevent multi-touch conflicts
     if (this.state.pointerId !== e.pointerId) return;
@@ -78,13 +99,5 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
 
     // 调用发射器发送按键抬起信号 / Send keyup signal by emitter
     this.emitter.release(isNormalRelease);
-  }
-
-  public reset(): void {
-    // 重置所有内部交互状态 / Reset all internal interaction states
-    this.setState(INITIAL_STATE);
-
-    // 重置发射器内部状态 / Reset internal state of emitter
-    this.emitter.reset();
   }
 }

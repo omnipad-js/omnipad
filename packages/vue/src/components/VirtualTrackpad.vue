@@ -26,8 +26,8 @@ interface VirtualTrackpadProps {
   sensitivity?: number;
 
   /** The ID (CID) of the TargetZone this trackpad sends signals to. */
-  targetStageId?: string;  
-  
+  targetStageId?: string;
+
   /** Optional: Mouse or keyboard event metadata to be emitted when triggered. */
   mapping?: ActionMapping;
 

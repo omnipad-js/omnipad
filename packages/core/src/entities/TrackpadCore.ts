@@ -158,7 +158,16 @@ export class TrackpadCore
     this.setState(INITIAL_STATE);
   }
 
-  // --- Internal Helpers ---
+  // --- IConfigurable Implementation ---
+
+  public override updateConfig(newConfig: Partial<TrackpadConfig>): void {
+    super.updateConfig(newConfig);
+
+    // 同步更新发射器配置 / sync update configuration of emitter
+    this.emitter.update(this.config.targetStageId, this.config.mapping);
+  }
+
+  // --- Internal Logic ---
 
   /**
    * Clean up pointer capture and reset interaction state.

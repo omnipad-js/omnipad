@@ -89,10 +89,11 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     // 1. 计算归一化向量 [-1, 1] / Calculate normalized vector
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    const radius = rect.width / 2;
+    const radiusX = rect.width / 2;
+    const radiusY = rect.height / 2;
 
-    const normX = clamp((e.clientX - centerX) / radius, -1, 1);
-    const normY = clamp((e.clientY - centerY) / radius, -1, 1);
+    const normX = clamp((e.clientX - centerX) / radiusX, -1, 1);
+    const normY = clamp((e.clientY - centerY) / radiusY, -1, 1);
 
     // 更新内部 vector 状态供适配层渲染浮标 / Update vector for floating stick rendering
     this.setState({ vector: { x: normX, y: normY } });
@@ -128,15 +129,6 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     }
   }
 
-  private handleRelease(e: PointerEvent) {
-    if (this.state.pointerId !== e.pointerId) return;
-
-    DOM.safeReleaseCapture(e.target, e.pointerId);
-
-    // 释放所有发射器并重置状态 / Release all emitters and reset state
-    this.reset();
-  }
-
   // --- IResettable Implementation ---
 
   public reset(): void {
@@ -147,5 +139,31 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     this.emitters.right.reset();
 
     this.setState(INITIAL_STATE);
+  }
+
+  // --- IConfigurable Implementation ---
+
+  public override updateConfig(newConfig: Partial<DPadConfig>): void {
+    super.updateConfig(newConfig);
+
+    // 同步更新发射器配置 / sync update configuration of emitter
+    this.emitters.up.update(this.config.targetStageId, this.config.mapping?.up);
+    this.emitters.down.update(this.config.targetStageId, this.config.mapping?.down);
+    this.emitters.left.update(this.config.targetStageId, this.config.mapping?.left);
+    this.emitters.right.update(this.config.targetStageId, this.config.mapping?.right);
+  }
+
+  // --- Internal Logic ---
+
+  /**
+   * Clean up pointer capture and reset interaction state.
+   */
+  private handleRelease(e: PointerEvent) {
+    if (this.state.pointerId !== e.pointerId) return;
+
+    DOM.safeReleaseCapture(e.target, e.pointerId);
+
+    // 释放所有发射器并重置状态 / Release all emitters and reset state
+    this.reset();
   }
 }
