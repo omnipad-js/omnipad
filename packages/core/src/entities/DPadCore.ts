@@ -6,6 +6,7 @@ import { CMP_TYPES } from '../types';
 import { ActionEmitter } from '../utils/action';
 import { clamp } from '../utils/math';
 import * as DOM from '../utils/dom';
+import { createRafThrottler } from '../utils/performance';
 
 const INITIAL_STATE: DPadState = {
   isActive: false,
@@ -28,6 +29,8 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     right: ActionEmitter;
   };
 
+  private throttledPointerMove: (e: PointerEvent) => void;
+
   constructor(uid: string, config: DPadConfig) {
     super(uid, CMP_TYPES.D_PAD, config, INITIAL_STATE);
 
@@ -38,7 +41,11 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
       down: new ActionEmitter(target, config.mapping?.down),
       left: new ActionEmitter(target, config.mapping?.left),
       right: new ActionEmitter(target, config.mapping?.right),
-    };
+    };    
+    
+    this.throttledPointerMove = createRafThrottler<PointerEvent>((e) => {
+      this.processInput(e);
+    });
   }
 
   // --- IPointerHandler Implementation ---
@@ -57,7 +64,7 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     if (e.cancelable) e.preventDefault();
     if (this.state.pointerId !== e.pointerId) return;
 
-    this.processInput(e);
+    this.throttledPointerMove(e);
   }
 
   public onPointerUp(e: PointerEvent): void {
