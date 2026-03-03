@@ -72,12 +72,13 @@
     },
     {
       "id": "node_5",
-      "type": "keyboard-button",
+      "type": "button",
       "parentId": "node_3",
       "config": {
         "label": "UP",
         "targetStageId": "$ruffle-player",
-        "mapping": {
+        "action": {
+          "type": "keyboard",
           "key": "ArrowUp",
           "code": "ArrowUp",
           "keyCode": 38

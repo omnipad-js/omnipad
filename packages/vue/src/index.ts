@@ -11,6 +11,7 @@ import VirtualKeyboardButton from './components/VirtualKeyboardButton.vue';
 import VirtualMouseButton from './components/VirtualMouseButton.vue';
 import VirtualTrackpad from './components/VirtualTrackpad.vue';
 
+registerComponent(CMP_TYPES.BUTTON, VirtualButton);
 registerComponent(CMP_TYPES.INPUT_ZONE, InputZone);
 registerComponent(CMP_TYPES.ROOT_LAYER, RootLayer);
 registerComponent(CMP_TYPES.TARGET_ZONE, TargetZone);
