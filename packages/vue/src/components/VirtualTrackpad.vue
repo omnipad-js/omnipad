@@ -6,6 +6,7 @@ import {
   TrackpadCore,
   type TrackpadState,
   CMP_TYPES,
+  ActionMapping,
 } from '@omnipad/core';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
@@ -25,7 +26,10 @@ interface VirtualTrackpadProps {
   sensitivity?: number;
 
   /** The ID (CID) of the TargetZone this trackpad sends signals to. */
-  targetStageId?: string;
+  targetStageId?: string;  
+  
+  /** Optional: Mouse or keyboard event metadata to be emitted when triggered. */
+  mapping?: ActionMapping;
 
   /** Spatial layout configuration relative to its parent zone. */
   layout?: LayoutBox;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import {
   ConfigTreeNode,
   type DPadConfig,
@@ -7,7 +7,6 @@ import {
   type DPadState,
   type LayoutBox,
   CMP_TYPES,
-  KEYS,
   supportsContainerQueries,
 } from '@omnipad/core';
 import { useCoreEntity } from '../composables/useCoreEntity';
