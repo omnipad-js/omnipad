@@ -1,4 +1,4 @@
-import { EntityType, InputActionSignal } from '.';
+import { AbstractRect, EntityType, InputActionSignal } from '.';
 
 /**
  * Trait: Provides identity with a unique ID and specific entity type.
@@ -31,7 +31,7 @@ export interface ISpatial {
   /**
    * Dynamically obtain dimensions and position to ensure the most precise real-time screen coordinates are obtained during each interaction.
    */
-  bindRectProvider(provider: () => DOMRect): void;
+  bindRectProvider(provider: () => AbstractRect): void;
 }
 
 /**

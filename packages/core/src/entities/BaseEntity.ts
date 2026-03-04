@@ -2,7 +2,7 @@ import { ICoreEntity, IResettable } from '../types/traits';
 import { ISpatial, IConfigurable, IObservable } from '../types/traits';
 import { Registry } from '../registry';
 import { SimpleEmitter } from '../utils/emitter';
-import { EntityType } from '../types';
+import { AbstractRect, EntityType } from '../types';
 
 /**
  * Base abstract class for all logic entities in the system.
@@ -16,7 +16,7 @@ export abstract class BaseEntity<TConfig, TState>
 
   protected config: TConfig;
   protected state: TState;
-  protected rectProvider: (() => DOMRect) | null = null;
+  protected rectProvider: (() => AbstractRect) | null = null;
 
   // 内部状态发射器，负责处理状态订阅逻辑 / Internal emitter for state subscription logic
   protected stateEmitter = new SimpleEmitter<TState>();
@@ -74,14 +74,14 @@ export abstract class BaseEntity<TConfig, TState>
 
   public abstract reset(): void;
 
-  public bindRectProvider(provider: () => DOMRect): void {
+  public bindRectProvider(provider: () => AbstractRect): void {
     this.rectProvider = provider;
   }
 
   /**
    * Called when triggering interactions, this subclass fetches the latest boundaries in real time.
    */
-  public getRect(): DOMRect | null {
+  public getRect(): AbstractRect | null {
     return this.rectProvider ? this.rectProvider() : null;
   }
 
