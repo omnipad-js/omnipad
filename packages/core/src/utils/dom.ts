@@ -1,6 +1,4 @@
-import { AnchorPoint, Vec2 } from '../types';
-
-// --- 1. Query Utilities ---
+// --- Query Utilities ---
 
 /**
  * Recursively penetrates Shadow DOM boundaries to find the deepest element at the
@@ -52,7 +50,7 @@ export const getDeepActiveElement = (): Element | null => {
   return el;
 };
 
-// --- 2. Action Utilities ---
+// --- Action Utilities ---
 
 /**
  * Forcefully focuses an element.
@@ -140,35 +138,7 @@ export const dispatchPointerEventAtPos = (
   }
 };
 
-// --- 3. Geometry Utilities ---
-
-/**
- * Calculates the pixel coordinate of an anchor point within a given DOMRect.
- * Used to translate relative layout definitions into screen-space pixels.
- *
- * @param rect - The bounding box of the container.
- * @param anchor - The defined anchor point (e.g., 'center', 'top-left').
- * @returns The absolute viewport coordinates {x, y}.
- */
-export const getAnchorPosition = (rect: DOMRect, anchor: AnchorPoint): Vec2 => {
-  const { left: l, top: t, width: w, height: h } = rect;
-
-  const map: Record<AnchorPoint, Vec2> = {
-    'top-left': { x: l, y: t },
-    'top-center': { x: l + w / 2, y: t },
-    'top-right': { x: l + w, y: t },
-    'center-left': { x: l, y: t + h / 2 },
-    center: { x: l + w / 2, y: t + h / 2 },
-    'center-right': { x: l + w, y: t + h / 2 },
-    'bottom-left': { x: l, y: t + h },
-    'bottom-center': { x: l + w / 2, y: t + h },
-    'bottom-right': { x: l + w, y: t + h },
-  };
-
-  return map[anchor] || map['center'];
-};
-
-// --- 4. Compatibility ---
+// --- Compatibility ---
 let _isContainerQueriesSupported: boolean | undefined;
 
 export const supportsContainerQueries = (): boolean => {
@@ -180,7 +150,7 @@ export const supportsContainerQueries = (): boolean => {
   return _isContainerQueriesSupported;
 };
 
-// 5. --- Safe Capture ---
+// --- Safe Capture ---
 
 /**
  * Safely sets pointer capture on an element.

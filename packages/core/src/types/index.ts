@@ -58,6 +58,26 @@ export const ACTION_TYPES = {
  * =================================================================
  */
 
+/** * Represents an abstract bounding box, typically used as a
+ * lightweight alternative to the DOMRect interface.
+ */
+export interface AbstractRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/** * Represents abstract pointer data, providing a platform-agnostic
+ * alternative to the native PointerEvent.
+ */
+export interface AbstractPointerEvent {
+  pointerId: number;
+  clientX: number;
+  clientY: number;
+  button: number;
+}
+
 /**
  * Represents a 2D coordinate or vector.
  * Typically used for percentage-based positioning (0-100).
