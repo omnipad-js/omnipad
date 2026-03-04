@@ -35,6 +35,10 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
 
   // --- IPointerHandler Implementation ---
 
+  public get activePointerId(): number | null {
+    return this.state.pointerId;
+  }
+
   public onPointerDown(e: PointerEvent): void {
     // 阻止默认行为以防止焦点丢失和浏览器手势干扰 / Prevent default behavior to avoid focus loss and browser gestures
     if (e.cancelable) e.preventDefault();

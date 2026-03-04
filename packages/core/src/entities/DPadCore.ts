@@ -50,6 +50,10 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
 
   // --- IPointerHandler Implementation ---
 
+  public get activePointerId(): number | null {
+    return this.state.pointerId;
+  }
+
   public onPointerDown(e: PointerEvent): void {
     if (e.cancelable) e.preventDefault();
     e.stopPropagation();

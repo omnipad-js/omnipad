@@ -41,6 +41,10 @@ export class TargetZoneCore
 
   // --- IPointerHandler Implementation ---
 
+  public get activePointerId(): number | null {
+    return -1;
+  }
+
   public onPointerDown(e: PointerEvent): void {
     if (e.cancelable) e.preventDefault();
     e.stopPropagation();

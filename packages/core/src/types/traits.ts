@@ -83,6 +83,8 @@ export interface IResettable {
  * Trait: Handles raw pointer input (Touch/Mouse).
  */
 export interface IPointerHandler {
+  readonly activePointerId: number | null;
+
   onPointerDown(e: PointerEvent): void;
   onPointerMove(e: PointerEvent): void;
   onPointerUp(e: PointerEvent): void;

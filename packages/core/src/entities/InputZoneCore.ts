@@ -25,6 +25,10 @@ export class InputZoneCore
     super(uid, CMP_TYPES.INPUT_ZONE, config, INITIAL_STATE);
   }
 
+  public get activePointerId(): number | null {
+    return this.state.dynamicPointerId;
+  }
+
   public onPointerDown(e: PointerEvent): void {
     // 1. 如果已经有一个在运行了，则不处理 / Ignore if a dynamic widget is already active
     if (this.state.isDynamicActive) return;

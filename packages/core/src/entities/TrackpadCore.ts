@@ -81,6 +81,10 @@ export class TrackpadCore
 
   // --- IPointerHandler Implementation ---
 
+  public get activePointerId(): number | null {
+    return this.state.pointerId;
+  }
+
   public onPointerDown(e: PointerEvent): void {
     if (e.cancelable) e.preventDefault();
     e.stopPropagation();
