@@ -4,7 +4,6 @@ import { IPointerHandler } from '../types/traits';
 import { BaseEntity } from './BaseEntity';
 import { ActionEmitter } from '../utils/action';
 import { CMP_TYPES } from '../types';
-import * as DOM from '../utils/dom';
 
 const INITIAL_STATE: ButtonState = {
   isActive: false,
@@ -40,12 +39,6 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
   }
 
   public onPointerDown(e: PointerEvent): void {
-    // 阻止默认行为以防止焦点丢失和浏览器手势干扰 / Prevent default behavior to avoid focus loss and browser gestures
-    if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
-
-    DOM.safeSetCapture(e.target, e.pointerId);
-
     // 更新内部交互状态 / Update internal interaction state
     this.setState({ isActive: true, isPressed: true, pointerId: e.pointerId });
 
@@ -53,20 +46,16 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
     this.emitter.press();
   }
 
-  public onPointerUp(e: PointerEvent): void {
-    if (e.cancelable) e.preventDefault();
-    this.handleRelease(e, true);
+  public onPointerUp(): void {
+    this.handleRelease(true);
   }
 
-  public onPointerCancel(e: PointerEvent): void {
+  public onPointerCancel(): void {
     // 处理系统级打断（如来电或浏览器手势拦截） / Handle system interruptions like calls or browser gestures
-    this.handleRelease(e, false);
+    this.handleRelease(false);
   }
 
-  public onPointerMove(e: PointerEvent): void {
-    // 按钮通常不处理位移，仅阻止默认滚动 / Buttons usually don't process movement, just prevent default scrolling
-    if (e.cancelable) e.preventDefault();
-  }
+  public onPointerMove(): void {}
 
   // --- IResettable Implementation ---
 
@@ -92,12 +81,7 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
   /**
    * Clean up pointer capture and reset interaction state.
    */
-  private handleRelease(e: PointerEvent, isNormalRelease: boolean) {
-    // 验证 pointerId 匹配，防止多指操作冲突 / Validate pointerId to prevent multi-touch conflicts
-    if (this.state.pointerId !== e.pointerId) return;
-
-    DOM.safeReleaseCapture(e.target, e.pointerId);
-
+  private handleRelease(isNormalRelease: boolean) {
     // 重置为初始状态 / Reset to initial state
     this.setState(INITIAL_STATE);
 
