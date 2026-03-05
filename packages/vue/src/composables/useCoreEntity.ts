@@ -5,12 +5,16 @@ import {
   ISpatial,
   IPointerHandler,
   createPointerBridge,
+  AnyFunction,
+  IDependencyBindable,
 } from '@omnipad/core';
 
 export function useCoreEntity<T extends ICoreEntity, S>(
   createCore: () => T,
   domEventOptions: Record<string, any> = {},
+  initialDelegates?: Record<string, AnyFunction>,
 ) {
+  const instance = createCore();
   const core = shallowRef<T>();
   const state = ref<S>();
   const elementRef = ref<any>(null);
@@ -21,8 +25,18 @@ export function useCoreEntity<T extends ICoreEntity, S>(
     state.value = newState;
   };
 
+  const bindDelegates = (delegates: Record<string, AnyFunction>) => {
+    if (!core.value) return;
+
+    const bindable = core.value as unknown as IDependencyBindable;
+    if (typeof bindable.bindDelegate === 'function') {
+      Object.entries(delegates).forEach(([key, fn]) => {
+        bindable.bindDelegate(key, fn);
+      });
+    }
+  };
+
   onMounted(() => {
-    const instance = createCore();
     core.value = instance;
 
     // 注册到全局单例
@@ -31,6 +45,11 @@ export function useCoreEntity<T extends ICoreEntity, S>(
     // 订阅逻辑层状态变化
     if ('subscribe' in instance) {
       (instance as any).subscribe(syncState);
+    }
+
+    // 初始时绑定的依赖方法
+    if (initialDelegates) {
+      bindDelegates(initialDelegates);
     }
 
     // 提取真实的 DOM 元素
@@ -54,10 +73,7 @@ export function useCoreEntity<T extends ICoreEntity, S>(
 
     // 自动生成标准化 DOM 事件 (IPointerHandler 接口对接)
     if ('onPointerDown' in instance) {
-      const bridge = createPointerBridge(
-        instance as unknown as IPointerHandler,
-        domEventOptions,
-      );
+      const bridge = createPointerBridge(instance as unknown as IPointerHandler, domEventOptions);
       domEvents.value = { ...bridge };
     }
   });
@@ -73,5 +89,6 @@ export function useCoreEntity<T extends ICoreEntity, S>(
     state,
     elementRef,
     domEvents,
+    bindDelegates,
   };
 }
