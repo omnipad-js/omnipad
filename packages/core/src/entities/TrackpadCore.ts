@@ -7,7 +7,6 @@ import { createRafThrottler } from '../utils/performance';
 import { GestureRecognizer } from '../utils/gesture';
 import { isVec2Equal } from '../utils';
 import { ActionEmitter } from '../utils/action';
-import * as DOM from '../utils/dom';
 
 /**
  * Initial state for the trackpad.
@@ -86,11 +85,6 @@ export class TrackpadCore
   }
 
   public onPointerDown(e: PointerEvent): void {
-    if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
-
-    DOM.safeSetCapture(e.target, e.pointerId);
-
     // Important: lastPointerPos must be updated immediately to prevent jump on first move
     // 关键：必须立即更新最后记录坐标，防止第一次移动时产生巨大的瞬间跳变
     this.lastPointerPos = { x: e.clientX, y: e.clientY };
@@ -145,11 +139,11 @@ export class TrackpadCore
     // Resolve gesture results (Tap, DoubleTap, etc.) / 结算手势判定结果
     this.gesture.onPointerUp(e.clientX, e.clientY);
 
-    this.handleRelease(e);
+    this.handleRelease();
   }
 
-  public onPointerCancel(e: PointerEvent): void {
-    this.handleRelease(e);
+  public onPointerCancel(): void {
+    this.handleRelease();
   }
 
   // --- IResettable Implementation ---
@@ -176,10 +170,7 @@ export class TrackpadCore
   /**
    * Clean up pointer capture and reset interaction state.
    */
-  private handleRelease(e: PointerEvent) {
-    if (this.state.pointerId !== e.pointerId) return;
-
-    DOM.safeReleaseCapture(e.target, e.pointerId);
+  private handleRelease() {
     this.setState(INITIAL_STATE);
   }
 }

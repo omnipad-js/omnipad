@@ -42,15 +42,15 @@ const { uid, config } = useWidgetConfig<TrackpadConfig>(CMP_TYPES.TRACKPAD, prop
   sensitivity: 1.0,
 });
 
-const { core, state, elementRef } = useCoreEntity<TrackpadCore, TrackpadState>(
+const { state, elementRef, domEvents } = useCoreEntity<TrackpadCore, TrackpadState>(
   () => new TrackpadCore(uid.value, config.value),
 );
 
 // 转发交互
-const onPointerDown = (e: PointerEvent) => core.value?.onPointerDown(e);
-const onPointerMove = (e: PointerEvent) => core.value?.onPointerMove(e);
-const onPointerUp = (e: PointerEvent) => core.value?.onPointerUp(e);
-const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
+const onPointerDown = (e: PointerEvent) => domEvents.value?.onPointerDown(e);
+const onPointerMove = (e: PointerEvent) => domEvents.value?.onPointerMove(e);
+const onPointerUp = (e: PointerEvent) => domEvents.value?.onPointerUp(e);
+const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e);
 
 // 暴露转发方法
 defineExpose({
