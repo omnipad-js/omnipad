@@ -108,6 +108,9 @@ export class TrackpadCore
    * @param e - The pointer event.
    */
   private processPointerMove(e: AbstractPointerEvent) {
+    // 状态锁保护，防止节流产生的异常信号 / State lock protection prevents abnormal signals caused by throttling.
+    if (!this.state.isActive) return;
+    
     // Calculate displacement since the last processed frame
     // 计算自上一帧处理以来的位移量
     const dx = e.clientX - this.lastPointerPos.x;

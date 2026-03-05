@@ -77,6 +77,9 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
    * 使用轴向分割逻辑处理 8 方向输入
    */
   private processInput(e: AbstractPointerEvent) {
+    // 状态锁保护，防止节流产生的异常信号 / State lock protection prevents abnormal signals caused by throttling.
+    if (!this.state.isActive) return;
+
     const rect = this.rect;
     if (!rect) return;
 
