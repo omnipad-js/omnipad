@@ -5,7 +5,6 @@ import { DPadState } from '../types/state';
 import { CMP_TYPES } from '../types';
 import { ActionEmitter } from '../utils/action';
 import { clamp } from '../utils/math';
-import * as DOM from '../utils/dom';
 import { createRafThrottler } from '../utils/performance';
 
 const INITIAL_STATE: DPadState = {
@@ -55,29 +54,20 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
   }
 
   public onPointerDown(e: PointerEvent): void {
-    if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
-
-    DOM.safeSetCapture(e.target, e.pointerId);
-
     this.setState({ isActive: true, pointerId: e.pointerId });
     this.processInput(e);
   }
 
   public onPointerMove(e: PointerEvent): void {
-    if (e.cancelable) e.preventDefault();
-    if (this.state.pointerId !== e.pointerId) return;
-
     this.throttledPointerMove(e);
   }
 
-  public onPointerUp(e: PointerEvent): void {
-    if (e.cancelable) e.preventDefault();
-    this.handleRelease(e);
+  public onPointerUp(): void {
+    this.reset();
   }
 
-  public onPointerCancel(e: PointerEvent): void {
-    this.handleRelease(e);
+  public onPointerCancel(): void {
+    this.reset();
   }
 
   // --- Internal Logic ---
@@ -155,19 +145,5 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     this.emitters.down.update(this.config.targetStageId, this.config.mapping?.down);
     this.emitters.left.update(this.config.targetStageId, this.config.mapping?.left);
     this.emitters.right.update(this.config.targetStageId, this.config.mapping?.right);
-  }
-
-  // --- Internal Logic ---
-
-  /**
-   * Clean up pointer capture and reset interaction state.
-   */
-  private handleRelease(e: PointerEvent) {
-    if (this.state.pointerId !== e.pointerId) return;
-
-    DOM.safeReleaseCapture(e.target, e.pointerId);
-
-    // 释放所有发射器并重置状态 / Release all emitters and reset state
-    this.reset();
   }
 }

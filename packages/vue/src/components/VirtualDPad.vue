@@ -36,7 +36,7 @@ const defaultProps = {
 const { uid, config } = useWidgetConfig<DPadConfig>(CMP_TYPES.D_PAD, props, defaultProps);
 
 // 桥接 Core
-const { core, state, elementRef } = useCoreEntity<DPadCore, DPadState>(
+const { core, state, elementRef, domEvents } = useCoreEntity<DPadCore, DPadState>(
   () => new DPadCore(uid.value, config.value),
 );
 
@@ -56,10 +56,10 @@ const stopBaseRect = watchEffect(() => {
 if (canUseNativeCQ) stopBaseRect();
 
 // 转发交互
-const onPointerDown = (e: PointerEvent) => core.value?.onPointerDown(e);
-const onPointerMove = (e: PointerEvent) => core.value?.onPointerMove(e);
-const onPointerUp = (e: PointerEvent) => core.value?.onPointerUp(e);
-const onPointerCancel = (e: PointerEvent) => core.value?.onPointerCancel(e);
+const onPointerDown = (e: PointerEvent) => domEvents.value?.onPointerDown(e);
+const onPointerMove = (e: PointerEvent) => domEvents.value?.onPointerMove(e);
+const onPointerUp = (e: PointerEvent) => domEvents.value?.onPointerUp(e);
+const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e);
 
 // 暴露转发方法
 defineExpose({
