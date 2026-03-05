@@ -27,9 +27,15 @@ const stickStyle = computed(() => {
   const tx = canUseNativeCQ ? `${vx * 50}cqw` : `${vx * rx}px`;
   const ty = canUseNativeCQ ? `${vy * 50}cqh` : `${vy * ry}px`;
 
+  // 杆头尺寸
+  const cx = canUseNativeCQ ? `100cqw` : `${rx}px`;
+  const cy = canUseNativeCQ ? `100cqh` : `${ry}px`;
+
   return {
     '--omnipad-axis-stick-container-x': tx,
     '--omnipad-axis-stick-container-y': ty,
+    '--omnipad-axis-stick-width': cx,
+    '--omnipad-axis-stick-height': cy,
     // 松手时加一点回弹过渡，活动时取消过渡保证绝对跟手
     transition: props.isActive ? 'none' : 'transform 0.1s ease-out',
   };
@@ -51,7 +57,7 @@ const stickStyle = computed(() => {
     <!-- 第二层：浮标/柄头，独立管控 transform -->
     <div v-if="showStick" class="omnipad-axis-stick-container" :style="stickStyle">
       <slot name="stick" :is-active="isActive" :vector="vector">
-        <div class="omnipad-default-stick" :class="{ 'is-active': isActive }"></div>
+        <div class="omnipad-default-axis-stick" :class="{ 'is-active': isActive }"></div>
       </slot>
     </div>
   </div>
@@ -78,6 +84,9 @@ const stickStyle = computed(() => {
 
 /* 浮标的锚点固定在基座中心 */
 .omnipad-axis-stick-container {
+  width: calc(var(--omnipad-axis-stick-width, 0px) * var(--omnipad-default-axis-stick-width-scaler, 0.2));
+  height: calc(var(--omnipad-axis-stick-height, 0px) * var(--omnipad-default-axis-stick-height-scaler, 0.2));
+
   position: absolute;
   left: 50%;
   top: 50%;
@@ -91,18 +100,5 @@ const stickStyle = computed(() => {
 
   --omnipad-axis-stick-container-x: 0px;
   --omnipad-axis-stick-container-y: 0px;
-}
-
-.omnipad-default-stick {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-.omnipad-default-stick.is-active {
-  background: var(--wvg-active-bg, rgba(255, 186, 67, 0.6));
-  border-color: var(--wvg-active-border, #ffba43);
 }
 </style>

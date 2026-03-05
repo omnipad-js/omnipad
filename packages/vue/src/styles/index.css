@@ -22,6 +22,9 @@
   --omnipad-btn-transition-duration: 0.1s;
   --omnipad-btn-transition-timing: ease-out;
 
+  /* --- D-Pad Variables --- */
+
+
   /* --- Default Cursor Variables --- */
   --omnipad-default-cursor-height: 20px;
   --omnipad-default-cursor-width: 20px;
@@ -38,6 +41,20 @@
   --omnipad-default-cursor-dot-border-width: 2px;
   --omnipad-default-cursor-dot-down-background: #ff0000;
   --omnipad-default-cursor-dot-down-scale: 0.8;
+
+  /* --- Default Axis Stick --- */
+  --omnipad-default-axis-stick-bg: rgba(255, 255, 255, 0.4);
+  --omnipad-default-axis-stick-border-color: rgba(255, 255, 255, 0.8);
+  --omnipad-default-axis-stick-border-radius: 50%;
+  --omnipad-default-axis-stick-border-style: solid;
+  --omnipad-default-axis-stick-border-width: 2px;
+  --omnipad-default-axis-stick-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  --omnipad-default-axis-stick-height-scaler: 0.2;
+  --omnipad-default-axis-stick-width-scaler: 0.2;
+
+  /* --- Default Axis Interactive State (Pressed) --- */
+  --omnipad-default-axis-stick-active-bg: rgba(255, 186, 67, 0.6);
+  --omnipad-default-axis-stick-active-border-color: #ffba43;
 
   /* --- Focus Variables --- */
   --omnipad-focus-color: rgba(100, 200, 255, 0.8);
@@ -81,17 +98,35 @@
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  border-width: var(--omnipad-default-cursor-dot-border-width);
-  border-style: var(--omnipad-default-cursor-dot-border-style);
+  background: var(--omnipad-default-cursor-dot-background);
   border-color: var(--omnipad-default-cursor-dot-border-color);
   border-radius: var(--omnipad-default-cursor-dot-border-radius);
-  background: var(--omnipad-default-cursor-dot-background);
+  border-style: var(--omnipad-default-cursor-dot-border-style);
+  border-width: var(--omnipad-default-cursor-dot-border-width);
 }
 
 /* Visual state when the virtual cursor is "pressed" or "clicking" */
 .omnipad-default-cursor-dot.is-down {
   transform: scale(var(--omnipad-default-cursor-dot-down-scale));
   background: var(--omnipad-default-cursor-dot-down-background);
+}
+
+/* The visual representation of the virtual axis stick */
+.omnipad-default-axis-stick {
+  width: 100%;
+  height: 100%;
+  background: var(--omnipad-default-axis-stick-bg);
+  border-width: var(--omnipad-default-axis-stick-border-width);
+  border-style: var(--omnipad-default-axis-stick-border-style);
+  border-color: var(--omnipad-default-axis-stick-border-color);
+  border-radius: var(--omnipad-default-axis-stick-border-radius);
+  box-shadow: var(--omnipad-default-axis-stick-box-shadow);
+}
+
+/* Visual state when the virtual axis stick is active */
+.omnipad-default-axis-stick.is-active {
+  background: var(--omnipad-default-axis-stick-active-bg);
+  border-color: var(--omnipad-default-axis-stick-active-border-color);
 }
 
 /**
