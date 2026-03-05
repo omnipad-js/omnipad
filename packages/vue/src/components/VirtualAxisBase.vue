@@ -28,8 +28,8 @@ const stickStyle = computed(() => {
   const ty = canUseNativeCQ ? `${vy * 50}cqh` : `${vy * ry}px`;
 
   // 杆头尺寸
-  const cx = canUseNativeCQ ? `100cqw` : `${rx}px`;
-  const cy = canUseNativeCQ ? `100cqh` : `${ry}px`;
+  const cx = canUseNativeCQ ? `100cqw` : `${rx * 2}px`;
+  const cy = canUseNativeCQ ? `100cqh` : `${ry * 2}px`;
 
   return {
     '--omnipad-axis-stick-container-x': tx,
@@ -49,16 +49,20 @@ const stickStyle = computed(() => {
     :style="containerStyle"
     tabindex="-1"
   >
-    <!-- 第一层：底座背景，供复写 -->
+    <!-- 底座背景，供复写 -->
     <div class="omnipad-axis-bg">
       <slot name="base" :is-active="isActive" :vector="vector"></slot>
     </div>
 
-    <!-- 第二层：浮标/柄头，独立管控 transform -->
+    <!-- 浮标/柄头，独立管控 transform -->
     <div v-if="showStick" class="omnipad-axis-stick-container" :style="stickStyle">
       <slot name="stick" :is-active="isActive" :vector="vector">
         <div class="omnipad-default-axis-stick" :class="{ 'is-active': isActive }"></div>
       </slot>
+    </div>
+
+    <div class="omnipad-axis-content-layer">
+      <slot :is-active="isActive" :vector="vector"></slot>
     </div>
   </div>
 </template>
@@ -76,10 +80,10 @@ const stickStyle = computed(() => {
   container-type: size;
 }
 
-.omnipad-axis-bg {
+.omnipad-axis-bg, .omnipad-axis-content-layer {
   position: absolute;
   inset: 0;
-  pointer-events: none; /* 事件穿透给最外层容器 */
+  pointer-events: none;
 }
 
 /* 浮标的锚点固定在基座中心 */

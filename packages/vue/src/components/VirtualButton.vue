@@ -66,5 +66,13 @@ defineExpose({
     @pointerup="onPointerUp"
     @pointercancel="onPointerCancel"
     @lostpointercapture="onPointerCancel"
-  />
+  >
+    <template #base="slotProps">
+      <slot name="base" v-bind="slotProps" />
+    </template>
+
+    <template #default="slotProps">
+      <slot v-bind="slotProps" />
+    </template>
+  </VirtualButtonBase>
 </template>
