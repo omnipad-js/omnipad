@@ -140,7 +140,39 @@ export const dispatchPointerEventAtPos = (
   }
 };
 
+/**
+ * Reclaims browser focus for the element located at the specified viewport coordinates.
+ *
+ * This utility identifies the deepest element (penetrating Shadow DOM) at the given position
+ * and ensures it becomes the active element. It is essential for ensuring that
+ * game engines (like Ruffle) receive keyboard events immediately after a virtual interaction.
+ *
+ * @param x - The horizontal coordinate relative to the viewport.
+ * @param y - The vertical coordinate relative to the viewport.
+ * @returns True if the focus was successfully moved to the target; false if it was already focused or no target found.
+ */
+export const reclaimFocusAtPos = (x: number, y: number): boolean => {
+  // Find the deepest element at coordinates, penetrating Shadow DOM boundaries
+  // 在指定坐标处寻找最深层元素，穿透 Shadow DOM 边界
+  const target = getDeepElement(x, y) as HTMLElement;
+  if (!target) return false;
+
+  // Identify the current truly active element across all Shadow Roots
+  // 识别当前页面中真正获得焦点的最深层元素（跨越所有 Shadow Root）
+  const currentActive = getDeepActiveElement();
+
+  // If the target is not currently focused, forcefully reclaim focus
+  // 如果当前焦点不在目标元素上，则执行强制夺回逻辑
+  if (currentActive !== target) {
+    focusElement(target);
+    return true;
+  }
+
+  return false;
+};
+
 // --- Compatibility ---
+
 let _isContainerQueriesSupported: boolean | undefined;
 
 export const supportsContainerQueries = (): boolean => {
