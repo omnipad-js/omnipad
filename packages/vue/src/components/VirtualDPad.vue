@@ -99,6 +99,7 @@ defineExpose({
 <template>
   <VirtualAxisBase
     ref="elementRef"
+    class="omnipad-dpad omnipad-prevent"
     :layout="config.layout"
     :is-active="state?.isActive"
     :vector="state?.vector"

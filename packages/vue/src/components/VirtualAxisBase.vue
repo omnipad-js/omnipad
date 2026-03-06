@@ -44,7 +44,7 @@ const stickStyle = computed(() => {
 
 <template>
   <div
-    class="omnipad-axis-base"
+    class="omnipad-axis-base omnipad-prevent"
     :class="{ 'is-active': isActive }"
     :style="containerStyle"
     tabindex="-1"
@@ -70,11 +70,6 @@ const stickStyle = computed(() => {
 <style scoped>
 .omnipad-axis-base {
   position: relative;
-  /* 基础重置 */
-  user-select: none;
-  touch-action: none;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
 
   /* for Container Queries */
   container-type: size;

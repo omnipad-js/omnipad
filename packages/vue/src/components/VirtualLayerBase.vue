@@ -23,10 +23,7 @@ defineProps<{
 <style scoped>
 .omnipad-virtual-layer-base {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   /* [核心]：图层本身不接收事件，确保不阻挡下方的模拟器 */
   pointer-events: none;
   z-index: 1000;

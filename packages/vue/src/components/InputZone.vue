@@ -200,8 +200,6 @@ const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e)
 .omnipad-input-zone {
   position: absolute;
   pointer-events: none;
-  user-select: none;
-  touch-action: none;
 
   /* for Container Queries */
   container-type: size;

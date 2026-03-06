@@ -15,7 +15,7 @@ const containerStyle = computed(() => {
 </script>
 
 <template>
-  <div class="omnipad-button-base" :style="containerStyle" tabindex="-1">
+  <div class="omnipad-button-base omnipad-prevent" :style="containerStyle" tabindex="-1">
     <slot name="base" :is-active="isActive" :label="label">
       <div class="omnipad-default-button-base" :class="{ 'is-active': isActive }"></div>
     </slot>
@@ -30,8 +30,7 @@ const containerStyle = computed(() => {
 
 <style scoped>
 .omnipad-button-base {
-  user-select: none;
-  touch-action: none;
+  position: relative;
   overflow: hidden;
   box-sizing: border-box;
   pointer-events: auto;

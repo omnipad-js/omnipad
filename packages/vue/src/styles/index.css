@@ -157,8 +157,9 @@
 .omnipad-prevent {
   touch-action: none;
   user-select: none;
+  outline: none;
   -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent;  
 }
 
 /* The trackpad's simple grid background visually indicates the touch-sensitive area. */

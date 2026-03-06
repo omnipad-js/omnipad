@@ -89,7 +89,7 @@ const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e)
   <div
     :id="uid"
     ref="elementRef"
-    class="omnipad-target-zone"
+    class="omnipad-target-zone omnipad-prevent"
     :style="containerStyle"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
@@ -145,8 +145,6 @@ const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e)
 
 <style scoped>
 .omnipad-target-zone {
-  user-select: none;
-  touch-action: none;
   pointer-events: auto;
   overflow: hidden;
 

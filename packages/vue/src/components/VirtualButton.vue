@@ -59,6 +59,7 @@ defineExpose({
   <VirtualButtonBase
     :id="uid"
     ref="elementRef"
+    class="omnipad-button omnipad-prevent"
     :layout="config.layout"
     :label="config.label"
     :is-active="state?.isPressed"

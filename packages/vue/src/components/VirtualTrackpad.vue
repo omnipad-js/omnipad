@@ -66,7 +66,7 @@ defineExpose({
   <VirtualButtonBase
     :id="uid"
     ref="elementRef"
-    class="omnipad-trackpad"
+    class="omnipad-trackpad omnipad-prevent"
     :layout="config.layout"
     :label="config.label"
     :is-active="state?.isPressed"
@@ -88,10 +88,6 @@ defineExpose({
 
 <style scoped>
 .omnipad-trackpad {
-  user-select: none;
-  touch-action: none;
-  overflow: hidden;
-
   --omnipad-btn-border-style: var(--omnipad-trackpad-border-style);
   --omnipad-btn-bg: var(--omnipad-trackpad-bg);
   cursor: var(--omnipad-trackpad-cursor);
