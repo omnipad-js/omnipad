@@ -13,16 +13,41 @@ import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 import VirtualAxisBase from './VirtualAxisBase.vue';
 
+/**
+ * Props for the Virtual D-Pad component.
+ */
 interface VirtualDPadProps {
+  /** The runtime tree node for automatic setup. */
   treeNode?: ConfigTreeNode;
+
+  /** Unique configuration ID (CID) for this D-pad. Used for profile serialization. */
   widgetId?: string;
+
+  /** The ID (CID) of the TargetZone this D-pad sends signals to, usually global ID. */
   targetStageId?: string;
+
+  /**
+   * Mapping definitions for the 4 cardinal directions.
+   * Each direction requires a standard KeyMapping object.
+   */
   mapping?: DPadConfig['mapping'];
+
+  /**
+   * Determines the minimum travel distance (0.0 to 1.0) required to trigger a key signal.
+   * @default 0.3
+   */
   threshold?: number;
+
+  /**
+   * Controls the visibility of the internal floating feedback handle (stick).
+   * @default false
+   */
   showStick?: {
     type: boolean;
     default: undefined;
   };
+
+  /** Spatial layout configuration relative to its parent zone. */
   layout?: LayoutBox;
 }
 
@@ -85,53 +110,71 @@ defineExpose({
     @pointercancel="onPointerCancel"
     @lostpointercapture="onPointerCancel"
   >
-    <!-- [经典重现]：绘制 D-Pad 的十字背景 -->
-    <template #base="{ vector }">
-      <div class="dpad-cross-bg">
-        <!-- 上 -->
-        <div class="dpad-arm top" :class="{ on: vector && vector.y < -config.threshold! }"></div>
-        <!-- 下 -->
-        <div class="dpad-arm bottom" :class="{ on: vector && vector.y > config.threshold! }"></div>
-        <!-- 左 -->
-        <div class="dpad-arm left" :class="{ on: vector && vector.x < -config.threshold! }"></div>
-        <!-- 右 -->
-        <div class="dpad-arm right" :class="{ on: vector && vector.x > config.threshold! }"></div>
-        <!-- 核心占位符 -->
-        <div class="dpad-center"></div>
-      </div>
+    <template #base="slotProps">
+      <slot name="base" v-bind="slotProps">
+        <!-- 默认经典的 D-Pad 十字渲染 -->
+        <div class="omnipad-dpad-cross-bg">
+          <div
+            class="dpad-arm top"
+            :class="{ on: slotProps.vector && slotProps.vector.y < -config.threshold! }"
+          ></div>
+          <div
+            class="dpad-arm bottom"
+            :class="{ on: slotProps.vector && slotProps.vector.y > config.threshold! }"
+          ></div>
+          <div
+            class="dpad-arm left"
+            :class="{ on: slotProps.vector && slotProps.vector.x < -config.threshold! }"
+          ></div>
+          <div
+            class="dpad-arm right"
+            :class="{ on: slotProps.vector && slotProps.vector.x > config.threshold! }"
+          ></div>
+          <div class="dpad-center"></div>
+        </div>
+      </slot>
+    </template>
+
+    <template #stick="slotProps">
+      <slot name="stick" v-bind="slotProps" />
+    </template>
+
+    <template #default="slotProps">
+      <slot v-bind="slotProps" />
     </template>
   </VirtualAxisBase>
 </template>
 
 <style scoped>
-.dpad-cross-bg {
+.omnipad-dpad-cross-bg {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  /* 一个微弱的底圆指示触控范围 */
-  background: rgba(255, 255, 255, 0.05);
-
-  pointer-events: auto;
+  border-radius: var(--omnipad-dpad-border-radius);
+  background: var(--omnipad-dpad-bg);
+  pointer-events: none;
 }
 
 /* 用绝对定位拼出一个十字架 */
 .dpad-arm {
   position: absolute;
-  background: var(--wvg-btn-bg, rgba(255, 255, 255, 0.2));
-  border: var(--wvg-btn-border, 2px solid rgba(255, 255, 255, 0.4));
+  background: var(--omnipad-dpad-arm-bg);
+  border: var(--omnipad-dpad-arm-border);
+  box-sizing: border-box;
   transition:
     background 0.1s,
-    transform 0.1s;
+    transform 0.1s,
+    border-color 0.1s;
 }
 
+/* 4个方向臂的布局定义 */
 .dpad-arm.top {
   top: 0;
   bottom: 66%;
   left: 33%;
   right: 33%;
   border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--omnipad-dpad-arm-border-radius) var(--omnipad-dpad-arm-border-radius) 0 0;
 }
 .dpad-arm.bottom {
   top: 66%;
@@ -139,7 +182,7 @@ defineExpose({
   left: 33%;
   right: 33%;
   border-top: none;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 var(--omnipad-dpad-arm-border-radius) var(--omnipad-dpad-arm-border-radius);
 }
 .dpad-arm.left {
   top: 33%;
@@ -147,7 +190,7 @@ defineExpose({
   left: 0;
   right: 66%;
   border-right: none;
-  border-radius: 8px 0 0 8px;
+  border-radius: var(--omnipad-dpad-arm-border-radius) 0 0 var(--omnipad-dpad-arm-border-radius);
 }
 .dpad-arm.right {
   top: 33%;
@@ -155,19 +198,21 @@ defineExpose({
   left: 66%;
   right: 0;
   border-left: none;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 var(--omnipad-dpad-arm-border-radius) var(--omnipad-dpad-arm-border-radius) 0;
 }
+
 .dpad-center {
   position: absolute;
   inset: 33%;
-  background: var(--wvg-btn-bg, rgba(255, 255, 255, 0.2));
+  background: var(--omnipad-dpad-arm-bg);
+  z-index: 1;
 }
 
-/* 激活反馈 */
+/* 激活反馈样式 */
 .dpad-arm.on {
-  background: var(--wvg-active-bg, rgba(255, 186, 67, 0.6));
-  border-color: var(--wvg-active-border, #ffba43);
-  /* 往内陷一点的效果 */
-  transform: scale(0.95);
+  background: var(--omnipad-dpad-active-bg);
+  border-color: var(--omnipad-dpad-active-border);
+  transform: var(--omnipad-dpad-active-transform);
+  z-index: 2;
 }
 </style>

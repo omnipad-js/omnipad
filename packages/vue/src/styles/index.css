@@ -23,6 +23,15 @@
   --omnipad-btn-transition-timing: ease-out;
 
   /* --- D-Pad Variables --- */
+  --omnipad-dpad-arm-bg: rgba(255, 255, 255, 0.15);
+  --omnipad-dpad-arm-border: 2px solid rgba(255, 255, 255, 0.4);
+  --omnipad-dpad-arm-border-radius: 8px;
+  --omnipad-dpad-active-bg: rgba(255, 186, 67, 0.6);
+  --omnipad-dpad-active-border: #ffba43;
+  --omnipad-dpad-active-scale: 0.96;
+  --omnipad-dpad-active-transform: scale(var(--omnipad-dpad-active-scale));
+  --omnipad-dpad-bg: rgba(255, 255, 255, 0.05);
+  --omnipad-dpad-border-radius: 50%;
 
 
   /* --- Default Cursor Variables --- */
@@ -57,7 +66,7 @@
   --omnipad-default-axis-stick-active-border-color: #ffba43;
 
   /* --- Focus Variables --- */
-  --omnipad-focus-color: rgba(100, 200, 255, 0.8);
+  --omnipad-focus-color: rgba(255, 186, 67, 0.8);
   --omnipad-focus-bg-color: rgba(100, 200, 255, 0.05);
 
   /* --- Trackpad Variables --- */
@@ -96,6 +105,7 @@
 .omnipad-default-axis-stick {
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
   background: var(--omnipad-default-axis-stick-bg);
   border-width: var(--omnipad-default-axis-stick-border-width);
   border-style: var(--omnipad-default-axis-stick-border-style);

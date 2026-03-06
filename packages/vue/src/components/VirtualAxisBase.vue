@@ -69,7 +69,7 @@ const stickStyle = computed(() => {
 
 <style scoped>
 .omnipad-axis-base {
-  position: absolute;
+  position: relative;
   /* 基础重置 */
   user-select: none;
   touch-action: none;
@@ -80,7 +80,8 @@ const stickStyle = computed(() => {
   container-type: size;
 }
 
-.omnipad-axis-bg, .omnipad-axis-content-layer {
+.omnipad-axis-bg,
+.omnipad-axis-content-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
