@@ -18,7 +18,7 @@ const { elementRef } = useCoreEntity(() => new RootLayerCore(uid.value, config.v
 </script>
 
 <template>
-  <div :id="uid" ref="elementRef" class="omnipad-virtual-layer">
+  <div :id="uid" ref="elementRef" class="omnipad-root-layer">
     <VirtualLayerBase :nodes="treeNode?.children || []">
       <slot />
     </VirtualLayerBase>
@@ -26,10 +26,8 @@ const { elementRef } = useCoreEntity(() => new RootLayerCore(uid.value, config.v
 </template>
 
 <style scoped>
-.omnipad-virtual-layer {
+.omnipad-root-layer {
   position: relative;
-  height: 100%;
-  width: 100%;
   pointer-events: none;
 }
 </style>

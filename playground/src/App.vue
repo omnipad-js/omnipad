@@ -143,10 +143,14 @@ body,
 }
 
 .main-root-layer {
-  position: absolute;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.main-root-layer > .omnipad-root-layer {
   height: 100%;
   width: 100%;
-  pointer-events: none;
 }
 
 .toolbar {
