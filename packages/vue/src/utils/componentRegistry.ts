@@ -15,3 +15,13 @@ export function getComponent(type: string): Component {
   }
   return comp;
 }
+
+export function getComponentSafe(type: string | undefined): Component | null {
+  if (!type || !registry[type]) return null;
+  return registry[type];
+}
+
+export function hasRegisteredComponent(type: string | undefined): boolean {
+  if (!type) return false;
+  return !!registry[type];
+}

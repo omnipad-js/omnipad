@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ConfigTreeNode } from '@omnipad/core';
-import { getComponent } from '../utils/componentRegistry';
+import { getComponent, getComponentSafe } from '../utils/componentRegistry';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -9,8 +9,18 @@ const props = defineProps<{
 
 const renderNodes = computed(() => {
   return (props.nodes || []).map((node) => {
-    const component = getComponent(node.config?.baseType || node.type);
+    // 尝试获取最匹配的组件
+    let component = getComponentSafe(node.type);
 
+    // 如果失败，尝试回退到基础类型 (例如自定义摇杆回退到普通摇杆)
+    if (!component && node.config?.baseType) {
+      component = getComponentSafe(node.config.baseType);
+    }
+
+    // 如果依然失败，调用原有的 getComponent 拿到警告占位符
+    if (!component) {
+      component = getComponent(node.type);
+    }
     return {
       node,
       component,

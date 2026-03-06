@@ -18,4 +18,4 @@ registerComponent(CMP_TYPES.D_PAD, VirtualDPad);
 
 export { InputZone, RootLayer, TargetZone, VirtualButton, VirtualDPad, VirtualTrackpad };
 
-export { registerComponent };
+export * from './utils/componentRegistry';
