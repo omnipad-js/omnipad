@@ -91,13 +91,15 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     const radiusX = rect.width / 2;
     const radiusY = rect.height / 2;
 
-    let normX = (e.clientX - centerX) / radiusX;
-    let normY = (e.clientY - centerY) / radiusY;
+    const normX = (e.clientX - centerX) / radiusX;
+    const normY = (e.clientY - centerY) / radiusY;
 
     // 验证触发点位置；若超出边界，则重置触发点位置 / Verify the trigger point location; if it is out of bounds, reset it.
     if (validate) {
-      if (normX != clamp(normX, -1, 1)) normX = 0;
-      if (normY != clamp(normY, -1, 1)) normY = 0;
+      if (normX != clamp(normX, -1, 1) || normY != clamp(normY, -1, 1)) {
+        this.setState({ vector: { x: 0, y: 0 } });
+        return;
+      }
     }
 
     // 更新内部 vector 状态供适配层渲染浮标 / Update vector for floating stick rendering
