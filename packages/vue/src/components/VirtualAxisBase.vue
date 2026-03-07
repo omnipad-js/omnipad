@@ -70,9 +70,20 @@ const stickStyle = computed(() => {
 <style scoped>
 .omnipad-axis-base {
   position: relative;
+  box-sizing: border-box;
+  pointer-events: auto;
 
   /* for Container Queries */
   container-type: size;
+}
+
+.omnipad-axis-bg {
+  box-sizing: border-box;
+  border-color: var(--omnipad-axis-base-border-color);
+  border-radius: var(--omnipad-axis-base-border-radius);
+  border-style: var(--omnipad-axis-base-border-style);
+  border-width: var(--omnipad-axis-base-border-width);
+  background: var(--omnipad-axis-base-bg);
 }
 
 .omnipad-axis-bg,
