@@ -60,7 +60,7 @@ const saveConfig = () => {
   console.log('[Playground] Profile Serialized from Registry.');
 };
 
-import demoRaw from './profiles/multiroot.json';
+import demoRaw from './profiles/joystick.json';
 onMounted(() => {
   InputManager.getInstance().init();
   jsonText.value = JSON.stringify(demoRaw, null, 2);
