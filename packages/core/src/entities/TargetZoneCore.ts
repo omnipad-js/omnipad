@@ -129,7 +129,7 @@ export class TargetZoneCore
     switch (type) {
       case ACTION_TYPES.KEYDOWN:
       case ACTION_TYPES.KEYUP:
-        this.delegates.dispatchKeyboardEvent(type, payload as any);
+        this.delegates.dispatchKeyboardEvent?.(type, payload as any);
         break;
 
       case ACTION_TYPES.MOUSEMOVE:
@@ -184,7 +184,7 @@ export class TargetZoneCore
     const py = rect.top + percentToPx(target.y, rect.height);
 
     // 调用驱动层派发合成事件 / Call DOM driver to dispatch synthetic events
-    this.delegates.dispatchPointerEventAtPos(pointerType, px, py, {
+    this.delegates.dispatchPointerEventAtPos?.(pointerType, px, py, {
       button: payload.button ?? 0,
       buttons: this.state.isPointerDown ? 1 : 0,
       pressure: this.state.isPointerDown ? 0.5 : 0,
@@ -205,7 +205,7 @@ export class TargetZoneCore
     const py = rect.top + percentToPx(this.state.position.y, rect.height);
 
     // 发起焦点夺回请求 / Send request of focus reclaim
-    this.delegates.reclaimFocusAtPos(px, py, () => this.triggerFocusFeedback());
+    this.delegates.reclaimFocusAtPos?.(px, py, () => this.triggerFocusFeedback());
   }
 
   /**

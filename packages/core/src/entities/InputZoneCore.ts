@@ -70,7 +70,7 @@ export class InputZoneCore
     });
 
     // 更新状态后运行动态控件按下事件 / Run the dynamic control pointerdown event after updating the state
-    this.delegates.dynamicWidgetPointerDown(e);
+    this.delegates.dynamicWidgetPointerDown?.(e);
   }
 
   public onPointerMove(e: AbstractPointerEvent): void {
@@ -78,18 +78,18 @@ export class InputZoneCore
     if (!this.state.isDynamicActive) return;
 
     // 运行动态控件移动事件 / Run the dynamic control pointermove event
-    this.delegates.dynamicWidgetPointerMove(e);
+    this.delegates.dynamicWidgetPointerMove?.(e);
   }
 
   public onPointerUp(e: AbstractPointerEvent): void {
     // 在释放之前先运行动态控件抬起事件 / Run the dynamic control pointerup event
-    this.delegates.dynamicWidgetPointerUp(e);
+    this.delegates.dynamicWidgetPointerUp?.(e);
 
     this.reset();
   }
 
   public onPointerCancel(e: AbstractPointerEvent): void {
-    this.delegates.dynamicWidgetPointerCancel(e);
+    this.delegates.dynamicWidgetPointerCancel?.(e);
 
     this.reset();
   }
