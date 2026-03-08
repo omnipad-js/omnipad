@@ -2,21 +2,21 @@
   /* --- Basic Button Variables --- */
   --omnipad-btn-bg: rgba(255, 255, 255, 0.2);
   --omnipad-btn-border-color: rgba(255, 255, 255, 0.4);
-  --omnipad-btn-border-width: 2px;
   --omnipad-btn-border-style: solid;
+  --omnipad-btn-border-width: 2px;
   --omnipad-btn-radius: 8px;
   
   /* --- Button Labels and Fonts --- */
-  --omnipad-btn-label-color: #ffffff;
   --omnipad-btn-font-family: 'Upheaval', 'monacoregular', sans-serif;
   --omnipad-btn-font-size: 18px;
   --omnipad-btn-font-weight: bold;
+  --omnipad-btn-label-color: #ffffff;
 
   /* --- Button Interactive State (Pressed) --- */
   --omnipad-btn-pressed-bg: rgba(255, 186, 67, 0.6);
   --omnipad-btn-pressed-border-color: #ffba43;
-  --omnipad-btn-pressed-scale: 0.92;
   --omnipad-btn-pressed-opacity: 1;
+  --omnipad-btn-pressed-scale: 0.92;
 
   /* --- Button Animation Control --- */
   --omnipad-btn-transition-duration: 0.1s;
@@ -33,7 +33,6 @@
   --omnipad-dpad-bg: rgba(255, 255, 255, 0.05);
   --omnipad-dpad-border-radius: 50%;
 
-
   /* --- Default Cursor Variables --- */
   --omnipad-default-cursor-height: 20px;
   --omnipad-default-cursor-width: 20px;
@@ -48,6 +47,7 @@
   --omnipad-default-cursor-dot-border-radius: 50%;
   --omnipad-default-cursor-dot-border-style: solid;
   --omnipad-default-cursor-dot-border-width: 2px;
+  
   --omnipad-default-cursor-dot-down-background: #ff0000;
   --omnipad-default-cursor-dot-down-scale: 0.8;
 
@@ -68,6 +68,22 @@
   /* --- Focus Variables --- */
   --omnipad-focus-color: rgba(255, 186, 67, 0.8);
   --omnipad-focus-bg-color: rgba(100, 200, 255, 0.05);
+
+  /* --- Joystick Variables --- */
+  --omnipad-joystick-base-border-color: rgba(255, 255, 255, 0.4);
+  --omnipad-joystick-base-border-radius: 50%;
+  --omnipad-joystick-base-border-style: solid;
+  --omnipad-joystick-base-border-width: 2px;
+  --omnipad-joystick-base-bg: rgba(255, 255, 255, 0.2);
+
+  --omnipad-default-joystick-stick-height-scaler: 0.5;
+  --omnipad-default-joystick-stick-width-scaler: 0.5;
+
+  --omnipad-joystick-btn-bg: rgba(255, 255, 255, 0.2);
+  --omnipad-joystick-btn-border-color: rgba(255, 255, 255, 0.4);
+  --omnipad-joystick-btn-border-style: solid;
+  --omnipad-joystick-btn-border-width: 2px;
+  --omnipad-joystick-btn-radius: 50%;
 
   /* --- Trackpad Variables --- */
   --omnipad-trackpad-bg: rgba(255, 255, 255, 0.05);

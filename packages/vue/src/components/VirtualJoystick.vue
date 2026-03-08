@@ -135,18 +135,19 @@ defineExpose({
 .omnipad-joystick {
   pointer-events: auto;
 
-  --omnipad-axis-base-border-color: rgba(255, 255, 255, 0.4);
-  --omnipad-axis-base-border-radius: 50%;
-  --omnipad-axis-base-border-style: solid;
-  --omnipad-axis-base-border-width: 2px;
-  --omnipad-axis-base-bg: rgba(255, 255, 255, 0.2);
-  --omnipad-default-axis-stick-height-scaler: 0.5;
-  --omnipad-default-axis-stick-width-scaler: 0.5;
+  --omnipad-axis-base-border-color: var(--omnipad-joystick-base-border-color);
+  --omnipad-axis-base-border-radius: var(--omnipad-joystick-base-border-radius);
+  --omnipad-axis-base-border-style: var(--omnipad-joystick-base-border-style);
+  --omnipad-axis-base-border-width: var(--omnipad-joystick-base-border-width);
+  --omnipad-axis-base-bg: var(--omnipad-joystick-base-bg, rgba(255, 255, 255, 0.2));
 
-  --omnipad-btn-bg: rgba(255, 255, 255, 0.2);
-  --omnipad-btn-border-color: rgba(255, 255, 255, 0.4);
-  --omnipad-btn-border-style: solid;
-  --omnipad-btn-border-width: 2px;
-  --omnipad-btn-radius: 50%;
+  --omnipad-default-axis-stick-height-scaler: var(--omnipad-default-joystick-stick-height-scaler, 0.5);
+  --omnipad-default-axis-stick-width-scaler: var(--omnipad-default-joystick-stick-width-scaler, 0.5);
+
+  --omnipad-btn-bg: var(--omnipad-joystick-btn-bg, rgba(255, 255, 255, 0.2));
+  --omnipad-btn-border-color: var(--omnipad-joystick-btn-border-color);
+  --omnipad-btn-border-style: var(--omnipad-joystick-btn-border-style);
+  --omnipad-btn-border-width: var(--omnipad-joystick-btn-border-width);
+  --omnipad-btn-radius: var(--omnipad-joystick-btn-radius);
 }
 </style>
