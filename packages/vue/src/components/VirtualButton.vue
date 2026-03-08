@@ -24,7 +24,7 @@ interface VirtualButtonProps {
   /** The ID (CID) of the TargetZone this button sends signals to, usually global ID. */
   targetStageId?: string;
 
-  /** Keyboard or Mouse event metadata to be emitted when triggered. */
+  /** Keyboard or mouse event metadata to be emitted when triggered. */
   mapping?: ButtonConfig['mapping'];
 
   /** Spatial layout configuration relative to its parent zone. */

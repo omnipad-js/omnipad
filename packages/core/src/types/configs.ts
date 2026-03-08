@@ -43,7 +43,7 @@ export interface BaseConfig {
   baseType: string;
   /** CID of the parent component. Root components have no parentId. */
   parentId?: string;
-  /** Spatial layout settings. */
+  /** Spatial layout configuration relative to its parent zone. */
   layout: LayoutBox;
 }
 
@@ -52,7 +52,7 @@ export interface BaseConfig {
  */
 export interface ButtonConfig extends BaseConfig {
   baseType: typeof CMP_TYPES.BUTTON;
-  /** Visual text displayed on the button. */
+  /** The text or symbol displayed on the button surface. */
   label?: string;
   /** CID of the TargetZone where signals should be dispatched. */
   targetStageId?: string;
@@ -65,9 +65,9 @@ export interface ButtonConfig extends BaseConfig {
  */
 export interface TrackpadConfig extends BaseConfig {
   baseType: typeof CMP_TYPES.TRACKPAD;
-  /** Label displayed on the trackpad */
+  /** The text or symbol displayed on the trackpad surface. */
   label?: string;
-  /** Simulation sensitivity, e.g. 0.5 - 2.0 */
+  /** Determines the mapping ratio between the physical displacement of the trackpad and the movement of the screen cursor. */
   sensitivity?: number;
   /** CID of the TargetZone where signals should be dispatched. */
   targetStageId?: string;
@@ -91,27 +91,23 @@ export interface DPadConfig extends BaseConfig {
   };
   /** Determines the minimum travel distance required to trigger a direction. */
   threshold?: number;
-  /** * Controls the visibility of the internal floating feedback handle (stick).
-   * * When true, an indicator will move within the D-pad area to provide
-   * visual feedback of the current input position.
-   * * @defaultValue false
-   */
+  /* Controls the visibility of the internal floating feedback handle (stick). */
   showStick?: boolean;
 }
 
 export interface JoystickConfig extends BaseConfig {
   baseType: typeof CMP_TYPES.JOYSTICK;
-  /** Label displayed on the joystick */
+  /** The text or symbol displayed on the stick button surface. */
   label?: string;
   /** CID of the TargetZone where signals should be dispatched. */
   targetStageId?: string;
   /** Determines the minimum travel distance required to trigger a direction. */
   threshold?: number;
-  /** Enable cursor displacement simulation */
+  /** Whether enable cursor displacement simulation. */
   cursorMode?: boolean;
-  /** Simulation sensitivity, e.g. 0.5 - 2.0 */
+  /** Determines the mapping velocity between the physical displacement of the joystick and the movement of the screen cursor. */
   cursorSensitivity?: number;
-  /** Defines the specific actions or key signals emitted for each cardinal direction. */
+  /** Defines the specific actions or key signals emitted for each cardinal direction and stick button. */
   mapping?: {
     up?: ActionMapping;
     down?: ActionMapping;
@@ -127,7 +123,7 @@ export interface JoystickConfig extends BaseConfig {
  */
 export interface InputZoneConfig extends BaseConfig {
   baseType: typeof CMP_TYPES.INPUT_ZONE;
-  /** If true, attempts to regain focus for the target stage when touched. */
+  /** If true, prevents the browser focus from leaving the game area when touching this zone. */
   preventFocusLoss?: boolean;
   /**
    * The CID of a child component intended to be used as a dynamic (floating) widget.
@@ -143,7 +139,7 @@ export interface TargetZoneConfig extends BaseConfig {
   baseType: typeof CMP_TYPES.TARGET_ZONE;
   /** Whether to render a visual virtual cursor. */
   cursorEnabled?: boolean;
-  /** Time in milliseconds before the cursor auto-hides after inactivity. 0 to disable. */
+  /** Delay in milliseconds before the virtual cursor auto-hides after inactivity (0 to disable). */
   cursorAutoDelay?: number;
 }
 

@@ -23,7 +23,7 @@ interface InputZoneProps {
   /** Unique configuration ID (CID) for this zone. Used for profile serialization. */
   widgetId?: string;
 
-  /** Spatial layout configuration (position, size, anchor). */
+  /** Spatial layout configuration relative to its parent zone. */
   layout?: LayoutBox;
 
   /** If true, prevents the browser focus from leaving the game area when touching this zone. */

@@ -13,7 +13,7 @@ import VirtualLayerBase from './VirtualLayerBase.vue';
 import { computed } from 'vue';
 
 const props = defineProps<{
-  /** The runtime tree node for auto-configuration. */
+  /** The runtime tree node for automatic setup. */
   treeNode?: ConfigTreeNode;
 
   /** Unique configuration ID (CID) for this layer. Used for profile serialization. */

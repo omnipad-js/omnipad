@@ -24,7 +24,7 @@ interface TargetZoneProps {
   /** Unique configuration ID (CID) for this zone. Used for profile serialization. */
   widgetId?: string;
 
-  /** Whether the virtual visual cursor is enabled for this stage. */
+  /** Whether to render a visual virtual cursor. */
   cursorEnabled?: boolean;
 
   /** Delay in milliseconds before the virtual cursor auto-hides after inactivity (0 to disable). */

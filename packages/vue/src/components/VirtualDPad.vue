@@ -26,14 +26,11 @@ interface VirtualDPadProps {
   /** The ID (CID) of the TargetZone this D-pad sends signals to, usually global ID. */
   targetStageId?: string;
 
-  /**
-   * Mapping definitions for the 4 cardinal directions.
-   * Each direction requires a standard ActionMapping object.
-   */
+  /** Defines the specific actions or key signals emitted for each cardinal direction. */
   mapping?: DPadConfig['mapping'];
 
   /**
-   * Determines the minimum travel distance (0.0 to 1.0) required to trigger a key signal.
+   * Determines the minimum travel distance required to trigger a direction.
    * @default 0.3
    */
   threshold?: number;

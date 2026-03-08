@@ -15,17 +15,34 @@ import VirtualAxisBase from './VirtualAxisBase.vue';
 import VirtualButtonBase from './VirtualButtonBase.vue';
 
 interface VirtualJoystickProps {
+  /** The runtime tree node for automatic setup. */
   treeNode?: ConfigTreeNode;
+
+  /** Unique configuration ID (CID) for this joystick. Used for profile serialization. */
   widgetId?: string;
+
+  /** The text or symbol displayed on the stick button surface. */
   label?: string;
+
+  /** The ID (CID) of the TargetZone this trackpad sends signals to. */
   targetStageId?: string;
+
+  /** Determines the minimum travel distance required to trigger a direction. */
   threshold?: number;
+
+  /** Whether enable cursor displacement simulation. */
   cursorMode?: {
     type: boolean;
     default: undefined;
   };
+
+  /** Determines the mapping velocity between the physical displacement of the joystick and the movement of the screen cursor. */
   cursorSensitivity?: number;
+
+  /** Defines the specific actions or key signals emitted for each cardinal direction and stick button. */
   mapping?: JoystickConfig['mapping'];
+
+  /** Spatial layout configuration relative to its parent zone. */
   layout?: LayoutBox;
 }
 
