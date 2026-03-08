@@ -61,8 +61,8 @@ export class TrackpadCore
     this.gesture = new GestureRecognizer({
       // Requirement: Single tap -> Click / 需求：轻点 -> 点击
       onTap: () => {
-        this.emitter.press();
-        this.emitter.release(true);
+        this.setState({ isPressed: true });
+        this.emitter.tap();
       },
 
       // Requirement: Double-tap & Hold -> Drag / 需求：双击并按住 -> 拖拽开始
