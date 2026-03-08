@@ -20,9 +20,11 @@
       "type": "d-pad",
       "parentId": "$left-pad",
       "config": {
-        "showStick": true,
         "threshold": 0.3,
         "mapping": {
+          "up": {
+            "code": "ArrowUp"
+          },
           "down": {
             "code": "ArrowDown"
           },
@@ -57,42 +59,27 @@
     },
     {
       "id": "node_2",
-      "type": "button",
+      "type": "joystick",
       "parentId": "$right-pad",
       "config": {
-        "label": "SPACE",
-        "mapping": {
-          "code": "Space"
-        },
+        "threshold": 0.2,
+        "cursorMode": true,
+        "cursorSensitivity": 2,
         "targetStageId": "$ruffle-player",
+        "mapping": {
+          "stick": {
+            "type": "mouse",
+            "button": 0
+          }
+        },
         "layout": {
-          "left": "30%",
+          "left": "50%",
           "top": "70%",
-          "width": "80px",
-          "height": "80px",
+          "width": "150px",
+          "height": "150px",
           "anchor": "center"
         },
-        "baseType": "button"
-      }
-    },
-    {
-      "id": "node_3",
-      "type": "button",
-      "parentId": "$right-pad",
-      "config": {
-        "label": "UP",
-        "mapping": {
-          "code": "ArrowUp"
-        },
-        "targetStageId": "$ruffle-player",
-        "layout": {
-          "left": "70%",
-          "top": "70%",
-          "width": "80px",
-          "height": "80px",
-          "anchor": "center"
-        },
-        "baseType": "button"
+        "baseType": "joystick"
       }
     }
   ]
