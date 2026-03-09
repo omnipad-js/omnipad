@@ -1,4 +1,5 @@
 import { AnchorPoint, FlexibleLength, CMP_TYPES } from '.';
+import { GamepadMappingConfig } from './gamepad';
 import { ActionMapping } from './keys';
 
 /**
@@ -182,6 +183,8 @@ export interface GamepadProfile {
   };
   /** List of all components in the profile. Hierarchies are defined via parentId. */
   items: FlatConfigItem[];
+  
+  gamepadMapping?: GamepadMappingConfig;
 }
 
 /**

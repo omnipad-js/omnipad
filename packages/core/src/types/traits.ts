@@ -109,3 +109,9 @@ export interface IDependencyBindable {
    */
   bindDelegate(key: string, delegate: AnyFunction): void;
 }
+
+export interface IProgrammatic {
+  triggerDown?(): void;
+  triggerUp?(): void;
+  triggerVector?(x: number, y: number): void;
+}

@@ -2,6 +2,7 @@ import { CONTEXT, KEYS, CMP_TYPES, ACTION_TYPES } from './types';
 
 export * from './types';
 
+export { GamepadManager } from './gamepadManager';
 export { InputManager } from './imputManager';
 export { Registry } from './registry';
 

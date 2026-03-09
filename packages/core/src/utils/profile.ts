@@ -1,5 +1,12 @@
 import { generateUID, isGlobalID } from './id';
-import { AnyConfig, ConfigTreeNode, FlatConfigItem, GamepadProfile } from '../types';
+import {
+  AnyConfig,
+  ConfigTreeNode,
+  FlatConfigItem,
+  GamepadMappingConfig,
+  GamepadProfile,
+  StandardButton,
+} from '../types';
 import { Registry } from '../registry';
 import { BaseEntity } from '../entities/BaseEntity';
 
@@ -44,10 +51,19 @@ export function parseProfileJson(raw: any): GamepadProfile {
     };
   });
 
+  // 4. 实体手柄配置
+  const gamepadMapping = raw.gamepadMapping;
+
   return {
     meta,
     items,
+    gamepadMapping,
   };
+}
+
+export interface ParsedProfileForest {
+  roots: Record<string, ConfigTreeNode>;
+  runtimeGamepadMapping?: GamepadMappingConfig;
 }
 
 /**
@@ -57,8 +73,8 @@ export function parseProfileJson(raw: any): GamepadProfile {
  * @param profile - The normalized profile data.
  * @returns A record map of root nodes, keyed by their original configuration ID.
  */
-export function parseProfileTrees(profile: GamepadProfile): Record<string, ConfigTreeNode> {
-  const { items } = profile;
+export function parseProfileTrees(profile: GamepadProfile): ParsedProfileForest {
+  const { items, gamepadMapping } = profile;
 
   // 1. 建立 CID -> UID 的映射表
   // 保证在此次解析周期内，同一个 CID 永远映射到同一个 UID，处理 ID 引用关系
@@ -73,6 +89,26 @@ export function parseProfileTrees(profile: GamepadProfile): Record<string, Confi
   // 2. 预先扫描所有项
   // 这一步是为了确保“后面引用的 ID”（如 targetStageId）在递归构建前已获得 UID
   items.forEach((item) => getUid(item.id, item.type));
+
+  // 2a. 实体手柄映射转换
+  const runtimeGamepadMapping: GamepadMappingConfig = {};
+  if (gamepadMapping) {
+    if (gamepadMapping.buttons) {
+      runtimeGamepadMapping.buttons = {};
+      for (const [btn, cid] of Object.entries(gamepadMapping.buttons)) {
+        runtimeGamepadMapping.buttons[btn as StandardButton] = getUid(cid);
+      }
+    }
+    if (gamepadMapping.dpad) {
+      runtimeGamepadMapping.dpad = getUid(gamepadMapping.dpad);
+    }
+    if (gamepadMapping.leftStick) {
+      runtimeGamepadMapping.leftStick = getUid(gamepadMapping.leftStick);
+    }
+    if (gamepadMapping.rightStick) {
+      runtimeGamepadMapping.rightStick = getUid(gamepadMapping.rightStick);
+    }
+  }
 
   // 3. 建立父子关系索引表
   // 优化搜索性能，将 O(n^2) 的树构建转为 O(n)
@@ -128,7 +164,10 @@ export function parseProfileTrees(profile: GamepadProfile): Record<string, Confi
     roots[rootItem.id] = buildNode(rootItem, new Set());
   });
 
-  return roots;
+  return {
+    roots,
+    runtimeGamepadMapping,
+  };
 }
 
 /**
