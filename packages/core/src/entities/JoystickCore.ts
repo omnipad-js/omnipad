@@ -1,5 +1,5 @@
 import { BaseEntity } from './BaseEntity';
-import { IPointerHandler } from '../types/traits';
+import { IPointerHandler, IProgrammatic } from '../types/traits';
 import { JoystickConfig } from '../types/configs';
 import { JoystickState } from '../types/state';
 import { AbstractPointerEvent, CMP_TYPES } from '../types';
@@ -25,16 +25,17 @@ const INITIAL_STATE: JoystickState = {
  */
 export class JoystickCore
   extends BaseEntity<JoystickConfig, JoystickState>
-  implements IPointerHandler
+  implements IPointerHandler, IProgrammatic
 {
   private emitters: {
     up: ActionEmitter;
     down: ActionEmitter;
     left: ActionEmitter;
     right: ActionEmitter;
-    stick: ActionEmitter;
-    mouse: ActionEmitter;
   };
+
+  private stickEmitter: ActionEmitter;
+  private cursorEmitter: ActionEmitter;
 
   private gesture: GestureRecognizer;
   private ticker: ReturnType<typeof createTicker>;
@@ -52,23 +53,24 @@ export class JoystickCore
       down: new ActionEmitter(target, m.down),
       left: new ActionEmitter(target, m.left),
       right: new ActionEmitter(target, m.right),
-      stick: new ActionEmitter(target, m.stick),
-      mouse: new ActionEmitter(target, { type: 'mouse' }),
     };
+    this.stickEmitter = new ActionEmitter(target, m.stick);
+    this.cursorEmitter = new ActionEmitter(target, { type: 'mouse' });
 
     // 2. 初始化手势识别器（用于杆头点击 L3）/ Gesture recognizer for stick-head tap
     this.gesture = new GestureRecognizer({
-      onTap: () => {
+      onTap: async () => {
         this.setState({ isPressed: true });
-        this.emitters.stick.tap();
+        await this.stickEmitter.tap();
+        this.setState({ isPressed: false });
       },
       onDoubleTapHoldStart: () => {
         this.setState({ isPressed: true });
-        this.emitters.stick.press();
+        this.stickEmitter.press();
       },
       onDoubleTapHoldEnd: () => {
         this.setState({ isPressed: false });
-        this.emitters.stick.release(false);
+        this.stickEmitter.release(false);
       },
     });
 
@@ -92,19 +94,21 @@ export class JoystickCore
   public onPointerDown(e: AbstractPointerEvent): void {
     this.setState({ isActive: true, pointerId: e.pointerId, vector: { x: 0, y: 0 } });
     this.gesture.onPointerDown(e.clientX, e.clientY);
+  }
+
+  public onPointerMove(e: AbstractPointerEvent): void {
+    if (!this.state.isActive || e.pointerId !== this.state.pointerId) return;
+    this.gesture.onPointerMove(e.clientX, e.clientY);
 
     // 如果开启了光标模拟，启动 Ticker / Start cursor ticker if enabled
     if (this.config.cursorMode) {
       this.ticker.start();
     }
-  }
-
-  public onPointerMove(e: AbstractPointerEvent): void {
-    this.gesture.onPointerMove(e.clientX, e.clientY);
     this.throttledUpdate(e);
   }
 
-  public onPointerUp(): void {
+  public onPointerUp(e: AbstractPointerEvent): void {
+    if (!this.state.isActive || e.pointerId !== this.state.pointerId) return;
     this.gesture.onPointerUp();
     this.handleRelease();
   }
@@ -119,7 +123,7 @@ export class JoystickCore
    * Clean up pointer capture and reset interaction state.
    */
   private handleRelease() {
-    this.setState(INITIAL_STATE);
+    this.setState({ isActive: false, pointerId: null, vector: { x: 0, y: 0 } });
 
     this.ticker.stop();
 
@@ -169,7 +173,7 @@ export class JoystickCore
    */
   private handleCursorTick() {
     const { vector, isActive } = this.state;
-    if (!isActive || !this.config.cursorMode || !this.gesture.hasMoved) return;
+    if (!isActive || !this.config.cursorMode) return;
 
     // 根据向量和灵敏度计算每帧的偏移增量
     // Calculate per-frame delta based on vector and sensitivity
@@ -181,7 +185,7 @@ export class JoystickCore
 
     if (Math.abs(delta.x) > 0 || Math.abs(delta.y) > 0) {
       // mouse 发射器发送 move 信号
-      this.emitters.mouse.move({ delta });
+      this.cursorEmitter.move({ delta });
     }
   }
 
@@ -219,9 +223,12 @@ export class JoystickCore
   // --- IResettable Implementation ---
 
   public reset(): void {
+    this.setState(INITIAL_STATE);
     this.gesture.reset();
 
     this.handleRelease();
+    this.stickEmitter.reset();
+    this.cursorEmitter.reset();
   }
 
   public override updateConfig(newConfig: Partial<JoystickConfig>): void {
@@ -233,7 +240,35 @@ export class JoystickCore
     this.emitters.down.update(target, m.down);
     this.emitters.left.update(target, m.left);
     this.emitters.right.update(target, m.right);
-    this.emitters.stick.update(target, m.stick);
-    this.emitters.stick.update(target);
+    this.stickEmitter.update(target, m.stick);
+    this.cursorEmitter.update(target);
+  }
+
+  // --- IProgrammatic Implementation ---
+
+  public triggerDown(): void {
+    if (this.state.isPressed) return;
+    this.setState({ isActive: true, isPressed: true });
+    this.stickEmitter.press();
+  }
+
+  public triggerUp(): void {
+    if (!this.state.isPressed) return;
+    this.setState({ isActive: false, isPressed: false });
+    this.stickEmitter.release(true);
+  }
+
+  triggerVector(x: number, y: number): void {
+    const vector = { x, y };
+    const deadzone = this.config.threshold ?? 0.3;
+    if (Math.abs(x) >= deadzone || Math.abs(y) >= deadzone) {
+      this.setState({ isActive: true, vector });
+      this.handleDigitalKeys(vector);
+      if (this.config.cursorMode) {
+        this.ticker.start();
+      }
+    } else {
+      this.handleRelease();
+    }
   }
 }
