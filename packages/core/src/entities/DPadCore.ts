@@ -1,5 +1,5 @@
 import { BaseEntity } from './BaseEntity';
-import { IPointerHandler } from '../types/traits';
+import { IPointerHandler, IProgrammatic } from '../types/traits';
 import { DPadConfig } from '../types/configs';
 import { DPadState } from '../types/state';
 import { AbstractPointerEvent, CMP_TYPES } from '../types';
@@ -19,7 +19,10 @@ const INITIAL_STATE: DPadState = {
  * Acts as a spatial distributor that maps a single touch point to 4 independent ActionEmitters.
  * Supports 8-way input by allowing simultaneous activation of orthogonal directions.
  */
-export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPointerHandler {
+export class DPadCore
+  extends BaseEntity<DPadConfig, DPadState>
+  implements IPointerHandler, IProgrammatic
+{
   // 维护四个独立的动作发射器 / Maintain four independent action emitters
   private emitters: {
     up: ActionEmitter;
@@ -58,10 +61,12 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
   }
 
   public onPointerMove(e: AbstractPointerEvent): void {
+    if (!this.state.isActive || e.pointerId !== this.state.pointerId) return;
     this.throttledPointerMove(e);
   }
 
-  public onPointerUp(): void {
+  public onPointerUp(e: AbstractPointerEvent): void {
+    if (!this.state.isActive || e.pointerId !== this.state.pointerId) return;
     this.reset();
   }
 
@@ -99,20 +104,25 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
       }
     }
 
-    // 更新内部 vector 状态供适配层渲染浮标 / Update vector for floating stick rendering
-    this.setState({ vector: { x: clamp(normX, -1, 1), y: clamp(normY, -1, 1) } });
+    const vector = { x: clamp(normX, -1, 1), y: clamp(normY, -1, 1) };
 
-    // 2. 轴向阈值判定 / Axial threshold check
+    // 更新内部 vector 状态供适配层渲染浮标 / Update vector for floating stick rendering
+    this.setState({ vector });
+
+    this.handleDigitalKeys(vector);
+  }
+
+  /**
+   * 将摇杆位置转换为 4/8 方向按键信号
+   */
+  private handleDigitalKeys(v: { x: number; y: number }) {
     const threshold = this.config.threshold ?? 0.3;
 
-    // 3. 驱动 4 个发射器。由于 ActionEmitter 内部有防抖，这里直接调用是安全的
-    // Drive emitters. Internal deduplication in ActionEmitter makes this safe.
-
-    // Y 轴处理
-    if (normY < -threshold) {
+    // Y-axis
+    if (v.y < -threshold) {
       this.emitters.up.press();
       this.emitters.down.release();
-    } else if (normY > threshold) {
+    } else if (v.y > threshold) {
       this.emitters.down.press();
       this.emitters.up.release();
     } else {
@@ -120,11 +130,11 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
       this.emitters.down.release();
     }
 
-    // X 轴处理
-    if (normX < -threshold) {
+    // X-axis
+    if (v.x < -threshold) {
       this.emitters.left.press();
       this.emitters.right.release();
-    } else if (normX > threshold) {
+    } else if (v.x > threshold) {
       this.emitters.right.press();
       this.emitters.left.release();
     } else {
@@ -155,5 +165,18 @@ export class DPadCore extends BaseEntity<DPadConfig, DPadState> implements IPoin
     this.emitters.down.update(this.config.targetStageId, this.config.mapping?.down);
     this.emitters.left.update(this.config.targetStageId, this.config.mapping?.left);
     this.emitters.right.update(this.config.targetStageId, this.config.mapping?.right);
+  }
+
+  // --- IProgrammatic Implementation ---
+
+  triggerVector(x: number, y: number): void {
+    const vector = { x, y };
+    const deadzone = this.config.threshold ?? 0.3;
+    if (Math.abs(x) >= deadzone || Math.abs(y) >= deadzone) {
+      this.setState({ isActive: true, vector });
+      this.handleDigitalKeys(vector);
+    } else {
+      this.reset();
+    }
   }
 }

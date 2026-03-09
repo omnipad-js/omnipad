@@ -73,8 +73,8 @@ export class GamepadManager {
    */
   public setConfig(config: GamepadMappingConfig) {
     this.config = config;
-  }  
-  
+  }
+
   /** Return the current gamepad mapping configuration. */
   public getConfig(): Readonly<GamepadMappingConfig | null> {
     return this.config;
