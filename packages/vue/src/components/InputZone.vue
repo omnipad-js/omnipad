@@ -6,11 +6,9 @@ import {
   InputZoneCore,
   InputZoneState,
   LayoutBox,
-  resolveLayoutStyle,
   CMP_TYPES,
-  remap,
-  supportsContainerQueries,
 } from '@omnipad/core';
+import { resolveLayoutStyle, remap, supportsContainerQueries } from '@omnipad/core/utils';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { getComponent } from '../utils/componentRegistry';
 import VirtualLayerBase from './VirtualLayerBase.vue';

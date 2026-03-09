@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { LayoutBox, resolveLayoutStyle, supportsContainerQueries, Vec2 } from '@omnipad/core';
+import { LayoutBox, Vec2 } from '@omnipad/core';
+import { resolveLayoutStyle, supportsContainerQueries } from '@omnipad/core/utils';
 
 const props = defineProps<{
   layout?: LayoutBox;

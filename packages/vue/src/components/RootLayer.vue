@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import {
-  ConfigTreeNode,
-  RootLayerCore,
-  BaseConfig,
-  CMP_TYPES,
-  LayoutBox,
-  resolveLayoutStyle,
-} from '@omnipad/core';
+import { ConfigTreeNode, RootLayerCore, BaseConfig, CMP_TYPES, LayoutBox } from '@omnipad/core';
+import { resolveLayoutStyle } from '@omnipad/core/utils';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 import VirtualLayerBase from './VirtualLayerBase.vue';

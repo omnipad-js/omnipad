@@ -7,8 +7,8 @@ import {
   JoystickState,
   LayoutBox,
   CMP_TYPES,
-  supportsContainerQueries,
 } from '@omnipad/core';
+import { supportsContainerQueries } from '@omnipad/core/utils';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 import VirtualAxisBase from './VirtualAxisBase.vue';
@@ -141,8 +141,14 @@ defineExpose({
   --omnipad-axis-base-border-width: var(--omnipad-joystick-base-border-width);
   --omnipad-axis-base-bg: var(--omnipad-joystick-base-bg, rgba(255, 255, 255, 0.2));
 
-  --omnipad-default-axis-stick-height-scaler: var(--omnipad-default-joystick-stick-height-scaler, 0.5);
-  --omnipad-default-axis-stick-width-scaler: var(--omnipad-default-joystick-stick-width-scaler, 0.5);
+  --omnipad-default-axis-stick-height-scaler: var(
+    --omnipad-default-joystick-stick-height-scaler,
+    0.5
+  );
+  --omnipad-default-axis-stick-width-scaler: var(
+    --omnipad-default-joystick-stick-width-scaler,
+    0.5
+  );
 
   --omnipad-btn-bg: var(--omnipad-joystick-btn-bg, rgba(255, 255, 255, 0.2));
   --omnipad-btn-border-color: var(--omnipad-joystick-btn-border-color);

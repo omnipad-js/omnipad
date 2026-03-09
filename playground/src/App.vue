@@ -3,13 +3,8 @@ import { ref, onMounted, computed, onBeforeMount } from 'vue';
 import RufflePlayer from './components/RufflePlayer.vue';
 import ConfigConsole from './components/ConfigConsole.vue';
 import { InputZone, registerComponent } from '@omnipad/vue';
-import {
-  parseProfileJson,
-  parseProfileTrees,
-  exportProfile,
-  InputManager,
-  Registry,
-} from '@omnipad/core';
+import { InputManager, Registry } from '@omnipad/core';
+import { parseProfileJson, parseProfileTrees, exportProfile } from '@omnipad/core/utils';
 import CustomTrackpad from './components/CustomTrackpad.vue';
 
 const jsonText = ref('{}'); // 文本框内容

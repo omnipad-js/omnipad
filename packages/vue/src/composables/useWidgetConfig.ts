@@ -1,5 +1,6 @@
 import { computed, inject, provide, ref, Ref } from 'vue';
-import { BaseConfig, ConfigTreeNode, EntityType, generateUID, CONTEXT } from '@omnipad/core';
+import { BaseConfig, ConfigTreeNode, EntityType, CONTEXT } from '@omnipad/core';
+import { generateUID } from '@omnipad/core/utils';
 
 /**
  * 控件配置整合钩子

@@ -4,10 +4,10 @@ import {
   ICoreEntity,
   ISpatial,
   IPointerHandler,
-  createPointerBridge,
   AnyFunction,
   IDependencyBindable,
 } from '@omnipad/core';
+import { createPointerBridge } from '@omnipad/core/utils';
 
 export function useCoreEntity<T extends ICoreEntity, S>(
   createCore: () => T,

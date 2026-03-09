@@ -10,8 +10,9 @@ export default defineConfig({
   },
   // resolve: {
   //   alias: {
-  //     '@omnipad/core': resolve(__dirname, '../packages/core/src/index.ts'),
-  //     '@omnipad/vue': resolve(__dirname, '../packages/vue/src/index.ts')
+  //     '@omnipad/core': path.resolve(__dirname, '../packages/core/src/index.ts'),
+  //     '@omnipad/core/utils': path.resolve(__dirname, '../packages/core/src/utils/index.ts'),
+  //     '@omnipad/vue': path.resolve(__dirname, '../packages/vue/src/index.ts')
   //   }
   // }
 });

@@ -7,13 +7,15 @@ import {
   TargetZoneConfig,
   TargetZoneCore,
   CMP_TYPES,
+} from '@omnipad/core';
+import {
   resolveLayoutStyle,
   remap,
   supportsContainerQueries,
   dispatchKeyboardEvent,
   dispatchPointerEventAtPos,
   reclaimFocusAtPos,
-} from '@omnipad/core';
+} from '@omnipad/core/utils';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 
