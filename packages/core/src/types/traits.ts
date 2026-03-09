@@ -104,15 +104,15 @@ export interface ISignalReceiver {
 
 /**
  * Capability for an entity to receive and store external functional dependencies.
- * 
- * This enables Runtime Dependency Injection (DI), allowing core logic to invoke 
- * host-specific methods (such as DOM event dispatchers or custom triggers) 
+ *
+ * This enables Runtime Dependency Injection (DI), allowing core logic to invoke
+ * host-specific methods (such as DOM event dispatchers or custom triggers)
  * without being tightly coupled to the environment.
  */
 export interface IDependencyBindable {
   /**
    * Binds a functional delegate by a specific identifier key.
-   * 
+   *
    * @param key - The unique lookup identifier for the dependency (e.g., 'domDispatcher').
    * @param delegate - The function implementation provided by the adapter layer.
    */
@@ -121,9 +121,9 @@ export interface IDependencyBindable {
 
 /**
  * Contract for widgets that support programmatic control.
- * 
- * This interface allows external systems—such as a Physical Gamepad Manager or 
- * automation scripts—to directly drive the state and behavior of a widget, 
+ *
+ * This interface allows external systems—such as a Physical Gamepad Manager or
+ * automation scripts—to directly drive the state and behavior of a widget,
  * bypassing native DOM pointer events.
  */
 export interface IProgrammatic {
@@ -142,7 +142,7 @@ export interface IProgrammatic {
   /**
    * Manually updates the directional input vector of the widget.
    * Primarily used for Joystick or D-Pad components.
-   * 
+   *
    * @param x - The horizontal component, normalized between -1.0 and 1.0.
    * @param y - The vertical component, normalized between -1.0 and 1.0.
    */

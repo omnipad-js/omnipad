@@ -68,9 +68,9 @@ export function parseProfileJson(raw: any): GamepadProfile {
 export interface ParsedProfileForest {
   /** Root nodes indexed by their original Config ID. */
   roots: Record<string, ConfigTreeNode>;
-  
-  /** 
-   * Processed gamepad mapping where all CIDs have been 
+
+  /**
+   * Processed gamepad mapping where all CIDs have been
    * translated into unique runtime UIDs.
    */
   runtimeGamepadMapping: GamepadMappingConfig;
@@ -186,9 +186,14 @@ export function parseProfileTrees(profile: GamepadProfile): ParsedProfileForest 
  *
  * @param meta - Metadata for the exported profile.
  * @param rootUid - The Entity ID of the node to be treated as the root.
+ * @param runtimeGamepadMapping - The current mapping from GamepadManager (using UIDs).
  * @returns A flat GamepadProfile ready for storage.
  */
-export function exportProfile(meta: GamepadProfile['meta'], rootUids?: string[]): GamepadProfile {
+export function exportProfile(
+  meta: GamepadProfile['meta'],
+  rootUids?: string[],
+  runtimeGamepadMapping?: GamepadMappingConfig,
+): GamepadProfile {
   const registry = Registry.getInstance();
   let targetEntities: BaseEntity<any, any>[] = [];
 
@@ -245,8 +250,37 @@ export function exportProfile(meta: GamepadProfile['meta'], rootUids?: string[])
     };
   });
 
+  // 3. 逆向转换 Gamepad 映射表
+  // 将 GamepadManager 里的 UID 映射转回新的 CID 映射
+  const exportedGamepadMapping: GamepadMappingConfig = {};
+
+  if (runtimeGamepadMapping) {
+    if (runtimeGamepadMapping.buttons) {
+      exportedGamepadMapping.buttons = {};
+      for (const [btn, uid] of Object.entries(runtimeGamepadMapping.buttons)) {
+        // 只有当这个 UID 对应的组件也在本次导出的 items 范围内时才保留
+        if (eidToCidMap.has(uid)) {
+          exportedGamepadMapping.buttons[btn as StandardButton] = eidToCidMap.get(uid)!;
+        }
+      }
+    }
+
+    // 转换摇杆指向
+    if (runtimeGamepadMapping.dpad && eidToCidMap.has(runtimeGamepadMapping.dpad)) {
+      exportedGamepadMapping.dpad = eidToCidMap.get(runtimeGamepadMapping.dpad);
+    }
+    if (runtimeGamepadMapping.leftStick && eidToCidMap.has(runtimeGamepadMapping.leftStick)) {
+      exportedGamepadMapping.leftStick = eidToCidMap.get(runtimeGamepadMapping.leftStick);
+    }
+    if (runtimeGamepadMapping.rightStick && eidToCidMap.has(runtimeGamepadMapping.rightStick)) {
+      exportedGamepadMapping.rightStick = eidToCidMap.get(runtimeGamepadMapping.rightStick);
+    }
+  }
+
   return {
     meta,
     items,
+    gamepadMapping:
+      Object.keys(exportedGamepadMapping).length > 0 ? exportedGamepadMapping : undefined,
   };
 }
