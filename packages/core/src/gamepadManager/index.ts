@@ -3,11 +3,15 @@ import { ICoreEntity, IPointerHandler, IProgrammatic } from '../types/traits';
 import { GamepadMappingConfig, StandardButton } from '../types/gamepad';
 
 /**
- * Unique symbol key for the global GameManager instance.
+ * Unique symbol key for the global GameManager instance to ensure
+ * singleton persistence across different modules.
  */
 const GAMEPAD_MANAGER_KEY = Symbol.for('omnipad.gamepad_manager.instance');
 
-// 标准手柄按键索引映射
+/**
+ * Standard Gamepad Button Index Mapping (Standard Mapping).
+ * Maps human-readable button names to browser Gamepad API indices.
+ */
 const BUTTON_MAP: Record<StandardButton, number> = {
   A: 0,
   B: 1,
@@ -27,15 +31,31 @@ const BUTTON_MAP: Record<StandardButton, number> = {
   Right: 15,
 };
 
+/**
+ * GamepadManager
+ *
+ * A singleton service that polls the browser Gamepad API via requestAnimationFrame.
+ * It translates physical hardware inputs into programmatic signals sent to
+ * virtual entities registered in the system.
+ *
+ * Handles:
+ * 1. Button edge detection (Down/Up).
+ * 2. D-Pad to vector conversion.
+ * 3. Analog stick deadzone processing.
+ */
 export class GamepadManager {
   private isRunning = false;
   private config: GamepadMappingConfig | null = null;
 
+  // Stores the state of buttons from the previous frame to detect changes
   // 记录上一帧的状态，用于判定按下/抬起边缘
   private lastButtonStates: boolean[] = [];
 
   private constructor() {}
 
+  /**
+   * Retrieves the global singleton instance of the GamepadManager.
+   */
   public static getInstance(): GamepadManager {
     const globalObj = globalThis as any;
 
@@ -46,34 +66,54 @@ export class GamepadManager {
     return globalObj[GAMEPAD_MANAGER_KEY];
   }
 
+  /**
+   * Updates the current gamepad mapping configuration.
+   *
+   * @param config - The mapping of physical inputs to virtual component IDs (UID).
+   */
   public setConfig(config: GamepadMappingConfig) {
     this.config = config;
   }
 
+  /**
+   * Starts the polling loop and listens for gamepad connection events.
+   */
   public start() {
     if (this.isRunning) return;
     this.isRunning = true;
 
+    // Listen for hardware connection updates / 监听硬件连接更新
     window.addEventListener('gamepadconnected', (e) => {
-      console.log('[Omnipad-Core] Gamepad Connected:', e.gamepad.id);
+      if (import.meta.env?.DEV) {
+        console.log('[Omnipad-Core] Gamepad Connected:', e.gamepad.id);
+      }
     });
 
     window.addEventListener('gamepaddisconnected', () => {
-      console.log('[Omnipad-Core] Gamepad disconnected.');
+      if (import.meta.env?.DEV) {
+        console.log('[Omnipad-Core] Gamepad disconnected.');
+      }
     });
+
     this.loop();
   }
 
+  /**
+   * Stops the polling loop.
+   */
   public stop() {
     this.isRunning = false;
   }
 
+  /**
+   * The core polling loop executing at the browser's refresh rate.
+   */
   private loop = () => {
     if (!this.isRunning) return;
 
     const gamepads = navigator.getGamepads();
 
-    // 简单起见，只取第一个连接的手柄
+    // Get the first available gamepad / 获取第一个有效的手柄
     const pad = Array.from(gamepads).filter((p) => p !== null)[0];
 
     if (pad && this.config) {
@@ -85,6 +125,9 @@ export class GamepadManager {
     requestAnimationFrame(this.loop);
   };
 
+  /**
+   * Process binary button inputs with edge detection.
+   */
   private processButtons(pad: Gamepad) {
     if (!this.config?.buttons) return;
 
@@ -95,7 +138,7 @@ export class GamepadManager {
       const isPressed = pad.buttons[btnIndex].pressed;
       const wasPressed = this.lastButtonStates[btnIndex] || false;
 
-      // 边缘检测 (Edge Detection)
+      // Only trigger if state changed to prevent signal spam / 仅在状态改变时触发，防止信号洪流
       if (isPressed && !wasPressed) {
         this.triggerVirtualEntity(targetCid, 'down');
       } else if (!isPressed && wasPressed) {
@@ -106,36 +149,39 @@ export class GamepadManager {
     });
   }
 
+  /**
+   * Translates physical D-Pad buttons into a normalized vector.
+   */
   private processDPad(pad: Gamepad) {
     const targetUid = this.config?.dpad;
     if (!targetUid) return;
 
-    // 1. 获取实体十字键的原始状态 (Standard Mapping: 12-Up, 13-Down, 14-Left, 15-Right)
+    // Map binary DPAD buttons to axis values (-1, 0, 1) / 将二进制十字键映射为轴向值
     const up = pad.buttons[12]?.pressed ? -1 : 0;
     const down = pad.buttons[13]?.pressed ? 1 : 0;
     const left = pad.buttons[14]?.pressed ? -1 : 0;
     const right = pad.buttons[15]?.pressed ? 1 : 0;
 
-    // 2. 合并为向量
-    const vx = left + right; // 结果为 -1, 0, 或 1
+    const vx = left + right;
     const vy = up + down;
 
-    // 3. 发送给虚拟 D-Pad 或 虚拟摇杆
-    // 它们都实现了 triggerVector(x, y) 契约
     this.triggerVirtualEntity(targetUid, 'vector', { x: vx, y: vy });
   }
 
+  /**
+   * Process analog stick movements with deadzone logic.
+   */
   private processAxes(pad: Gamepad) {
     const deadzone = this.config?.deadzone ?? 0.1;
 
-    // 左摇杆 (Axis 0: X, Axis 1: Y)
+    // Left Stick (Axis 0, 1)
     if (this.config?.leftStick) {
       const x = Math.abs(pad.axes[0]) > deadzone ? pad.axes[0] : 0;
       const y = Math.abs(pad.axes[1]) > deadzone ? pad.axes[1] : 0;
       this.triggerVirtualEntity(this.config.leftStick, 'vector', { x, y });
     }
 
-    // 右摇杆 (Axis 2: X, Axis 3: Y)
+    // Right Stick (Axis 2, 3)
     if (this.config?.rightStick) {
       const x = Math.abs(pad.axes[2]) > deadzone ? pad.axes[2] : 0;
       const y = Math.abs(pad.axes[3]) > deadzone ? pad.axes[3] : 0;
@@ -144,15 +190,24 @@ export class GamepadManager {
   }
 
   /**
-   * 工具：通过 Registry 查找组件，并调用程序化接口
+   * Locates a virtual entity and triggers its programmatic interface.
+   *
+   * @param uid - The Entity ID (UID) of the target.
+   * @param action - The type of trigger ('down', 'up', or 'vector').
+   * @param payload - Optional data for vector movements.
    */
   private triggerVirtualEntity(
     uid: string,
     action: 'down' | 'up' | 'vector',
     payload?: { x: number; y: number },
   ) {
-    const target = Registry.getInstance().getEntity<ICoreEntity & IProgrammatic & IPointerHandler>(uid);
-    if (!target || target.activePointerId) return;
+    const target = Registry.getInstance().getEntity<ICoreEntity & IProgrammatic & IPointerHandler>(
+      uid,
+    );
+
+    // Safety: Ignore hardware input if the component is currently being touched by a finger
+    // 安全机制：如果组件当前正被手指触摸，则忽略硬件手柄的指令，防止输入冲突
+    if (!target || target.activePointerId != null) return;
 
     if (action === 'down' && target.triggerDown) target.triggerDown();
     if (action === 'up' && target.triggerUp) target.triggerUp();

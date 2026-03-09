@@ -61,9 +61,19 @@ export function parseProfileJson(raw: any): GamepadProfile {
   };
 }
 
+/**
+ * The resulting structure after parsing a GamepadProfile.
+ * Contains a map of root nodes and a runtime-ready gamepad mapping table.
+ */
 export interface ParsedProfileForest {
+  /** Root nodes indexed by their original Config ID. */
   roots: Record<string, ConfigTreeNode>;
-  runtimeGamepadMapping?: GamepadMappingConfig;
+  
+  /** 
+   * Processed gamepad mapping where all CIDs have been 
+   * translated into unique runtime UIDs.
+   */
+  runtimeGamepadMapping: GamepadMappingConfig;
 }
 
 /**

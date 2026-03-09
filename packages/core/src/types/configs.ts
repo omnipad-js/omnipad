@@ -183,7 +183,10 @@ export interface GamepadProfile {
   };
   /** List of all components in the profile. Hierarchies are defined via parentId. */
   items: FlatConfigItem[];
-  
+  /**
+   * Global mapping configuration for physical gamepad hardware.
+   * Defines how hardware inputs interact with the virtual components listed in 'items'.
+   */
   gamepadMapping?: GamepadMappingConfig;
 }
 
