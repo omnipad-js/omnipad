@@ -1,6 +1,6 @@
 import { ButtonConfig } from '../types/configs';
 import { ButtonState } from '../types/state';
-import { IPointerHandler } from '../types/traits';
+import { IPointerHandler, IProgrammatic } from '../types/traits';
 import { BaseEntity } from './BaseEntity';
 import { ActionEmitter } from '../utils/action';
 import { AbstractPointerEvent, CMP_TYPES } from '../types';
@@ -16,7 +16,10 @@ const INITIAL_STATE: ButtonState = {
  * Core logic implementation for a button widget.
  * Handles pointer interactions and translates them into keyboard signals for a target stage.
  */
-export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements IPointerHandler {
+export class ButtonCore
+  extends BaseEntity<ButtonConfig, ButtonState>
+  implements IPointerHandler, IProgrammatic
+{
   // 组合一个动作发射器来模拟按钮行为 / compose an ActionEmitter for button simulation
   private emitter: ActionEmitter;
 
@@ -46,7 +49,8 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
     this.emitter.press();
   }
 
-  public onPointerUp(): void {
+  public onPointerUp(e: AbstractPointerEvent): void {
+    if (!this.state.isActive || e.pointerId !== this.state.pointerId) return;
     this.handleRelease(true);
   }
 
@@ -87,5 +91,19 @@ export class ButtonCore extends BaseEntity<ButtonConfig, ButtonState> implements
 
     // 调用发射器发送按键抬起信号 / Send keyup signal by emitter
     this.emitter.release(isNormalRelease);
+  }
+
+  // --- IProgrammatic Implementation ---
+
+  public triggerDown(): void {
+    if (this.state.isPressed) return;
+    this.setState({ isActive: true, isPressed: true });
+    this.emitter.press();
+  }
+
+  public triggerUp(): void {
+    if (!this.state.isPressed) return;
+    this.setState({ isActive: false, isPressed: false });
+    this.emitter.release(true);
   }
 }
