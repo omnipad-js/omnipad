@@ -19,6 +19,8 @@ export interface LayoutBox {
   width?: FlexibleLength;
   /** Height of the component. */
   height?: FlexibleLength;
+  /** Whether equal width and length. (aspect-ratio: 1/1) */
+  isSquare?: boolean;
   /**
    * The alignment point of the component relative to its (left, top) coordinates.
    * @example 'center' will center the component on its position.
