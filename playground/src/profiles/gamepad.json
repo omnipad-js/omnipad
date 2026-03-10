@@ -333,23 +333,26 @@
       }
     }
   ],
-  "gamepadMapping": {
-    "buttons": {
-      "A": "node_9",
-      "B": "node_10",
-      "X": "node_8",
-      "Y": "node_7",
-      "L3": "node_2",
-      "R3": "node_4",
-      "LB": "node_11",
-      "RB": "node_12",
-      "LT": "node_13",
-      "RT": "node_14",
-      "Select": "node_3",
-      "Start": "node_6"
-    },
-    "dpad": "node_1",
-    "leftStick": "node_2",
-    "rightStick": "node_4"
-  }
+  "gamepadMappings": [
+    {},
+    {
+      "buttons": {
+        "A": "node_9",
+        "B": "node_10",
+        "X": "node_8",
+        "Y": "node_7",
+        "L3": "node_2",
+        "R3": "node_4",
+        "LB": "node_11",
+        "RB": "node_12",
+        "LT": "node_13",
+        "RT": "node_14",
+        "Select": "node_3",
+        "Start": "node_6"
+      },
+      "dpad": "node_1",
+      "leftStick": "node_2",
+      "rightStick": "node_4"
+    }
+  ]
 }

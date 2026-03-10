@@ -45,11 +45,11 @@ const BUTTON_MAP: Record<StandardButton, number> = {
  */
 export class GamepadManager {
   private isRunning = false;
-  private config: GamepadMappingConfig | null = null;
+  private config: GamepadMappingConfig[] | null = null;
 
   // Stores the state of buttons from the previous frame to detect changes
   // 记录上一帧的状态，用于判定按下/抬起边缘
-  private lastButtonStates: boolean[] = [];
+  private lastButtonStates: boolean[][] = [];
 
   private constructor() {}
 
@@ -71,12 +71,12 @@ export class GamepadManager {
    *
    * @param config - The mapping of physical inputs to virtual component IDs (UID).
    */
-  public setConfig(config: GamepadMappingConfig) {
+  public setConfig(config: GamepadMappingConfig[]) {
     this.config = config;
   }
 
   /** Return the current gamepad mapping configuration. */
-  public getConfig(): Readonly<GamepadMappingConfig | null> {
+  public getConfig(): Readonly<GamepadMappingConfig[] | null> {
     return this.config;
   }
 
@@ -118,14 +118,18 @@ export class GamepadManager {
 
     const gamepads = navigator.getGamepads();
 
-    // Get the first available gamepad / 获取第一个有效的手柄
-    const pad = Array.from(gamepads).filter((p) => p !== null)[0];
+    this.config?.forEach((mapping, index) => {
+      const pad = gamepads[index]; // Gamepad API 保证 index 是固定的物理插槽
 
-    if (pad && this.config) {
-      this.processButtons(pad);
-      this.processDPad(pad);
-      this.processAxes(pad);
-    }
+      if (pad && pad.connected && mapping) {
+        // 确保状态数组初始化
+        if (!this.lastButtonStates[index]) this.lastButtonStates[index] = [];
+
+        this.processButtons(pad, mapping, index);
+        this.processDPad(pad, mapping);
+        this.processAxes(pad, mapping);
+      }
+    });
 
     requestAnimationFrame(this.loop);
   };
@@ -133,15 +137,15 @@ export class GamepadManager {
   /**
    * Process binary button inputs with edge detection.
    */
-  private processButtons(pad: Gamepad) {
-    if (!this.config?.buttons) return;
+  private processButtons(pad: Gamepad, mapping: GamepadMappingConfig, padIndex: number) {
+    if (!mapping.buttons) return;
 
-    Object.entries(this.config.buttons).forEach(([btnName, targetCid]) => {
+    Object.entries(mapping.buttons).forEach(([btnName, targetCid]) => {
       const btnIndex = BUTTON_MAP[btnName as StandardButton];
       if (btnIndex === undefined || !pad.buttons[btnIndex]) return;
 
       const isPressed = pad.buttons[btnIndex].pressed;
-      const wasPressed = this.lastButtonStates[btnIndex] || false;
+      const wasPressed = this.lastButtonStates[padIndex][btnIndex] || false;
 
       // Only trigger if state changed to prevent signal spam / 仅在状态改变时触发，防止信号洪流
       if (isPressed && !wasPressed) {
@@ -150,15 +154,15 @@ export class GamepadManager {
         this.triggerVirtualEntity(targetCid, 'up');
       }
 
-      this.lastButtonStates[btnIndex] = isPressed;
+      this.lastButtonStates[padIndex][btnIndex] = isPressed;
     });
   }
 
   /**
    * Translates physical D-Pad buttons into a normalized vector.
    */
-  private processDPad(pad: Gamepad) {
-    const targetUid = this.config?.dpad;
+  private processDPad(pad: Gamepad, mapping: GamepadMappingConfig) {
+    const targetUid = mapping?.dpad;
     if (!targetUid) return;
 
     // Map binary DPAD buttons to axis values (-1, 0, 1) / 将二进制十字键映射为轴向值
@@ -176,21 +180,21 @@ export class GamepadManager {
   /**
    * Process analog stick movements with deadzone logic.
    */
-  private processAxes(pad: Gamepad) {
-    const deadzone = this.config?.deadzone ?? 0.1;
+  private processAxes(pad: Gamepad, mapping: GamepadMappingConfig) {
+    const deadzone = mapping?.deadzone ?? 0.1;
 
     // Left Stick (Axis 0, 1)
-    if (this.config?.leftStick) {
+    if (mapping?.leftStick) {
       const x = Math.abs(pad.axes[0]) > deadzone ? pad.axes[0] : 0;
       const y = Math.abs(pad.axes[1]) > deadzone ? pad.axes[1] : 0;
-      this.triggerVirtualEntity(this.config.leftStick, 'vector', { x, y });
+      this.triggerVirtualEntity(mapping.leftStick, 'vector', { x, y });
     }
 
     // Right Stick (Axis 2, 3)
-    if (this.config?.rightStick) {
+    if (mapping?.rightStick) {
       const x = Math.abs(pad.axes[2]) > deadzone ? pad.axes[2] : 0;
       const y = Math.abs(pad.axes[3]) > deadzone ? pad.axes[3] : 0;
-      this.triggerVirtualEntity(this.config.rightStick, 'vector', { x, y });
+      this.triggerVirtualEntity(mapping.rightStick, 'vector', { x, y });
     }
   }
 

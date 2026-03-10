@@ -32,7 +32,7 @@ const loadConfig = () => {
     const raw = JSON.parse(jsonText.value);
     const safeProfile = parseProfileJson(raw);
 
-    const { roots, runtimeGamepadMapping } = parseProfileTrees(safeProfile);
+    const { roots, runtimeGamepadMappings } = parseProfileTrees(safeProfile);
 
     forest.value = roots;
     loadCount.value++;
@@ -41,8 +41,8 @@ const loadConfig = () => {
       Registry.getInstance().getAllEntities().length,
     );
 
-    if (runtimeGamepadMapping) {
-      GamepadManager.getInstance().setConfig(runtimeGamepadMapping);
+    if (runtimeGamepadMappings) {
+      GamepadManager.getInstance().setConfig(runtimeGamepadMappings);
       GamepadManager.getInstance().start();
     } else {
       GamepadManager.getInstance().stop();
@@ -53,12 +53,12 @@ const loadConfig = () => {
 };
 // --- 导出逻辑：同时指定多个根 ---
 const saveConfig = () => {
-  const runtimeGamepadMapping = GamepadManager.getInstance().getConfig();
+  const runtimeGamepadMappings = GamepadManager.getInstance().getConfig();
   const rootIds = ['$left-pad', '$right-pad'];
   const exported = exportProfile(
     { name: 'Flex Export', version: '1.0' },
     rootIds.map((id) => forest.value[id]?.uid).filter(Boolean),
-    runtimeGamepadMapping ?? undefined,
+    runtimeGamepadMappings ?? [],
   );
 
   // 回填到文本框

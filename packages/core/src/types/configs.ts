@@ -192,7 +192,7 @@ export interface GamepadProfile {
    * Global mapping configuration for physical gamepad hardware.
    * Defines how hardware inputs interact with the virtual components listed in 'items'.
    */
-  gamepadMapping?: GamepadMappingConfig;
+  gamepadMappings?: GamepadMappingConfig[];
 }
 
 /**

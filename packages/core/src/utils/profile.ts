@@ -52,12 +52,12 @@ export function parseProfileJson(raw: any): GamepadProfile {
   });
 
   // 4. 实体手柄配置
-  const gamepadMapping = raw.gamepadMapping;
+  const gamepadMappings = raw.gamepadMappings;
 
   return {
     meta,
     items,
-    gamepadMapping,
+    gamepadMappings,
   };
 }
 
@@ -73,7 +73,7 @@ export interface ParsedProfileForest {
    * Processed gamepad mapping where all CIDs have been
    * translated into unique runtime UIDs.
    */
-  runtimeGamepadMapping: GamepadMappingConfig;
+  runtimeGamepadMappings: GamepadMappingConfig[];
 }
 
 /**
@@ -84,7 +84,7 @@ export interface ParsedProfileForest {
  * @returns A record map of root nodes, keyed by their original configuration ID.
  */
 export function parseProfileTrees(profile: GamepadProfile): ParsedProfileForest {
-  const { items, gamepadMapping } = profile;
+  const { items, gamepadMappings } = profile;
 
   // 1. 建立 CID -> UID 的映射表
   // 保证在此次解析周期内，同一个 CID 永远映射到同一个 UID，处理 ID 引用关系
@@ -101,23 +101,30 @@ export function parseProfileTrees(profile: GamepadProfile): ParsedProfileForest 
   items.forEach((item) => getUid(item.id, item.type));
 
   // 2a. 实体手柄映射转换
-  const runtimeGamepadMapping: GamepadMappingConfig = {};
-  if (gamepadMapping) {
-    if (gamepadMapping.buttons) {
-      runtimeGamepadMapping.buttons = {};
-      for (const [btn, cid] of Object.entries(gamepadMapping.buttons)) {
-        runtimeGamepadMapping.buttons[btn as StandardButton] = getUid(cid);
+  const runtimeGamepadMappings: GamepadMappingConfig[] = [];
+  if (gamepadMappings) {
+    gamepadMappings.forEach((mapping) => {
+      const runtimeMapping: GamepadMappingConfig = {};
+
+      if (mapping.buttons) {
+        runtimeMapping.buttons = {};
+        for (const [btn, cid] of Object.entries(mapping.buttons)) {
+          runtimeMapping.buttons[btn as StandardButton] = getUid(cid);
+        }
       }
-    }
-    if (gamepadMapping.dpad) {
-      runtimeGamepadMapping.dpad = getUid(gamepadMapping.dpad);
-    }
-    if (gamepadMapping.leftStick) {
-      runtimeGamepadMapping.leftStick = getUid(gamepadMapping.leftStick);
-    }
-    if (gamepadMapping.rightStick) {
-      runtimeGamepadMapping.rightStick = getUid(gamepadMapping.rightStick);
-    }
+
+      if (mapping.dpad) {
+        runtimeMapping.dpad = getUid(mapping.dpad);
+      }
+      if (mapping.leftStick) {
+        runtimeMapping.leftStick = getUid(mapping.leftStick);
+      }
+      if (mapping.rightStick) {
+        runtimeMapping.rightStick = getUid(mapping.rightStick);
+      }
+
+      runtimeGamepadMappings.push(runtimeMapping);
+    });
   }
 
   // 3. 建立父子关系索引表
@@ -176,7 +183,7 @@ export function parseProfileTrees(profile: GamepadProfile): ParsedProfileForest 
 
   return {
     roots,
-    runtimeGamepadMapping,
+    runtimeGamepadMappings,
   };
 }
 
@@ -192,7 +199,7 @@ export function parseProfileTrees(profile: GamepadProfile): ParsedProfileForest 
 export function exportProfile(
   meta: GamepadProfile['meta'],
   rootUids?: string[],
-  runtimeGamepadMapping?: GamepadMappingConfig,
+  runtimeGamepadMappings?: Readonly<GamepadMappingConfig[]>,
 ): GamepadProfile {
   const registry = Registry.getInstance();
   let targetEntities: BaseEntity<any, any>[] = [];
@@ -252,35 +259,46 @@ export function exportProfile(
 
   // 3. 逆向转换 Gamepad 映射表
   // 将 GamepadManager 里的 UID 映射转回新的 CID 映射
-  const exportedGamepadMapping: GamepadMappingConfig = {};
+  const exportedGamepadMappings: GamepadMappingConfig[] = [];
 
-  if (runtimeGamepadMapping) {
-    if (runtimeGamepadMapping.buttons) {
-      exportedGamepadMapping.buttons = {};
-      for (const [btn, uid] of Object.entries(runtimeGamepadMapping.buttons)) {
-        // 只有当这个 UID 对应的组件也在本次导出的 items 范围内时才保留
-        if (eidToCidMap.has(uid)) {
-          exportedGamepadMapping.buttons[btn as StandardButton] = eidToCidMap.get(uid)!;
+  if (runtimeGamepadMappings) {
+    runtimeGamepadMappings.forEach((mapping) => {
+      const exportedMapping: GamepadMappingConfig = {};
+
+      if (mapping.buttons) {
+        exportedMapping.buttons = {};
+        for (const [btn, uid] of Object.entries(mapping.buttons)) {
+          // 只有当这个 UID 对应的组件也在本次导出的 items 范围内时才保留
+          if (eidToCidMap.has(uid)) {
+            exportedMapping.buttons[btn as StandardButton] = eidToCidMap.get(uid)!;
+          }
         }
       }
-    }
 
-    // 转换摇杆指向
-    if (runtimeGamepadMapping.dpad && eidToCidMap.has(runtimeGamepadMapping.dpad)) {
-      exportedGamepadMapping.dpad = eidToCidMap.get(runtimeGamepadMapping.dpad);
-    }
-    if (runtimeGamepadMapping.leftStick && eidToCidMap.has(runtimeGamepadMapping.leftStick)) {
-      exportedGamepadMapping.leftStick = eidToCidMap.get(runtimeGamepadMapping.leftStick);
-    }
-    if (runtimeGamepadMapping.rightStick && eidToCidMap.has(runtimeGamepadMapping.rightStick)) {
-      exportedGamepadMapping.rightStick = eidToCidMap.get(runtimeGamepadMapping.rightStick);
-    }
+      // 转换摇杆指向
+      if (mapping.dpad && eidToCidMap.has(mapping.dpad)) {
+        exportedMapping.dpad = eidToCidMap.get(mapping.dpad);
+      }
+      if (mapping.leftStick && eidToCidMap.has(mapping.leftStick)) {
+        exportedMapping.leftStick = eidToCidMap.get(mapping.leftStick);
+      }
+      if (mapping.rightStick && eidToCidMap.has(mapping.rightStick)) {
+        exportedMapping.rightStick = eidToCidMap.get(mapping.rightStick);
+      }
+
+      if (Object.keys(exportedMapping).length > 0) {
+        exportedGamepadMappings.push(exportedMapping);
+      } else {
+        // 如果这个手柄的映射都没在导出范围内，可以塞个空对象占位，保持 index 顺序
+        exportedGamepadMappings.push({});
+      }
+    });
   }
 
   return {
     meta,
     items,
-    gamepadMapping:
-      Object.keys(exportedGamepadMapping).length > 0 ? exportedGamepadMapping : undefined,
+    gamepadMappings:
+      Object.keys(exportedGamepadMappings).length > 0 ? exportedGamepadMappings : undefined,
   };
 }
