@@ -42,7 +42,7 @@
         "layout": {
           "left": "60%",
           "top": "70%",
-          "height": "33%",
+          "height": "25%",
           "anchor": "center"
         },
         "baseType": "d-pad"
@@ -53,7 +53,7 @@
       "type": "joystick",
       "parentId": "$left-pad",
       "config": {
-        "label": "L",
+        "label": "L3",
         "threshold": 0.2,
         "cursorMode": false,
         "cursorSensitivity": 1,
@@ -75,7 +75,7 @@
         "layout": {
           "left": "30%",
           "top": "30%",
-          "height": "33%",
+          "height": "25%",
           "anchor": "center"
         },
         "baseType": "joystick"
@@ -94,10 +94,11 @@
         "layout": {
           "left": "80%",
           "top": "30%",
-          "height": "10%",
+          "height": "8%",
           "anchor": "center"
         },
-        "baseType": "button"
+        "baseType": "button",
+        "cssClasses": "round-button"
       }
     },
     {
@@ -118,7 +119,7 @@
       "type": "joystick",
       "parentId": "$right-pad",
       "config": {
-        "label": "R",
+        "label": "R3",
         "threshold": 0.2,
         "cursorMode": true,
         "cursorSensitivity": 2,
@@ -132,7 +133,7 @@
         "layout": {
           "left": "40%",
           "top": "70%",
-          "height": "33%",
+          "height": "25%",
           "anchor": "center"
         },
         "baseType": "joystick"
@@ -146,10 +147,11 @@
         "layout": {
           "left": "60%",
           "top": "30%",
-          "height": "33%",
+          "height": "20%",
           "anchor": "center"
         },
-        "baseType": "input-zone"
+        "baseType": "input-zone",
+        "cssClasses": "round-button"
       }
     },
     {
@@ -165,10 +167,11 @@
         "layout": {
           "left": "20%",
           "top": "30%",
-          "height": "10%",
+          "height": "8%",
           "anchor": "center"
         },
-        "baseType": "button"
+        "baseType": "button",
+        "cssClasses": "round-button"
       }
     },
     {
@@ -179,12 +182,12 @@
         "label": "Y",
         "targetStageId": "$ruffle-player",
         "mapping": {
-          "key": "ArrowDown"
+          "key": "G"
         },
         "layout": {
           "left": "50%",
           "top": "0%",
-          "height": "50%",
+          "height": "60%",
           "anchor": "center"
         },
         "baseType": "button"
@@ -198,12 +201,12 @@
         "label": "X",
         "targetStageId": "$ruffle-player",
         "mapping": {
-          "key": "ArrowUp"
+          "key": "H"
         },
         "layout": {
           "left": "0%",
           "top": "50%",
-          "height": "50%",
+          "height": "60%",
           "anchor": "center"
         },
         "baseType": "button"
@@ -222,7 +225,7 @@
         "layout": {
           "left": "50%",
           "top": "100%",
-          "height": "50%",
+          "height": "60%",
           "anchor": "center"
         },
         "baseType": "button"
@@ -241,7 +244,89 @@
         "layout": {
           "left": "100%",
           "top": "50%",
-          "height": "50%",
+          "height": "60%",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_11",
+      "type": "button",
+      "parentId": "$left-pad",
+      "config": {
+        "label": "LB",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse",
+          "button": 1
+        },
+        "layout": {
+          "left": "20%",
+          "top": "60%",
+          "width": "15%",
+          "height": "15%",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_12",
+      "type": "button",
+      "parentId": "$right-pad",
+      "config": {
+        "label": "RB",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse"
+        },
+        "layout": {
+          "left": "80%",
+          "top": "60%",
+          "width": "15%",
+          "height": "15%",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_13",
+      "type": "button",
+      "parentId": "$left-pad",
+      "config": {
+        "label": "LT",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse",
+          "button": 1
+        },
+        "layout": {
+          "left": "20%",
+          "top": "85%",
+          "width": "15%",
+          "height": "15%",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_14",
+      "type": "button",
+      "parentId": "$right-pad",
+      "config": {
+        "label": "RT",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse"
+        },
+        "layout": {
+          "left": "80%",
+          "top": "85%",
+          "width": "15%",
+          "height": "15%",
           "anchor": "center"
         },
         "baseType": "button"
@@ -256,6 +341,10 @@
       "Y": "node_7",
       "L3": "node_2",
       "R3": "node_4",
+      "LB": "node_11",
+      "RB": "node_12",
+      "LT": "node_13",
+      "RT": "node_14",
       "Select": "node_3",
       "Start": "node_6"
     },
