@@ -9,7 +9,7 @@ const emit = defineEmits(['update:modelValue', 'load', 'save']);
 
 const internalText = ref(props.modelValue);
 
-const availableRoots = ref(['$left-pad', '$right-pad', '$ruffle-player']);
+const availableRoots = ref(['$left-pad', '$ruffle-player', '$right-pad']);
 const selectedRoots = ref<string[]>([]);
 
 const getFriendlyName = (id: string) => {
@@ -93,7 +93,7 @@ watch(
     ></textarea>
     <div class="export-section">
       <div class="checkbox-group">
-      <label>SAVE: </label>
+        <label>SAVE: </label>
         <label v-for="rootId in availableRoots" :key="rootId" class="check-item">
           <input type="checkbox" :value="rootId" v-model="selectedRoots" />
           {{ getFriendlyName(rootId) }}

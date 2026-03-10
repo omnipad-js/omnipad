@@ -131,7 +131,7 @@ onBeforeMount(() => {
           widget-id="$ruffle-player"
           cursor-enabled
           :tree-node="renderPlayer"
-          :key="`player-${loadCount}`"
+          :load-count="loadCount"
         />
       </section>
 

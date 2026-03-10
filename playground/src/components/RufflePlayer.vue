@@ -10,6 +10,7 @@ const props = defineProps<{
   cursorEnabled?: boolean;
   cursorAutoDelay?: number;
   layout?: Record<string, any>;
+  loadCount?: number;
 }>();
 
 const containerRef = ref<HTMLElement | null>(null);
@@ -75,6 +76,7 @@ onMounted(() => {
         :cursor-enabled="cursorEnabled"
         :cursor-auto-delay="cursorAutoDelay"
         :layout="stageLayout"
+        :key="`player-${loadCount}`"
         class="player-overlay"
       >
         <template #cursor="{ isDown }">
