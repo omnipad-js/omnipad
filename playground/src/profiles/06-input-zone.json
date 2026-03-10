@@ -1,0 +1,125 @@
+{
+  "meta": { "name": "InputZone & Dynamic Widgets Configuration Sample", "version": "1.0" },
+  "items": [
+    {
+      "id": "$left-pad",
+      "type": "root-layer",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "baseType": "root-layer"
+      }
+    },
+    {
+      "id": "$right-pad",
+      "type": "root-layer",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "baseType": "root-layer"
+      }
+    },
+    {
+      "id": "node_1",
+      "parentId": "$left-pad",
+      "type": "input-zone",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "dynamicWidgetId": "node_2",
+        "baseType": "input-zone"
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "d-pad",
+      "parentId": "node_1",
+      "config": {
+        "threshold": 0.3,
+        "mapping": {
+          "down": {
+            "code": "ArrowDown"
+          },
+          "left": {
+            "code": "ArrowLeft"
+          },
+          "right": {
+            "code": "ArrowRight"
+          }
+        },
+        "targetStageId": "$ruffle-player",
+        "layout": {
+          "width": "150px",
+          "height": "150px",
+          "anchor": "center"
+        },
+        "baseType": "d-pad"
+      }
+    },
+    {
+      "id": "node_3",
+      "parentId": "$right-pad",
+      "type": "input-zone",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "dynamicWidgetId": "node_4",
+        "baseType": "input-zone"
+      }
+    },
+    {
+      "id": "node_4",
+      "type": "button",
+      "parentId": "node_3",
+      "config": {
+        "label": "FIRE",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "code": "Space"
+        },
+        "layout": {
+          "width": "80px",
+          "height": "80px",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "button",
+      "parentId": "node_3",
+      "config": {
+        "label": "JUMP",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "code": "ArrowUp"
+        },
+        "layout": {
+          "left": "50%",
+          "top": "70%",
+          "width": "80px",
+          "height": "80px",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    }
+  ]
+}

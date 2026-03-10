@@ -170,27 +170,6 @@ body,
   font-family: sans-serif;
 }
 
-.playground-root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-}
-
-.static-trackpad {
-  height: 100%;
-  width: 100%;
-  display: var(--static-trackpad-display, none);
-}
-
-.show-static-trackpad {
-  --static-trackpad-display: show;
-}
-
-.round-button {
-  --omnipad-btn-radius: 50%;
-}
-
 .toolbar {
   height: 50px;
   background: #222;
@@ -293,5 +272,36 @@ body,
 }
 .main-stage {
   background: #000;
+}
+
+/* 自定义样式 */
+
+.playground-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.static-trackpad {
+  height: 100%;
+  width: 100%;
+  display: var(--static-trackpad-display, none);
+}
+
+.show-static-trackpad {
+  --static-trackpad-display: show;
+}
+
+.round-button {
+  --omnipad-btn-radius: 50%;
+}
+
+.red-team {
+  filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(30) brightness(1.2);
+}
+
+.blue-team {
+  filter: brightness(0.5) sepia(1) hue-rotate(190deg) saturate(30) brightness(1.2);
 }
 </style>

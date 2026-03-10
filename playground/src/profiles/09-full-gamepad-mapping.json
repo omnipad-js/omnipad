@@ -1,0 +1,370 @@
+{
+  "meta": {
+    "name": "Full Gamepad Mapping Demo",
+    "version": "1.0"
+  },
+  "items": [
+    {
+      "id": "$left-pad",
+      "type": "root-layer",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "baseType": "root-layer"
+      }
+    },
+    {
+      "id": "node_1",
+      "type": "d-pad",
+      "parentId": "$left-pad",
+      "config": {
+        "showStick": false,
+        "threshold": 0.3,
+        "mapping": {
+          "up": {
+            "code": "ArrowUp"
+          },
+          "down": {
+            "code": "ArrowDown"
+          },
+          "left": {
+            "code": "ArrowLeft"
+          },
+          "right": {
+            "code": "ArrowRight"
+          }
+        },
+        "targetStageId": "$ruffle-player",
+        "layout": {
+          "left": "60%",
+          "top": "70%",
+          "height": "25%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "d-pad"
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "joystick",
+      "parentId": "$left-pad",
+      "config": {
+        "label": "L3",
+        "threshold": 0.2,
+        "cursorMode": false,
+        "cursorSensitivity": 1,
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "up": {
+            "code": "KeyW"
+          },
+          "down": {
+            "code": "KeyS"
+          },
+          "left": {
+            "code": "KeyA"
+          },
+          "right": {
+            "code": "KeyD"
+          }
+        },
+        "layout": {
+          "left": "30%",
+          "top": "30%",
+          "height": "25%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "joystick"
+      }
+    },
+    {
+      "id": "node_3",
+      "type": "button",
+      "parentId": "$left-pad",
+      "config": {
+        "label": "P",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "KeyP"
+        },
+        "layout": {
+          "left": "80%",
+          "top": "30%",
+          "height": "8%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button",
+        "cssClasses": "round-button"
+      }
+    },
+    {
+      "id": "node_4",
+      "type": "button",
+      "parentId": "$left-pad",
+      "config": {
+        "label": "LB",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse",
+          "button": 1
+        },
+        "layout": {
+          "left": "20%",
+          "top": "60%",
+          "width": "15%",
+          "height": "15%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "button",
+      "parentId": "$left-pad",
+      "config": {
+        "label": "LT",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse",
+          "button": 1
+        },
+        "layout": {
+          "left": "20%",
+          "top": "85%",
+          "width": "15%",
+          "height": "15%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "$right-pad",
+      "type": "root-layer",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "baseType": "root-layer"
+      }
+    },
+    {
+      "id": "node_6",
+      "type": "joystick",
+      "parentId": "$right-pad",
+      "config": {
+        "label": "R3",
+        "threshold": 0.2,
+        "cursorMode": true,
+        "cursorSensitivity": 2,
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "stick": {
+            "type": "mouse",
+            "button": 0
+          }
+        },
+        "layout": {
+          "left": "40%",
+          "top": "70%",
+          "height": "25%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "joystick"
+      }
+    },
+    {
+      "id": "node_7",
+      "type": "input-zone",
+      "parentId": "$right-pad",
+      "config": {
+        "layout": {
+          "left": "60%",
+          "top": "30%",
+          "height": "20%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "input-zone",
+        "cssClasses": "round-button"
+      }
+    },
+    {
+      "id": "node_8",
+      "type": "button",
+      "parentId": "$right-pad",
+      "config": {
+        "label": "S",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": " "
+        },
+        "layout": {
+          "left": "20%",
+          "top": "30%",
+          "height": "8%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button",
+        "cssClasses": "round-button"
+      }
+    },
+    {
+      "id": "node_9",
+      "type": "button",
+      "parentId": "$right-pad",
+      "config": {
+        "label": "RB",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse"
+        },
+        "layout": {
+          "left": "80%",
+          "top": "60%",
+          "width": "15%",
+          "height": "15%",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_10",
+      "type": "button",
+      "parentId": "$right-pad",
+      "config": {
+        "label": "RT",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "type": "mouse"
+        },
+        "layout": {
+          "left": "80%",
+          "top": "85%",
+          "width": "15%",
+          "height": "15%",
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_11",
+      "type": "button",
+      "parentId": "node_7",
+      "config": {
+        "label": "Y",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "G"
+        },
+        "layout": {
+          "left": "50%",
+          "top": "0%",
+          "height": "60%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_12",
+      "type": "button",
+      "parentId": "node_7",
+      "config": {
+        "label": "X",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "H"
+        },
+        "layout": {
+          "left": "0%",
+          "top": "50%",
+          "height": "60%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_13",
+      "type": "button",
+      "parentId": "node_7",
+      "config": {
+        "label": "A",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": ","
+        },
+        "layout": {
+          "left": "50%",
+          "top": "100%",
+          "height": "60%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    },
+    {
+      "id": "node_14",
+      "type": "button",
+      "parentId": "node_7",
+      "config": {
+        "label": "B",
+        "targetStageId": "$ruffle-player",
+        "mapping": {
+          "key": "."
+        },
+        "layout": {
+          "left": "100%",
+          "top": "50%",
+          "height": "60%",
+          "isSquare": true,
+          "anchor": "center"
+        },
+        "baseType": "button"
+      }
+    }
+  ],
+  "gamepadMappings": [
+    {},
+    {
+      "buttons": {
+        "A": "node_13",
+        "B": "node_14",
+        "X": "node_12",
+        "Y": "node_11",
+        "L3": "node_2",
+        "R3": "node_6",
+        "LB": "node_4",
+        "RB": "node_9",
+        "LT": "node_5",
+        "RT": "node_10",
+        "Select": "node_3",
+        "Start": "node_8"
+      },
+      "dpad": "node_1",
+      "leftStick": "node_2",
+      "rightStick": "node_6"
+    }
+  ]
+}
