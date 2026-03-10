@@ -1,6 +1,6 @@
 {
   "name": "@omnipad/vue",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "main": "./dist/omnipad-vue.umd.js",
   "module": "./dist/omnipad-vue.mjs",
@@ -32,7 +32,7 @@
     "vue": "^3.5.27"
   },
   "peerDependencies": {
-    "vue": "^3.2.0" 
+    "vue": "^3.2.0"
   },
   "dependencies": {
     "@omnipad/core": "workspace:*"
