@@ -187,6 +187,7 @@ export interface GamepadProfile {
     name: string;
     version: string;
     author?: string;
+    description?: string;
   };
   /** List of all components in the profile. Hierarchies are defined via parentId. */
   items: FlatConfigItem[];
