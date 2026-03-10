@@ -6,8 +6,8 @@
   },
   "items": [
     {
-      "id": "$right-pad",
-      "type": "input-zone",
+      "id": "$left-pad",
+      "type": "root-layer",
       "config": {
         "layout": {
           "left": 0,
@@ -15,7 +15,22 @@
           "width": "100%",
           "height": "100%"
         },
-        "baseType": "input-zone"
+        "baseType": "root-layer",
+        "cssClasses": ["show-static-trackpad"],
+        "hasStaticTrackpad": true
+      }
+    },
+    {
+      "id": "$right-pad",
+      "type": "root-layer",
+      "config": {
+        "layout": {
+          "left": 0,
+          "top": 0,
+          "width": "100%",
+          "height": "100%"
+        },
+        "baseType": "root-layer"
       }
     },
     {

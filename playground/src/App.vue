@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, onBeforeMount } from 'vue';
+import { ref, computed, onBeforeMount } from 'vue';
 import RufflePlayer from './components/RufflePlayer.vue';
 import ConfigConsole from './components/ConfigConsole.vue';
-import { InputZone, registerComponent } from '@omnipad/vue';
+import { registerComponent, RootLayer } from '@omnipad/vue';
 import { GamepadManager, InputManager, Registry } from '@omnipad/core';
 import { parseProfileJson, parseProfileTrees, exportProfile } from '@omnipad/core/utils';
 import CustomTrackpad from './components/CustomTrackpad.vue';
@@ -52,12 +52,11 @@ const loadConfig = () => {
   }
 };
 // --- 导出逻辑：同时指定多个根 ---
-const saveConfig = () => {
+const saveConfig = (selectedRoots: string[]) => {
   const runtimeGamepadMappings = GamepadManager.getInstance().getConfig();
-  const rootIds = ['$left-pad', '$right-pad'];
   const exported = exportProfile(
     { name: 'Flex Export', version: '1.0' },
-    rootIds.map((id) => forest.value[id]?.uid).filter(Boolean),
+    selectedRoots,
     runtimeGamepadMappings ?? [],
   );
 
@@ -65,13 +64,6 @@ const saveConfig = () => {
   jsonText.value = JSON.stringify(exported, null, 2);
   console.log('[Playground] Profile Serialized from Registry.');
 };
-
-import demoRaw from './profiles/gamepad.json';
-onMounted(() => {
-  InputManager.getInstance().init();
-  jsonText.value = JSON.stringify(demoRaw, null, 2);
-  loadConfig();
-});
 
 const toggleFullscreen = () => {
   InputManager.getInstance().toggleFullscreen();
@@ -83,6 +75,10 @@ const renderLeftPad = computed(() => {
 
 const renderRightPad = computed(() => {
   return forest.value ? forest.value['$right-pad'] : {};
+});
+
+const renderPlayer = computed(() => {
+  return forest.value ? forest.value['$ruffle-player'] : {};
 });
 
 // 注册自定义触摸板
@@ -107,32 +103,25 @@ onBeforeMount(() => {
     <main class="game-flex-container">
       <!-- [左侧/下方左半] 输入分区 -->
       <section class="flex-item side-panel left">
-        <InputZone
+        <RootLayer
           v-if="renderLeftPad"
           widget-id="$left-pad"
           :tree-node="renderLeftPad"
           :key="`left-${loadCount}`"
-        />
-        <!-- <InputZone
-          v-else
-          :layout="{
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: '100%',
-          }"
         >
-          <CustomTrackpad
-            :layout="{
-              top: 0,
-              left: 0,
-              height: '100%',
-              width: '100%',
-            }"
-            target-stage-id="$ruffle-player"
-            label="STATIC TRACKPAD (1x sensitivity)"
-          ></CustomTrackpad>
-        </InputZone> -->
+          <div v-if="renderLeftPad?.config?.hasStaticTrackpad" class="static-trackpad">
+            <CustomTrackpad
+              :layout="{
+                top: 0,
+                left: 0,
+                height: '100%',
+                width: '100%',
+              }"
+              target-stage-id="$ruffle-player"
+              label="STATIC TRACKPAD (1x sensitivity)"
+            ></CustomTrackpad>
+          </div>
+        </RootLayer>
       </section>
 
       <!-- [中间/上方全宽] 游戏核心区 -->
@@ -141,13 +130,14 @@ onBeforeMount(() => {
           :swf-url="currentSwf"
           widget-id="$ruffle-player"
           cursor-enabled
-          :cursor-auto-delay="3000"
+          :tree-node="renderPlayer"
+          :key="`player-${loadCount}`"
         />
       </section>
 
       <!-- [右侧/下方右半] 输入分区 -->
       <section class="flex-item side-panel right">
-        <InputZone
+        <RootLayer
           v-if="renderRightPad"
           widget-id="$right-pad"
           :tree-node="renderRightPad"
@@ -185,6 +175,16 @@ body,
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+}
+
+.static-trackpad {
+  height: 100%;
+  width: 100%;
+  display: var(--static-trackpad-display, none);
+}
+
+.show-static-trackpad {
+  --static-trackpad-display: show;
 }
 
 .round-button {
