@@ -1,8 +1,9 @@
 {
   "meta": {
-    "name": "LayoutBox Demo",
+    "name": "05-layout-box: Responsive Scaling",
     "version": "1.0",
-    "author": "Playground"
+    "author": "Omnipad",
+    "description": "A practical look at how the LayoutBox maps configuration to CSS positioning. See how various units like px, %, and vh/vw are used to define component constraints, ensuring predictable layouts across different screen scales without complex logic."
   },
   "items": [
     {

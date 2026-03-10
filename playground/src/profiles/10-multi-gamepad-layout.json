@@ -1,7 +1,9 @@
 {
   "meta": {
-    "name": "Full Gamepad Mapping Demo",
-    "version": "1.0"
+    "name": "10-multi-gamepad-layout: Local Co-op & Multi-Slot Support",
+    "version": "1.0",
+    "author": "Omnipad",
+    "description": "Unlock the potential for local multiplayer by assigning multiple gamepad slots to a single interface. This layout routes signals from two distinct physical controllers to separate virtual zones, enabling two players to interact with the same game session simultaneously."
   },
   "items": [
     {
@@ -14,7 +16,8 @@
           "width": "100%",
           "height": "100%"
         },
-        "baseType": "root-layer"
+        "baseType": "root-layer",
+        "cssClasses": "red-team"
       }
     },
     {
@@ -158,7 +161,8 @@
           "width": "100%",
           "height": "100%"
         },
-        "baseType": "root-layer"
+        "baseType": "root-layer",
+        "cssClasses": "blue-team"
       }
     },
     {
@@ -346,24 +350,27 @@
     }
   ],
   "gamepadMappings": [
-    {},
+    {
+      "buttons": {
+        "L3": "node_2",
+        "LB": "node_4",
+        "LT": "node_5",
+        "Select": "node_3"
+      },
+      "dpad": "node_1",
+      "leftStick": "node_2"
+    },
     {
       "buttons": {
         "A": "node_13",
         "B": "node_14",
         "X": "node_12",
         "Y": "node_11",
-        "L3": "node_2",
         "R3": "node_6",
-        "LB": "node_4",
         "RB": "node_9",
-        "LT": "node_5",
         "RT": "node_10",
-        "Select": "node_3",
         "Start": "node_8"
       },
-      "dpad": "node_1",
-      "leftStick": "node_2",
       "rightStick": "node_6"
     }
   ]

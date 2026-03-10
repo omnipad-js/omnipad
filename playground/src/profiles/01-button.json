@@ -1,8 +1,9 @@
 {
   "meta": {
-    "name": "Button Sample",
+    "name": "01-button: Basic Input Units",
     "version": "1.0",
-    "author": "Playground"
+    "author": "Omnipad",
+    "description": "This example demonstrates the core building blocks of virtual interaction. It features a standard keyboard-mapped button on the left and a fixed-point mouse button on the right, highlighting the library's ability to simulate both key presses and precision clicks."
   },
   "items": [
     {

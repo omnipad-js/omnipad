@@ -1,7 +1,9 @@
 {
   "meta": {
-    "name": "Multi Gamepad Mapping Demo",
-    "version": "1.0"
+    "name": "09-full-gamepad-layout: Physical Hardware Mapping",
+    "version": "1.0",
+    "author": "Omnipad",
+    "description": "A complete 1:1 demonstration of the Gamepad API integration. This profile maps every standard controller button and axis to a corresponding virtual widget, creating a perfect bridge between physical console hardware and web-based game engines."
   },
   "items": [
     {
@@ -14,8 +16,7 @@
           "width": "100%",
           "height": "100%"
         },
-        "baseType": "root-layer",
-        "cssClasses": "red-team"
+        "baseType": "root-layer"
       }
     },
     {
@@ -159,8 +160,7 @@
           "width": "100%",
           "height": "100%"
         },
-        "baseType": "root-layer",
-        "cssClasses": "blue-team"
+        "baseType": "root-layer"
       }
     },
     {
@@ -348,27 +348,24 @@
     }
   ],
   "gamepadMappings": [
-    {
-      "buttons": {
-        "L3": "node_2",
-        "LB": "node_4",
-        "LT": "node_5",
-        "Select": "node_3"
-      },
-      "dpad": "node_1",
-      "leftStick": "node_2"
-    },
+    {},
     {
       "buttons": {
         "A": "node_13",
         "B": "node_14",
         "X": "node_12",
         "Y": "node_11",
+        "L3": "node_2",
         "R3": "node_6",
+        "LB": "node_4",
         "RB": "node_9",
+        "LT": "node_5",
         "RT": "node_10",
+        "Select": "node_3",
         "Start": "node_8"
       },
+      "dpad": "node_1",
+      "leftStick": "node_2",
       "rightStick": "node_6"
     }
   ]
