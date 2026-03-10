@@ -3,7 +3,7 @@ import { ref, onMounted, computed, onBeforeMount } from 'vue';
 import RufflePlayer from './components/RufflePlayer.vue';
 import ConfigConsole from './components/ConfigConsole.vue';
 import { InputZone, registerComponent } from '@omnipad/vue';
-import { InputManager, Registry } from '@omnipad/core';
+import { GamepadManager, InputManager, Registry } from '@omnipad/core';
 import { parseProfileJson, parseProfileTrees, exportProfile } from '@omnipad/core/utils';
 import CustomTrackpad from './components/CustomTrackpad.vue';
 
@@ -32,22 +32,33 @@ const loadConfig = () => {
     const raw = JSON.parse(jsonText.value);
     const safeProfile = parseProfileJson(raw);
 
-    forest.value = parseProfileTrees(safeProfile);
+    const { roots, runtimeGamepadMapping } = parseProfileTrees(safeProfile);
+
+    forest.value = roots;
     loadCount.value++;
     console.log(
       '[Playground] Config Loaded into TreeNode.',
       Registry.getInstance().getAllEntities().length,
     );
+
+    if (runtimeGamepadMapping) {
+      GamepadManager.getInstance().setConfig(runtimeGamepadMapping);
+      GamepadManager.getInstance().start();
+    } else {
+      GamepadManager.getInstance().stop();
+    }
   } catch (e: any) {
     alert('读取失败: ' + e.message);
   }
 };
 // --- 导出逻辑：同时指定多个根 ---
 const saveConfig = () => {
+  const runtimeGamepadMapping = GamepadManager.getInstance().getConfig();
   const rootIds = ['$left-pad', '$right-pad'];
   const exported = exportProfile(
     { name: 'Flex Export', version: '1.0' },
     rootIds.map((id) => forest.value[id]?.uid).filter(Boolean),
+    runtimeGamepadMapping ?? undefined,
   );
 
   // 回填到文本框
@@ -55,7 +66,7 @@ const saveConfig = () => {
   console.log('[Playground] Profile Serialized from Registry.');
 };
 
-import demoRaw from './profiles/multiroot.json';
+import demoRaw from './profiles/gamepad.json';
 onMounted(() => {
   InputManager.getInstance().init();
   jsonText.value = JSON.stringify(demoRaw, null, 2);
@@ -174,6 +185,10 @@ body,
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+}
+
+.round-button {
+  --omnipad-btn-radius: 50%;
 }
 
 .toolbar {
