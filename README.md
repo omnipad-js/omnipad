@@ -13,7 +13,7 @@
 
 > **Break the device barrier: Wrap any Web game for mobile with a single configuration.**
 
-OmniPad is a **high-performance, headless** virtual input engine specifically designed for Web-based games (HTML5 Canvas, Ruffle Flash Emulator, Godot Web exports, etc.). 
+OmniPad is a **high-performance, headless** virtual input engine specifically designed for Web-based games (HTML5 Canvas, Ruffle Flash Emulator, Godot Web exports, etc.).
 
 It provides a comprehensive orchestration system that translates "Touch Gestures / Physical Gamepad Inputs" into "Native Browser Keyboard / Mouse Events." Without modifying a single line of your game's core source code, OmniPad empowers legacy web games with a native-mobile-like control experience.
 
@@ -22,17 +22,18 @@ It provides a comprehensive orchestration system that translates "Touch Gestures
 ---
 
 ## 🆚 Why OmniPad?
+
 Most joystick libraries (like nipple.js) only provide raw UI and coordinate calculations. OmniPad is a **complete input adaptation layer**: We don't just provide the UI; we solve the "end-game" pain points of web game porting, such as **Shadow DOM isolation**, **browser focus loss**, and **multi-touch conflicts**.
 
 ## ✨ Core Architecture & Features
 
-* 🚀 **Headless Design**: The input state machine, gesture recognition, and core scheduling are fully encapsulated in the zero-dependency `@omnipad/core`. It is natively framework-agnostic. We currently provide `@omnipad/vue`, a production-ready Vue 3 adapter.
-* 🌲 **Flat Profile & Forest**: An innovative JSON parsing engine. It supports parsing a single flat configuration into multiple independent root nodes, allowing you to use native CSS Flex/Grid to build complex responsive layouts for both landscape and portrait modes.
-* 👻 **Event Penetration & Focus Protection**: Features high-fidelity synthetic event routing that elegantly penetrates the Shadow DOM boundaries of WebAssembly emulators (like Ruffle). Built-in "Auto-Focus Reclaim" logic ensures keys never get stuck or unresponsive.
-* 🎛️ **Touch-to-Spawn (Dynamic Mounting)**: Supports **spawning** joysticks or buttons anywhere in an `InputZone` upon touch. This perfectly mimics the control habits of modern mobile action games.
-* ⚡️ **Performance First**: No expensive DOM reflows. All displacement calculations happen in memory, with hardware acceleration forced via `translate3d`. Built-in **rAF (requestAnimationFrame) throttling** ensures perfect synchronization with high-refresh-rate screens.
-* 📐 **Responsive Unit Support**: The `LayoutBox` constraint system natively supports `px`, `%`, `vh/vw`, and other CSS units. Combined with a flexible **Anchor** system, a single configuration can adapt to everything from an iPhone SE to an iPad Pro.
-* 🔌 **Input Fusion**: Managed by a unified underlying state machine, OmniPad supports simultaneous inputs from screen touch, mouse clicks, and **Physical Gamepads**, with real-time synchronized feedback on the virtual UI.
+- 🚀 **Headless Design**: The input state machine, gesture recognition, and core scheduling are fully encapsulated in the zero-dependency `@omnipad/core`. It is natively framework-agnostic. We currently provide `@omnipad/vue`, a production-ready Vue 3 adapter.
+- 🌲 **Flat Profile & Forest**: An innovative JSON parsing engine. It supports parsing a single flat configuration into multiple independent root nodes, allowing you to use native CSS Flex/Grid to build complex responsive layouts for both landscape and portrait modes.
+- 👻 **Event Penetration & Focus Protection**: Features high-fidelity synthetic event routing that elegantly penetrates the Shadow DOM boundaries of WebAssembly emulators (like Ruffle). Built-in "Auto-Focus Reclaim" logic ensures keys never get stuck or unresponsive.
+- 🎛️ **Touch-to-Spawn (Dynamic Mounting)**: Supports **spawning** joysticks or buttons anywhere in an `InputZone` upon touch. This perfectly mimics the control habits of modern mobile action games.
+- ⚡️ **Performance First**: No expensive DOM reflows. All displacement calculations happen in memory, with hardware acceleration forced via `translate3d`. Built-in **rAF (requestAnimationFrame) throttling** ensures perfect synchronization with high-refresh-rate screens.
+- 📐 **Responsive Unit Support**: The `LayoutBox` constraint system natively supports `px`, `%`, `vh/vw`, and other CSS units. Combined with a flexible **Anchor** system, a single configuration can adapt to everything from an iPhone SE to an iPad Pro.
+- 🔌 **Input Fusion**: Managed by a unified underlying state machine, OmniPad supports simultaneous inputs from screen touch, mouse clicks, and **Physical Gamepads**, with real-time synchronized feedback on the virtual UI.
 
 ---
 
@@ -51,6 +52,7 @@ npm install @omnipad/core @omnipad/vue
 ## 🚀 Quick Start
 
 ### Pattern 1: Standalone Mode
+
 Ideal for simple scenarios where you need to add fixed buttons to specific corners. No complex configuration required; just use them as standard UI components.
 
 ```vue
@@ -62,32 +64,34 @@ import '@omnipad/vue/style.css';
 <template>
   <div class="game-container">
     <!-- Deploy an action button mapped to the W key -->
-    <VirtualButton 
+    <VirtualButton
       label="JUMP"
       target-stage-id="$stage"
-      :mapping="{ code: 'KeyW' }" 
-      style="width: 80px; height: 80px; z-index: 100;" 
+      :mapping="{ code: 'KeyW' }"
+      style="width: 80px; height: 80px; z-index: 100;"
     />
-    
+
     <!-- Deploy an analog stick with 360° cursor displacement -->
-    <VirtualJoystick 
+    <VirtualJoystick
       :cursor-mode="true"
       :cursor-sensitivity="1.2"
       target-stage-id="$stage"
-      :mapping="{ stick: { type: 'mouse', button: 0 } }" 
-      :layout="{ bottom: '120px', left: '120px', width: '150px', height: '150px', zIndex: 100 }" 
+      :mapping="{ stick: { type: 'mouse', button: 0 } }"
+      :layout="{ bottom: '120px', left: '120px', width: '150px', height: '150px', zIndex: 100 }"
     />
 
     <!-- Deploy a full-screen reception zone to handle simulated events -->
-    <TargetZone 
+    <TargetZone
       widget-id="$stage"
       cursor-enabled
-      :layout="{ left: 0, top: 0, height: '100%', width: '100%' }"/>
+      :layout="{ left: 0, top: 0, height: '100%', width: '100%' }"
+    />
   </div>
 </template>
 ```
 
 ### Pattern 2: Data-Driven Mode
+
 Recommended for complex applications. Define screen partitions (Zones) and all key mappings via a flat JSON profile. Use **RootLayer (or any OmniPad component)** as the root node to carry the parsed `ConfigTreeNode`.
 
 **1. Define `profile.json`:**
@@ -114,12 +118,12 @@ Recommended for complex applications. Define screen partitions (Zones) and all k
       "type": "d-pad",
       "parentId": "$ui-layer",
       "config": {
-        "mapping": { 
+        "mapping": {
           "up": { "code": "ArrowUp" },
           "down": { "code": "ArrowDown" },
           "left": { "code": "ArrowLeft" },
           "right": { "code": "ArrowRight" }
-        }, 
+        },
         "layout": { "left": "10%", "bottom": "20%", "height": "20%", "isSquare": true }
       }
     },
@@ -129,7 +133,7 @@ Recommended for complex applications. Define screen partitions (Zones) and all k
       "parentId": "$ui-layer",
       "config": {
         "label": "FIRE",
-        "mapping": { "code": "Space" }, 
+        "mapping": { "code": "Space" },
         "layout": { "right": "10%", "bottom": "20%", "height": "10%", "isSquare": true }
       }
     }
@@ -138,6 +142,7 @@ Recommended for complex applications. Define screen partitions (Zones) and all k
 ```
 
 **2. Parse and Render in Vue:**
+
 ```vue
 <script setup>
 import { computed } from 'vue';
@@ -155,14 +160,17 @@ const forest = computed(() => parseProfileTrees(parseProfileJson(profileRaw)));
     <canvas id="my-game"></canvas>
     <!-- Upon receiving the root node, the engine will automatically generate the entire interactive interface through recursion. -->
     <RootLayer
-      class="ui-layer" 
+      class="ui-layer"
       v-if="forest.roots['$ui-layer']"
-      :tree-node="forest.roots['$ui-layer']" />
+      :tree-node="forest.roots['$ui-layer']"
+    />
   </div>
 </template>
 
 <style>
-.viewport, #my-game, .ui-layer {
+.viewport,
+#my-game,
+.ui-layer {
   position: absolute;
   inset: 0;
   height: 100%;
@@ -184,6 +192,7 @@ import { GamepadManager } from '@omnipad/core';
 GamepadManager.getInstance().setConfig(forest.value.runtimeGamepadMappings);
 GamepadManager.getInstance().start();
 ```
+
 ```json
 // Add a mapping array at the root of profile.json:
 "gamepadMappings":[
@@ -193,7 +202,8 @@ GamepadManager.getInstance().start();
   }
 ]
 ```
-> *💡 Tip: Supports array-based mapping for Local Co-op scenarios! Player 1 and Player 2 can play together without interference.*
+
+> _💡 Tip: Supports array-based mapping for Local Co-op scenarios! Player 1 and Player 2 can play together without interference._
 
 ---
 
@@ -202,7 +212,9 @@ GamepadManager.getInstance().start();
 OmniPad’s core philosophy is **"Logic Closed, UI Open."**
 
 ### 1. CSS Theming
+
 The library separates layout from style. The `layout` property handles physical coordinates, while visual aesthetics are managed by CSS variables.
+
 ```css
 /* Modify the global theme */
 :root {
@@ -217,7 +229,9 @@ The library separates layout from style. The `layout` property handles physical 
 ```
 
 ### 2. Factory Extension
+
 You can write your own custom components and **register them into the parsing engine** seamlessly.
+
 ```typescript
 import { registerComponent } from '@omnipad/vue';
 import CustomTrackpad from './components/CustomTrackpad.vue';
@@ -225,19 +239,20 @@ import CustomTrackpad from './components/CustomTrackpad.vue';
 // Register the custom component as 'custom-trackpad'
 registerComponent('custom-trackpad', CustomTrackpad);
 ```
+
 After registration, you can directly use `"type": "custom-trackpad"` in your JSON configuration. The engine will automatically instantiate and bind the Core logic for you.
 
 ---
 
 ## 🧩 Widgets Overview
 
-* 🔘 **VirtualButton**: Supports taps and long-presses. Maps to keyboard or mouse buttons.
-* 🖱️ **VirtualTrackpad**: Relative displacement trackpad with a built-in gesture engine supporting Double-tap & Hold.
-* ➕ **VirtualDPad**: Authentic 8-way digital D-pad optimized for zero-latency in retro action games.
-* 🕹️ **VirtualJoystick**: 360° analog stick with L3 support. Dual engines for discrete key mapping and continuous cursor velocity.
-* 🎛️ **TargetZone**: The reception stage for events. Dispatches low-level DOM events and renders focus-return feedback.
-* 📥 **InputZone**: A logic container that defines interactive regions and handles the "Touch-to-Spawn" dynamic widget logic.
-* 🏗️ **RootLayer**: The entry point. Manages the lifecycle of entities and provides the dependency injection context.
+- 🔘 **VirtualButton**: Supports taps and long-presses. Maps to keyboard or mouse buttons.
+- 🖱️ **VirtualTrackpad**: Relative displacement trackpad with a built-in gesture engine supporting Double-tap & Hold.
+- ➕ **VirtualDPad**: Authentic 8-way digital D-pad optimized for zero-latency in retro action games.
+- 🕹️ **VirtualJoystick**: 360° analog stick with L3 support. Dual engines for discrete key mapping and continuous cursor velocity.
+- 🎛️ **TargetZone**: The reception stage for events. Dispatches low-level DOM events and renders focus-return feedback.
+- 📥 **InputZone**: A logic container that defines interactive regions and handles the "Touch-to-Spawn" dynamic widget logic.
+- 🏗️ **RootLayer**: The entry point. Manages the lifecycle of entities and provides the dependency injection context.
 
 ---
 
@@ -249,7 +264,7 @@ OmniPad has established a rock-solid foundation. We are now evolving toward a fu
   - Turbo (Auto-fire) and Toggle mode support.
   - Custom sequences for "One-tap combos."
 - [ ] **Framework Adapters**
-  - Launching `@omnipad/react`, `@omnipad/svelte`, and a dependency-free Web Components version. *(Looking for Maintainers!)*
+  - Launching `@omnipad/react`, `@omnipad/svelte`, and a dependency-free Web Components version. _(Looking for Maintainers!)_
 - [ ] **OmniPad Studio**
   - A visual drag-and-drop editor for creating and exporting `profile.json` files.
 - [ ] **Universal Browser Extension**
@@ -262,4 +277,5 @@ OmniPad has established a rock-solid foundation. We are now evolving toward a fu
 This project is licensed under the [MIT License](./LICENSE).
 
 ---
+
 **Built with ❤️ for the Web Gaming community.**

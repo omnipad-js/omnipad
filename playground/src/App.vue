@@ -91,7 +91,15 @@ onBeforeMount(() => {
   <div class="playground-root">
     <!-- 顶部工具栏 -->
     <header class="toolbar">
-      <div class="logo">OmniPad Playground</div>
+      <div class="logo">
+        OmniPad Playground
+        <a href="https://github.com/omnipad-js/omnipad" class="github-tag" target="_blank">
+          &nbsp;<img
+            src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white"
+            alt="GitHub"
+          />
+        </a>
+      </div>
       <div class="file-input">
         <label for="swf-upload" class="upload-btn">Import SWF</label>
         <input id="swf-upload" type="file" accept=".swf" @change="onFileChange" hidden />
@@ -168,6 +176,10 @@ body,
   background: #111;
   color: #eee;
   font-family: sans-serif;
+}
+
+.github-tag img {
+  vertical-align: middle;
 }
 
 .toolbar {
