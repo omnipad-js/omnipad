@@ -17,7 +17,7 @@ import { LayoutBox, AnchorPoint } from '../types';
  * resolveLayoutStyle({ left: '50%', top: '50%', anchor: 'center' });
  */
 export const resolveLayoutStyle = (layout: LayoutBox): Record<string, string | number> => {
-  if (!layout) return {};
+  if (Object.keys(layout ?? {}).length === 0) return {};
 
   const style: Record<string, string | number> = {};
 
