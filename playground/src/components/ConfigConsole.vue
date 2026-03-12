@@ -5,7 +5,7 @@ const props = defineProps<{
   modelValue: string; // 文本框内的 JSON 字符串
 }>();
 
-const emit = defineEmits(['update:modelValue', 'load', 'save']);
+const emit = defineEmits(['update:modelValue', 'load', 'save', 'close']);
 
 const internalText = ref(props.modelValue);
 
@@ -64,6 +64,10 @@ const handleSave = () => {
   // 保存动作发生后，App.vue 会更新 modelValue，需要同步到 internalText
 };
 
+const handleClose = () => {
+  emit('close', selectedRoots.value);
+};
+
 // 监听外部 modelValue 变化（当保存成功回填时）
 import { watch } from 'vue';
 watch(
@@ -78,6 +82,7 @@ watch(
   <div class="config-console">
     <!-- 预设工具栏 -->
     <div class="preset-toolbar">
+      <button class="close-btn" @click="handleClose">&times;</button>
       <label>📚 PRESET: </label>
       <select v-model="selectedPreset" @change="applyPreset">
         <option value="" disabled>-- Select a Profile --</option>
@@ -110,6 +115,7 @@ watch(
 <style scoped>
 .config-console {
   display: flex;
+  max-width: 90vw;
   flex-direction: column;
   gap: 10px;
   background: #222;
@@ -187,5 +193,23 @@ button {
 }
 button:hover {
   opacity: 0.9;
+}
+
+.close-btn {
+  flex: none;
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #fff;
+  height: 44px;
+  width: 44px;
+}
+
+.close-btn:hover {
+  color: #ff0000;
 }
 </style>

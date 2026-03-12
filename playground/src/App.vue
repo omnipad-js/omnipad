@@ -65,6 +65,8 @@ const saveConfig = (selectedRoots: string[]) => {
   console.log('[Playground] Profile Serialized from Registry.');
 };
 
+const closeConfig = () => (showConfig.value = false);
+
 const toggleFullscreen = () => {
   InputManager.getInstance().toggleFullscreen();
 };
@@ -160,6 +162,7 @@ onBeforeMount(() => {
       v-show="showConfig"
       @load="loadConfig"
       @save="saveConfig"
+      @close="closeConfig"
       style="position: absolute; top: 0; right: 0; bottom: 0"
     />
   </div>

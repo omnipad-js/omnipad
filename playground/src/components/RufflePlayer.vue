@@ -49,6 +49,7 @@ const loadSwf = (url: string) => {
       allowScriptAccess: true,
       backgroundColor: '#000000',
       letterbox: 'on',
+      forceScale: true,
     });
   }
 };
