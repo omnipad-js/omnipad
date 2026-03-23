@@ -155,6 +155,9 @@ export class Registry implements IRegistry {
       if ('reset' in entity) {
         (entity as any).reset();
       }
+      if ('markRectDirty' in entity) {
+        (entity as any).markRectDirty();
+      }
     });
   }
 
