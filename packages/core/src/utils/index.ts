@@ -1,3 +1,4 @@
+export * from './cache';
 export * from './dom';
 export * from './id';
 export * from './layout';
