@@ -25,7 +25,7 @@ const cAF =
  */
 export function createRafThrottler<T = any>(callback: (payload: T) => void) {
   let ticking = false;
-  let latestPayload: T | null = null;
+  let latestPayload: T | undefined;
 
   return function (payload: T) {
     latestPayload = payload;
@@ -34,9 +34,7 @@ export function createRafThrottler<T = any>(callback: (payload: T) => void) {
       ticking = true;
 
       rAF(() => {
-        if (latestPayload !== null) {
-          callback(latestPayload);
-        }
+        callback(latestPayload as T);
         ticking = false;
       });
     }
