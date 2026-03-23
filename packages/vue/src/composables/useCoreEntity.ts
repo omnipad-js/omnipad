@@ -7,7 +7,7 @@ import {
   type IPointerHandler,
   type ISpatial,
 } from '@omnipad/core';
-import { createPointerBridge } from '@omnipad/core/utils';
+import { createCachedProvider, createPointerBridge } from '@omnipad/core/utils';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.
@@ -35,6 +35,8 @@ export function useCoreEntity<T extends ICoreEntity, S>(
   const state = ref<S>();
   const elementRef = ref<any>(null);
   const domEvents = ref<Record<string, (e: PointerEvent) => any>>({});
+
+  let resizeObserver: ResizeObserver | null = null;
 
   // 统一处理状态订阅
   const syncState = (newState: S) => {
@@ -84,7 +86,23 @@ export function useCoreEntity<T extends ICoreEntity, S>(
 
     // 尺寸监听 (ISpatial 接口对接)
     if (domEl && 'bindRectProvider' in instance) {
-      (instance as unknown as ISpatial).bindRectProvider(() => domEl!.getBoundingClientRect());
+      const spatialCore = instance as unknown as ISpatial;
+
+      // A. 创建缓存闭包
+      const cached = createCachedProvider(() => {
+        const r = domEl!.getBoundingClientRect();
+        return r;
+      });
+
+      // B. 注入逻辑层
+      // 传入获取方法 cached.get 和 适配层清理缓存的方法 cached.markDirty
+      spatialCore.bindRectProvider(cached.get, cached.markDirty);
+
+      // C. 使用原生 ResizeObserver 监听“自身”尺寸变化
+      resizeObserver = new ResizeObserver(() => {
+        spatialCore.markRectDirty();
+      });
+      resizeObserver.observe(domEl);
     }
 
     // 自动生成标准化 DOM 事件 (IPointerHandler 接口对接)
@@ -95,6 +113,12 @@ export function useCoreEntity<T extends ICoreEntity, S>(
   });
 
   onUnmounted(() => {
+    // 销毁观察器防止内存泄漏
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+    // 销毁 Core
     if (core.value) {
       core.value.destroy(); // 内部会处理 Registry.unregister
     }
