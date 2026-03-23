@@ -1,5 +1,14 @@
 # playground
 
+## 0.4.2
+
+### Patch Changes
+
+- perf: rect-binding optimization
+- Updated dependencies
+  - @omnipad/core@0.4.2
+  - @omnipad/vue@0.4.2
+
 ## 0.4.1
 
 ### Patch Changes
