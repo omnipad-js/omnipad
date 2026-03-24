@@ -10,6 +10,7 @@ import { TargetZoneConfig } from '../types/configs';
 import { CursorState } from '../types/state';
 import { IDependencyBindable, IPointerHandler, ISignalReceiver } from '../types/traits';
 import { clamp, isVec2Equal, percentToPx, pxToPercent } from '../utils/math';
+import { createRafThrottler } from '../utils/performance';
 import { BaseEntity } from './BaseEntity';
 
 /**
@@ -44,6 +45,7 @@ export class TargetZoneCore
 {
   private hideTimer: ReturnType<typeof setTimeout> | null = null;
   private focusFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
+  private throttledMoveExecution: (payload: any) => void;
 
   private delegates: TargetZoneDelegates = {
     dispatchKeyboardEvent: () => {},
@@ -53,6 +55,11 @@ export class TargetZoneCore
 
   constructor(uid: string, config: TargetZoneConfig) {
     super(uid, CMP_TYPES.TARGET_ZONE, config, INITIAL_STATE);
+
+    // 初始化节流器，只包裹耗时的 DOM 查询和派发逻辑 / Wrap only the time-consuming DOM queries and dispatch logic
+    this.throttledMoveExecution = createRafThrottler((payload: any) => {
+      this.executeMouseAction(ACTION_TYPES.POINTERMOVE, payload);
+    });
   }
 
   // --- IDependencyBindable Implementation ---
@@ -132,7 +139,9 @@ export class TargetZoneCore
           this.updateCursorPositionByDelta(payload.delta);
         }
         if (this.config.cursorEnabled) this.showCursor();
-        this.executeMouseAction(ACTION_TYPES.POINTERMOVE, payload);
+
+        // 沉重的 DOM 查询交给节流器 / Throttle heavy DOM queries (e.g. elementsFromPoint)
+        this.throttledMoveExecution(payload);
         break;
 
       case ACTION_TYPES.MOUSEDOWN:
