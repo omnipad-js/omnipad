@@ -1,5 +1,13 @@
 # @omnipad/vue
 
+## 0.4.3
+
+### Patch Changes
+
+- perf: performance tuning and interaction refinement
+- Updated dependencies
+  - @omnipad/core@0.4.3
+
 ## 0.4.2
 
 ### Patch Changes

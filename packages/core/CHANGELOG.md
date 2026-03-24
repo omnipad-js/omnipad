@@ -1,5 +1,11 @@
 # @omnipad/core
 
+## 0.4.3
+
+### Patch Changes
+
+- perf: performance tuning and interaction refinement
+
 ## 0.4.2
 
 ### Patch Changes
