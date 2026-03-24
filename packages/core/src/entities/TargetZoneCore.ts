@@ -33,6 +33,9 @@ const INITIAL_STATE: CursorState = {
   isFocusReturning: false,
 };
 
+/** Edge safe inset in pixels */
+const EDGE_SAFE_INSET = 1;
+
 /**
  * Core logic for the Target Focus Zone.
  *
@@ -182,8 +185,16 @@ export class TargetZoneCore
     const target = payload.point || this.state.position;
 
     // 换算为屏幕绝对像素坐标 / Convert percentage to absolute pixel coordinates
-    const px = rect.left + percentToPx(target.x, rect.width);
-    const py = rect.top + percentToPx(target.y, rect.height);
+    const px = clamp(
+      rect.left + percentToPx(target.x, rect.width),
+      rect.left + EDGE_SAFE_INSET,
+      rect.left + rect.width - EDGE_SAFE_INSET,
+    );
+    const py = clamp(
+      rect.top + percentToPx(target.y, rect.height),
+      rect.top + EDGE_SAFE_INSET,
+      rect.top + rect.height - EDGE_SAFE_INSET,
+    );
 
     // 调用驱动层派发合成事件 / Call DOM driver to dispatch synthetic events
     this.delegates.dispatchPointerEventAtPos?.(pointerType, px, py, {
@@ -203,8 +214,16 @@ export class TargetZoneCore
     if (!rect) return;
 
     // 换算当前光标所在的绝对像素点 / Calculate absolute pixel point of current cursor
-    const px = rect.left + percentToPx(this.state.position.x, rect.width);
-    const py = rect.top + percentToPx(this.state.position.y, rect.height);
+    const px = clamp(
+      rect.left + percentToPx(this.state.position.x, rect.width),
+      rect.left + EDGE_SAFE_INSET,
+      rect.left + rect.width - EDGE_SAFE_INSET,
+    );
+    const py = clamp(
+      rect.top + percentToPx(this.state.position.y, rect.height),
+      rect.top + EDGE_SAFE_INSET,
+      rect.top + rect.height - EDGE_SAFE_INSET,
+    );
 
     // 发起焦点夺回请求 / Send request of focus reclaim
     this.delegates.reclaimFocusAtPos?.(px, py, () => this.triggerFocusFeedback());
