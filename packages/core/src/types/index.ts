@@ -118,14 +118,30 @@ export type BuiltInActionType = (typeof ACTION_TYPES)[keyof typeof ACTION_TYPES]
 /** Input action type strings, allowing for custom action extensions */
 export type InputActionType = BuiltInActionType | (string & {});
 
-/** Supported CSS units for layout calculation */
-export type Unit = 'px' | '%' | 'vh' | 'vw' | 'rem';
+/**
+ * Supported CSS units for layout calculation.
+ * Using a constant array for runtime validation.
+ */
+export const VALID_UNITS = ['px', '%', 'vh', 'vw', 'rem', 'em'] as const;
+
+/**
+ * Derived type for type safety in TS
+ */
+export type CssUnit = (typeof VALID_UNITS)[number];
+
+/**
+ * Parsed length input.
+ */
+export interface ParsedLength {
+  value: number;
+  unit: CssUnit;
+}
 
 /**
  * Flexible length input.
  * Supports numbers (interpreted as px) or strings (e.g., '50%', '10vh').
  */
-export type FlexibleLength = string | number;
+export type FlexibleLength = ParsedLength | string | number;
 
 /**
  * Anchor position used to determine the alignment of an element relative to its coordinates.

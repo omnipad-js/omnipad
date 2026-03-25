@@ -1,4 +1,61 @@
-import { LayoutBox, AnchorPoint } from '../types';
+import { LayoutBox, AnchorPoint, VALID_UNITS, CssUnit, ParsedLength } from '../types';
+
+/**
+ * Convert the length input into a sanitized ParsedLength
+ *
+ * @param input - The raw length input.
+ * @returns A sanitized ParsedLength.
+ */
+export function parseLength(input: string | number | undefined): ParsedLength {
+  // 1. 处理空值或无效值
+  if (input === undefined || input === null) {
+    return { value: 0, unit: 'px' };
+  }
+
+  // 2. 处理纯数字：默认 px
+  if (typeof input === 'number') {
+    return {
+      value: Number.isFinite(input) ? input : 0,
+      unit: 'px',
+    };
+  }
+
+  // 3. 处理字符串
+  const val = input.trim();
+  const numericPart = parseFloat(val);
+
+  // 检查数字部分是否有效
+  if (isNaN(numericPart)) {
+    return { value: 0, unit: 'px' };
+  }
+
+  // 提取单位部分
+  const unitMatch = val.match(/[a-z%]+$/i);
+  const unitPart = unitMatch ? unitMatch[0].toLowerCase() : 'px';
+
+  return sanitizeParsedLength({ value: numericPart, unit: unitPart as CssUnit });
+}
+
+/**
+ * Check the whitelist of verification units and sanitize ParsedLength.
+ */
+export const sanitizeParsedLength = (parsed: ParsedLength): ParsedLength => {
+  const { value, unit } = parsed;
+  if ((VALID_UNITS as readonly string[]).includes(unit)) {
+    return { value, unit };
+  }
+
+  // 非法单位，降级为 px
+  console.warn(`[Omnipad-Core] Blocked invalid CSS unit: ${unit}`);
+  return { value, unit: 'px' };
+};
+
+/**
+ * Convert the ParsedLength back to a CSS string
+ */
+export const lengthToCss = (parsed: ParsedLength): string => {
+  return `${parsed.value}${parsed.unit}`;
+};
 
 /**
  * Converts a LayoutBox configuration into a CSS style object suitable for Vue/React.
@@ -30,12 +87,16 @@ export const resolveLayoutStyle = (layout: LayoutBox): Record<string, string | n
   // 遍历标准的 CSS 位置属性
   const fields: (keyof LayoutBox)[] = ['left', 'top', 'right', 'bottom', 'width', 'height'];
   fields.forEach((field) => {
-    const val = layout[field];
-    // 如果是纯数字则补全 px，如果是字符串（如 10vh）则原样保留
-    if (val !== undefined && typeof val === 'number') {
-      style[field] = `${val}px`;
-    } else if (val !== undefined && typeof val === 'string') {
-      style[field] = val;
+    const rawValue = layout[field];
+    if (rawValue != undefined) {
+      // 检查是否已经是解析好的对象
+      if (typeof rawValue === 'object' && 'unit' in rawValue) {
+        const parsed = sanitizeParsedLength(rawValue as ParsedLength);
+        style[field] = lengthToCss(parsed);
+      } else if (typeof rawValue === 'string' || typeof rawValue === 'number') {
+        const parsed = parseLength(rawValue as string | number);
+        style[field] = lengthToCss(parsed);
+      }
     }
   });
 
