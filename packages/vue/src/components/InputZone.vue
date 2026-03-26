@@ -43,10 +43,10 @@ const { uid, config, customClasses } = useWidgetConfig<InputZoneConfig>(
   CMP_TYPES.INPUT_ZONE,
   props,
 );
-const { core, state, elementRef, domEvents, bindDelegates } = useCoreEntity<
+const { core, state, domEvents, effectiveLayout, elementRef, bindDelegates } = useCoreEntity<
   InputZoneCore,
   InputZoneState
->(() => new InputZoneCore(uid.value, config.value), { requireDirectHit: true });
+>(() => new InputZoneCore(uid.value, config.value), config, { requireDirectHit: true });
 
 const fixedChildren = computed(() => {
   const targetUid = props.treeNode?.config?.dynamicWidgetId;
@@ -124,7 +124,7 @@ watch(
 );
 
 // 样式计算
-const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
+const containerStyle = computed(() => resolveLayoutStyle(effectiveLayout.value));
 
 // Whether browser supports Container Queries
 const canUseNativeCQ = supportsContainerQueries();

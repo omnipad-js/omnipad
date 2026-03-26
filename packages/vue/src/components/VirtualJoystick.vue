@@ -61,9 +61,10 @@ const { uid, config, customClasses } = useWidgetConfig<JoystickConfig>(
   defaultProps,
 );
 
-const { core, state, elementRef, domEvents } = useCoreEntity<JoystickCore, JoystickState>(
-  () => new JoystickCore(uid.value, config.value),
-);
+const { core, state, domEvents, effectiveLayout, elementRef } = useCoreEntity<
+  JoystickCore,
+  JoystickState
+>(() => new JoystickCore(uid.value, config.value), config);
 
 const canUseNativeCQ = supportsContainerQueries();
 const baseRadius = ref({ x: 0, y: 0 });
@@ -98,7 +99,7 @@ defineExpose({
     ref="elementRef"
     class="omnipad-joystick omnipad-prevent"
     :class="customClasses"
-    :layout="config.layout"
+    :layout="effectiveLayout"
     :is-active="state?.isActive"
     :vector="state?.vector"
     show-stick

@@ -46,8 +46,12 @@ const { uid, config, customClasses } = useWidgetConfig<TargetZoneConfig>(
   props,
   defaultProps,
 );
-const { core, state, elementRef, domEvents } = useCoreEntity<TargetZoneCore, CursorState>(
+const { core, state, domEvents, effectiveLayout, elementRef } = useCoreEntity<
+  TargetZoneCore,
+  CursorState
+>(
   () => new TargetZoneCore(uid.value, config.value),
+  config,
   {},
   {
     dispatchKeyboardEvent: dispatchKeyboardEvent,
@@ -56,7 +60,7 @@ const { core, state, elementRef, domEvents } = useCoreEntity<TargetZoneCore, Cur
   },
 );
 
-const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
+const containerStyle = computed(() => resolveLayoutStyle(effectiveLayout.value));
 
 // Whether browser supports Container Queries
 const canUseNativeCQ = supportsContainerQueries();

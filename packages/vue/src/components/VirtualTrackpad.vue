@@ -42,9 +42,10 @@ const { uid, config, customClasses } = useWidgetConfig<TrackpadConfig>(CMP_TYPES
   sensitivity: 1.0,
 });
 
-const { core, state, elementRef, domEvents } = useCoreEntity<TrackpadCore, TrackpadState>(
-  () => new TrackpadCore(uid.value, config.value),
-);
+const { core, state, domEvents, effectiveLayout, elementRef } = useCoreEntity<
+  TrackpadCore,
+  TrackpadState
+>(() => new TrackpadCore(uid.value, config.value), config);
 
 // 转发交互
 const onPointerDown = (e: PointerEvent) => domEvents.value?.onPointerDown(e);
@@ -69,7 +70,7 @@ defineExpose({
     ref="elementRef"
     class="omnipad-trackpad omnipad-prevent"
     :class="customClasses"
-    :layout="config.layout"
+    :layout="effectiveLayout"
     :label="config.label"
     :is-active="state?.isPressed"
     @pointerdown="onPointerDown"

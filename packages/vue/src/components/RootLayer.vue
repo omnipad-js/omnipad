@@ -25,9 +25,12 @@ const props = defineProps<{
 
 const { uid, config, customClasses } = useWidgetConfig<BaseConfig>(CMP_TYPES.ROOT_LAYER, props);
 
-const { elementRef } = useCoreEntity(() => new RootLayerCore(uid.value, config.value));
+const { effectiveLayout, elementRef } = useCoreEntity(
+  () => new RootLayerCore(uid.value, config.value),
+  config,
+);
 
-const containerStyle = computed(() => resolveLayoutStyle(config.value.layout));
+const containerStyle = computed(() => resolveLayoutStyle(effectiveLayout.value));
 </script>
 
 <template>

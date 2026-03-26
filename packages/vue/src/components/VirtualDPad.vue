@@ -62,8 +62,9 @@ const { uid, config, customClasses } = useWidgetConfig<DPadConfig>(
 );
 
 // 桥接 Core
-const { core, state, elementRef, domEvents } = useCoreEntity<DPadCore, DPadState>(
+const { core, state, domEvents, effectiveLayout, elementRef } = useCoreEntity<DPadCore, DPadState>(
   () => new DPadCore(uid.value, config.value),
+  config,
 );
 
 const canUseNativeCQ = supportsContainerQueries();
@@ -103,7 +104,7 @@ defineExpose({
     ref="elementRef"
     class="omnipad-dpad omnipad-prevent"
     :class="customClasses"
-    :layout="config.layout"
+    :layout="effectiveLayout"
     :is-active="state?.isActive"
     :vector="state?.vector"
     :show-stick="config.showStick"

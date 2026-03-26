@@ -1,12 +1,14 @@
-import { ref, onMounted, onUnmounted, shallowRef } from 'vue';
+import { ref, onMounted, onUnmounted, shallowRef, ComputedRef } from 'vue';
 import {
   Registry,
   WindowManager,
   type AnyFunction,
+  type BaseConfig,
   type ICoreEntity,
   type IDependencyBindable,
   type IPointerHandler,
   type ISpatial,
+  type LayoutBox,
 } from '@omnipad/core';
 import { createCachedProvider, createPointerBridge } from '@omnipad/core/utils';
 
@@ -28,12 +30,14 @@ import { createCachedProvider, createPointerBridge } from '@omnipad/core/utils';
  */
 export function useCoreEntity<T extends ICoreEntity, S>(
   createCore: () => T,
+  externalConfig: ComputedRef<BaseConfig>,
   domEventOptions: Record<string, any> = {},
   initialDelegates?: Record<string, AnyFunction>,
 ) {
   const instance = createCore();
   const core = shallowRef<T>();
   const state = ref<S>();
+  const effectiveLayout = ref<LayoutBox>({});
   const elementRef = ref<any>(null);
   const domEvents = ref<Record<string, (e: PointerEvent) => any>>({});
 
@@ -57,6 +61,10 @@ export function useCoreEntity<T extends ICoreEntity, S>(
 
   onMounted(() => {
     core.value = instance;
+
+    if (externalConfig) {
+      effectiveLayout.value = externalConfig.value.layout;
+    }
 
     // 注册到全局单例
     Registry.getInstance().register(instance);
@@ -132,8 +140,9 @@ export function useCoreEntity<T extends ICoreEntity, S>(
   return {
     core,
     state,
-    elementRef,
     domEvents,
+    effectiveLayout,
+    elementRef,
     bindDelegates,
   };
 }

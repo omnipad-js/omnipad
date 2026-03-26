@@ -41,9 +41,10 @@ const { uid, config, customClasses } = useWidgetConfig<ButtonConfig>(
   props,
   defaultProps,
 );
-const { core, state, elementRef, domEvents } = useCoreEntity<ButtonCore, ButtonState>(
-  () => new ButtonCore(uid.value, config.value),
-);
+const { core, state, domEvents, effectiveLayout, elementRef } = useCoreEntity<
+  ButtonCore,
+  ButtonState
+>(() => new ButtonCore(uid.value, config.value), config);
 
 // 转发交互
 const onPointerDown = (e: PointerEvent) => domEvents.value?.onPointerDown(e);
@@ -68,7 +69,7 @@ defineExpose({
     ref="elementRef"
     class="omnipad-button omnipad-prevent"
     :class="customClasses"
-    :layout="config.layout"
+    :layout="effectiveLayout"
     :label="config.label"
     :is-active="state?.isPressed"
     @pointerdown="onPointerDown"
