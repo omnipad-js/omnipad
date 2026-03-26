@@ -1,5 +1,6 @@
-import { ref, onMounted, onUnmounted, shallowRef, ComputedRef, readonly } from 'vue';
+import { ref, onMounted, onUnmounted, shallowRef, ComputedRef, readonly, watch } from 'vue';
 import {
+  IConfigurable,
   Registry,
   WindowManager,
   type AnyFunction,
@@ -10,7 +11,7 @@ import {
   type ISpatial,
   type LayoutBox,
 } from '@omnipad/core';
-import { createCachedProvider, createPointerBridge } from '@omnipad/core/utils';
+import { createCachedProvider, createPointerBridge, getObjectDiff } from '@omnipad/core/utils';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.
@@ -67,6 +68,27 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
       });
     }
   };
+
+  // 监听外部 Props 配置变化
+  let lastExternalConfig = { ...externalConfig.value };
+  watch(
+    externalConfig,
+    (newVal) => {
+      if (!core.value) return;
+
+      // 1. 找出到底是哪些属性在 Vue 层变了
+      const diff = getObjectDiff(lastExternalConfig, newVal);
+
+      if (Object.keys(diff).length > 0) {
+        // 2. 只把变动的部分推送给 Core
+        (core.value as unknown as IConfigurable<C>).updateConfig(diff as unknown as C);
+      }
+
+      // 3. 更新快照，为下一次对比做准备
+      lastExternalConfig = { ...externalConfig.value };
+    },
+    { deep: true },
+  );
 
   onMounted(() => {
     core.value = instance;
