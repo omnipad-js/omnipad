@@ -187,11 +187,11 @@ export class Registry implements IRegistry {
   }
 
   public broadcastSignal(signal: InputActionSignal) {
-    const target = this.getEntity<ICoreEntity & ISignalReceiver>(signal.targetStageId);
+    const target = this.getEntity<ICoreEntity>(signal.targetStageId);
 
-    if (target) {
+    if (target && 'handleSignal' in target) {
       // A. 发送给具体的 TargetZone
-      target.handleSignal(signal);
+      (target as unknown as ISignalReceiver).handleSignal(signal);
     } else if (globalSignalHandler) {
       // B. 如果找不到目标，且有全局处理器，则交给全局处理器
       // 这里的全局处理器就是派发给 window 的逻辑

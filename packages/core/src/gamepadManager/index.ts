@@ -218,9 +218,9 @@ export class GamepadManager {
     // 安全机制：如果组件当前正被手指触摸，则忽略硬件手柄的指令，防止输入冲突
     if (!target || target.activePointerId != null) return;
 
-    if (action === 'down' && target.triggerDown) target.triggerDown();
-    if (action === 'up' && target.triggerUp) target.triggerUp();
-    if (action === 'vector' && target.triggerVector && payload) {
+    if (action === 'down' && typeof target.triggerDown === 'function') target.triggerDown();
+    if (action === 'up' && typeof target.triggerUp === 'function') target.triggerUp();
+    if (action === 'vector' && typeof target.triggerVector === 'function' && payload) {
       target.triggerVector(payload.x, payload.y);
     }
   }
