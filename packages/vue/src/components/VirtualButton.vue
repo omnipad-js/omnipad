@@ -48,10 +48,10 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
 >(() => new ButtonCore(uid, initialConfig, props.treeNode?.type), reactiveConfig);
 
 // 转发交互
-const onPointerDown = (e: PointerEvent) => domEvents.value?.onPointerDown(e);
-const onPointerMove = (e: PointerEvent) => domEvents.value?.onPointerMove(e);
-const onPointerUp = (e: PointerEvent) => domEvents.value?.onPointerUp(e);
-const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e);
+const onPointerDown = (e: PointerEvent) => domEvents?.onPointerDown?.(e);
+const onPointerMove = (e: PointerEvent) => domEvents?.onPointerMove?.(e);
+const onPointerUp = (e: PointerEvent) => domEvents?.onPointerUp?.(e);
+const onPointerCancel = (e: PointerEvent) => domEvents?.onPointerCancel?.(e);
 
 // 暴露转发方法
 defineExpose({

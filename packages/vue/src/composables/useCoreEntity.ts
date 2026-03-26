@@ -41,7 +41,6 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   const effectiveConfig = ref<C>();
   const effectiveLayout = ref<LayoutBox>();
   const elementRef = ref<any>(null);
-  const domEvents = ref<Record<string, (e: PointerEvent) => any>>({});
 
   let resizeObserver: ResizeObserver | null = null;
 
@@ -144,12 +143,6 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
       resizeObserver.observe(domEl);
     }
 
-    // 自动生成标准化 DOM 事件 (IPointerHandler 接口对接)
-    if ('onPointerDown' in instance) {
-      const bridge = createPointerBridge(instance as unknown as IPointerHandler, domEventOptions);
-      domEvents.value = { ...bridge };
-    }
-
     // 只要有任何一个组件被挂载到页面上，自动启动全局视口监听
     // 内部的 _isListening 会保证它只绑定一次原生事件
     WindowManager.getInstance().init();
@@ -167,10 +160,16 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
     }
   });
 
+  // 自动生成标准化 DOM 事件，在组件层根据需要绑定
+  const domEvents: Record<string, any> =
+    'onPointerDown' in instance
+      ? createPointerBridge(instance as unknown as IPointerHandler, domEventOptions)
+      : {};
+
   return {
     core: readonly(core),
     state: readonly(state),
-    domEvents: readonly(domEvents),
+    domEvents,
     effectiveConfig: readonly(effectiveConfig),
     effectiveLayout: readonly(effectiveLayout),
     elementRef,
