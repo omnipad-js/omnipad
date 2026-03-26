@@ -46,15 +46,22 @@ export interface ISpatial {
  */
 export interface IConfigurable<TConfig> {
   /**
+   * Retrieves a snapshot of the current configuration.
+   */
+  getConfig(): TConfig;
+
+  /**
+   * Subscribes to config changes.
+   * @param cb - Callback function triggered on config updates.
+   * @returns An unsubscribe function.
+   */
+  subscribeConfig(cb: (config: TConfig) => void): () => void;
+
+  /**
    * Dynamically updates the current configuration.
    * @param config - Partial configuration object to merge.
    */
   updateConfig(config: Partial<TConfig>): void;
-
-  /**
-   * Retrieves a snapshot of the current configuration.
-   */
-  getConfig(): TConfig;
 }
 
 /**
