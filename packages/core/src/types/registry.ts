@@ -1,3 +1,4 @@
+import { InputActionSignal } from '.';
 import { ICoreEntity } from './traits';
 
 /**
@@ -66,4 +67,15 @@ export interface IRegistry {
    * Used for system resets or full application unmounts.
    */
   clear(): void;
+
+  /**
+   * Dispatches an input action signal to a specific target entity or a global handler.
+   *
+   * @param signal - The action signal object containing the target ID and payload data.
+   * @example
+   * ```typescript
+   * dispatcher.broadcastSignal({ targetStageId: 'player_1', type: 'KEYDOWN' });
+   * ```
+   */
+  broadcastSignal(signal: InputActionSignal): void;
 }

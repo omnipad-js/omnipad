@@ -1,6 +1,5 @@
 import { Registry } from '../registry';
 import { ActionMapping, ACTION_TYPES } from '../types';
-import { ICoreEntity, ISignalReceiver } from '../types/traits';
 import { KEYS } from '../types/keys';
 import { delayFrames } from './performance';
 
@@ -143,10 +142,8 @@ export class ActionEmitter {
   private emitSignal(signalType: string, extraPayload: any = {}): void {
     if (!this.targetId || !this.mapping) return;
 
-    const target = Registry.getInstance().getEntity<ICoreEntity & ISignalReceiver>(this.targetId);
-    if (!target) return;
-
-    target.handleSignal({
+    // 让注册表发送信号至目标
+    Registry.getInstance().broadcastSignal({
       targetStageId: this.targetId,
       type: signalType,
       payload: {

@@ -1,11 +1,36 @@
+import { InputActionSignal } from '../types';
 import { IRegistry } from '../types/registry';
-import { ICoreEntity } from '../types/traits';
+import { ICoreEntity, ISignalReceiver } from '../types/traits';
 
 /**
  * Unique symbol key for the global registry instance to ensure singleton
  * persistence across different modules or packages in a monorepo.
  */
 const GLOBAL_REGISTRY_KEY = Symbol.for('omnipad.registry.instance');
+
+/**
+ * A private placeholder for the global signal processor.
+ * @remarks
+ * This is designed to be environment-agnostic. The adaptation layer can override
+ * this based on the runtime context (e.g., setting it to `null` in a Node.js
+ * environment or mapping it to `window.dispatchEvent` in a browser).
+ */
+let globalSignalHandler: ((signal: InputActionSignal) => void) | null = null;
+
+/**
+ * Configures the global fallback handler for action signals.
+ *
+ * @param handler - A callback function that processes signals when no specific
+ * entity target is found.
+ * @example
+ * ```typescript
+ * // In a browser environment:
+ * setGlobalSignalHandler((signal) => window.postMessage(signal, '*'));
+ * ```
+ */
+export function setGlobalSignalHandler(handler: (signal: InputActionSignal) => void) {
+  globalSignalHandler = handler;
+}
 
 /**
  * Global Registry Singleton.
@@ -161,7 +186,16 @@ export class Registry implements IRegistry {
     });
   }
 
-  public debugGetSnapshot(): Map<string, ICoreEntity> {
-    return new Map(this.entities);
+  public broadcastSignal(signal: InputActionSignal) {
+    const target = this.getEntity<ICoreEntity & ISignalReceiver>(signal.targetStageId);
+
+    if (target) {
+      // A. 发送给具体的 TargetZone
+      target.handleSignal(signal);
+    } else if (globalSignalHandler) {
+      // B. 如果找不到目标，且有全局处理器，则交给全局处理器
+      // 这里的全局处理器就是派发给 window 的逻辑
+      globalSignalHandler(signal);
+    }
   }
 }
