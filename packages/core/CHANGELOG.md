@@ -1,5 +1,11 @@
 # @omnipad/core
 
+## 0.4.5
+
+### Patch Changes
+
+- refactor: decoupled signal dispatching, improved configuration and rect sync.
+
 ## 0.4.4
 
 ### Patch Changes

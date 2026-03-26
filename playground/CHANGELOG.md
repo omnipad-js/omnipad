@@ -1,5 +1,14 @@
 # playground
 
+## 0.4.5
+
+### Patch Changes
+
+- refactor: decoupled signal dispatching, improved configuration and rect sync.
+- Updated dependencies
+  - @omnipad/core@0.4.5
+  - @omnipad/vue@0.4.5
+
 ## 0.4.4
 
 ### Patch Changes
