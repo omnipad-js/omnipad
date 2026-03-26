@@ -1,5 +1,5 @@
 import { ICoreEntity, IResettable } from '../types/traits';
-import { ISpatial, IConfigurable, IObservable } from '../types/traits';
+import { ISpatial, IConfigurable, IStateful } from '../types/traits';
 import { Registry } from '../registry';
 import { SimpleEmitter } from '../utils/emitter';
 import { AbstractRect, EntityType } from '../types';
@@ -9,7 +9,7 @@ import { AbstractRect, EntityType } from '../types';
  * Provides fundamental identity management, state subscription, and spatial awareness.
  */
 export abstract class BaseEntity<TConfig, TState>
-  implements ICoreEntity, ISpatial, IResettable, IConfigurable<TConfig>, IObservable<TState>
+  implements ICoreEntity, ISpatial, IResettable, IConfigurable<TConfig>, IStateful<TState>
 {
   public readonly uid: string;
   public readonly type: EntityType;
@@ -37,16 +37,6 @@ export abstract class BaseEntity<TConfig, TState>
     // Registration is not automatic here, handled by adapter or subclasses
   }
 
-  // --- IObservable Implementation ---
-
-  public subscribe(cb: (state: TState) => void): () => void {
-    // 立即执行一次回调以确保 UI 初始状态同步 / Immediate callback execution to ensure initial UI state sync
-    cb(this.state);
-
-    // 委托给发射器管理后续订阅 / Delegate subsequent subscriptions to the emitter
-    return this.stateEmitter.subscribe(cb);
-  }
-
   // --- IConfigurable Implementation ---
 
   public getConfig(): Readonly<TConfig> {
@@ -70,19 +60,26 @@ export abstract class BaseEntity<TConfig, TState>
     this.configEmitter.emit(this.config);
   }
 
-  // --- State Management ---
+  // --- IStateful Management ---
 
-  /**
-   * Updates the internal state and notifies all subscribers.
-   *
-   * @param partialState - Partial object containing updated state values.
-   */
-  protected setState(partialState: Partial<TState>): void {
+  public getState(): Readonly<TState> {
+    return this.state;
+  }
+
+  public setState(partialState: Partial<TState>): void {
     // 执行状态浅合并 / Perform shallow merge of the state
     this.state = { ...this.state, ...partialState };
 
     // 触发更新通知 / Trigger update notification
     this.stateEmitter.emit(this.state);
+  }
+
+  public subscribeState(cb: (state: TState) => void): () => void {
+    // 立即执行一次回调以确保 UI 初始状态同步 / Immediate callback execution to ensure initial UI state sync
+    cb(this.state);
+
+    // 委托给发射器管理后续订阅 / Delegate subsequent subscriptions to the emitter
+    return this.stateEmitter.subscribe(cb);
   }
 
   // --- Lifecycle ---
@@ -114,9 +111,5 @@ export abstract class BaseEntity<TConfig, TState>
 
   public markRectDirty(): void {
     this._onMarkDirtyCb?.();
-  }
-
-  public getState(): Readonly<TState> {
-    return this.state;
   }
 }

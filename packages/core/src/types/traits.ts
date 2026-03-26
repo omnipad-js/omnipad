@@ -58,27 +58,33 @@ export interface IConfigurable<TConfig> {
   subscribeConfig(cb: (config: TConfig) => void): () => void;
 
   /**
-   * Dynamically updates the current configuration.
+   * Updates the internal config and notifies all subscribers.
    * @param config - Partial configuration object to merge.
    */
   updateConfig(config: Partial<TConfig>): void;
 }
 
 /**
- * Trait: Enables state subscription for the adapter layer (e.g., Vue/React).
+ * Trait: Provides state management.
  */
-export interface IObservable<TState> {
+export interface IStateful<TState> {
+  /**
+   * Retrieves the current state snapshot.
+   */
+  getState(): TState;
+
   /**
    * Subscribes to state changes.
    * @param cb - Callback function triggered on state updates.
    * @returns An unsubscribe function.
    */
-  subscribe(cb: (state: TState) => void): () => void;
+  subscribeState(cb: (state: TState) => void): () => void;
 
   /**
-   * Retrieves the current state snapshot.
+   * Updates the internal state and notifies all subscribers.
+   * @param state - Partial object containing updated state values.
    */
-  getState(): TState;
+  setState(state: Partial<TState>): void;
 }
 
 /**

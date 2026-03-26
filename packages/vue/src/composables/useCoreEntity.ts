@@ -97,8 +97,8 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
     Registry.getInstance().register(instance);
 
     // 订阅逻辑层状态与配置变化
-    if ('subscribe' in instance) {
-      (instance as any).subscribe(syncState);
+    if ('subscribeState' in instance) {
+      (instance as any).subscribeState(syncState);
     }
     if ('subscribeConfig' in instance) {
       (instance as any).subscribeConfig(syncConfig);
