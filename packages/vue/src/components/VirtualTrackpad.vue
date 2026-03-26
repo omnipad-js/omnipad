@@ -37,7 +37,7 @@ interface VirtualTrackpadProps {
 
 const props = defineProps<VirtualTrackpadProps>();
 
-const { uid, config, customClasses } = useWidgetConfig<TrackpadConfig>(CMP_TYPES.TRACKPAD, props, {
+const { uid, config } = useWidgetConfig<TrackpadConfig>(CMP_TYPES.TRACKPAD, props, {
   label: 'TRACKPAD',
   sensitivity: 1.0,
 });
@@ -70,7 +70,7 @@ defineExpose({
     :id="uid"
     ref="elementRef"
     class="omnipad-trackpad omnipad-prevent"
-    :class="customClasses"
+    :class="effectiveConfig?.cssClasses"
     :layout="effectiveLayout"
     :label="effectiveConfig?.label"
     :is-active="state?.isPressed"

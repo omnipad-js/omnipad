@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, shallowRef, ComputedRef } from 'vue';
+import { ref, onMounted, onUnmounted, shallowRef, ComputedRef, readonly } from 'vue';
 import {
   Registry,
   WindowManager,
@@ -147,11 +147,11 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   });
 
   return {
-    core,
-    state,
-    domEvents,
-    effectiveConfig,
-    effectiveLayout,
+    core: readonly(core),
+    state: readonly(state),
+    domEvents: readonly(domEvents),
+    effectiveConfig: readonly(effectiveConfig),
+    effectiveLayout: readonly(effectiveLayout),
     elementRef,
     bindDelegates,
   };

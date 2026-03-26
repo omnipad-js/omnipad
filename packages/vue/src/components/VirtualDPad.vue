@@ -55,11 +55,7 @@ const defaultProps = {
 };
 
 // 整合配置
-const { uid, config, customClasses } = useWidgetConfig<DPadConfig>(
-  CMP_TYPES.D_PAD,
-  props,
-  defaultProps,
-);
+const { uid, config } = useWidgetConfig<DPadConfig>(CMP_TYPES.D_PAD, props, defaultProps);
 
 // 桥接 Core
 const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } = useCoreEntity<
@@ -104,7 +100,7 @@ defineExpose({
   <VirtualAxisBase
     ref="elementRef"
     class="omnipad-dpad omnipad-prevent"
-    :class="customClasses"
+    :class="effectiveConfig?.cssClasses"
     :layout="effectiveLayout"
     :is-active="state?.isActive"
     :vector="state?.vector"

@@ -55,11 +55,7 @@ const defaultProps = {
   cursorSensitivity: 1.0,
 };
 
-const { uid, config, customClasses } = useWidgetConfig<JoystickConfig>(
-  CMP_TYPES.JOYSTICK,
-  props,
-  defaultProps,
-);
+const { uid, config } = useWidgetConfig<JoystickConfig>(CMP_TYPES.JOYSTICK, props, defaultProps);
 
 const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } = useCoreEntity<
   JoystickCore,
@@ -99,7 +95,7 @@ defineExpose({
   <VirtualAxisBase
     ref="elementRef"
     class="omnipad-joystick omnipad-prevent"
-    :class="customClasses"
+    :class="effectiveConfig?.cssClasses"
     :layout="effectiveLayout"
     :is-active="state?.isActive"
     :vector="state?.vector"

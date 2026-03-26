@@ -39,17 +39,15 @@ const slots = useSlots() as {
 const dynamicWidgetRef = ref<any>(null);
 
 // 整合配置
-const { uid, config, customClasses } = useWidgetConfig<InputZoneConfig>(
-  CMP_TYPES.INPUT_ZONE,
-  props,
-);
-const { core, state, domEvents, effectiveLayout, elementRef, bindDelegates } = useCoreEntity<
-  InputZoneCore,
-  InputZoneState,
-  InputZoneConfig
->(() => new InputZoneCore(uid.value, config.value, props.treeNode?.type), config, {
-  requireDirectHit: true,
-});
+const { uid, config } = useWidgetConfig<InputZoneConfig>(CMP_TYPES.INPUT_ZONE, props);
+const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef, bindDelegates } =
+  useCoreEntity<InputZoneCore, InputZoneState, InputZoneConfig>(
+    () => new InputZoneCore(uid.value, config.value, props.treeNode?.type),
+    config,
+    {
+      requireDirectHit: true,
+    },
+  );
 
 const fixedChildren = computed(() => {
   const targetUid = props.treeNode?.config?.dynamicWidgetId;
@@ -168,7 +166,7 @@ const onPointerCancel = (e: PointerEvent) => domEvents.value?.onPointerCancel(e)
     :id="uid"
     ref="elementRef"
     class="omnipad-input-zone omnipad-prevent"
-    :class="customClasses"
+    :class="effectiveConfig?.cssClasses"
     :style="containerStyle"
   >
     <!-- 基础层：VirtualLayerBase 处理静态 Children -->
