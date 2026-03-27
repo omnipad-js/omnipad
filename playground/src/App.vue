@@ -3,7 +3,8 @@ import { ref, computed, onBeforeMount } from 'vue';
 import RufflePlayer from './components/RufflePlayer.vue';
 import ConfigConsole from './components/ConfigConsole.vue';
 import { registerComponent, RootLayer } from '@omnipad/vue';
-import { GamepadManager, Registry, WindowManager } from '@omnipad/core';
+import { Registry } from '@omnipad/core';
+import { GamepadManager, WindowManager } from '@omnipad/core/dom';
 import { parseProfileJson, parseProfileTrees, exportProfile } from '@omnipad/core/utils';
 import CustomTrackpad from './components/CustomTrackpad.vue';
 

@@ -2,10 +2,7 @@ import { CONTEXT, KEYS, CMP_TYPES, ACTION_TYPES } from './types';
 
 export * from './types';
 
-export { GamepadManager } from './dom/GamepadManager';
-export { ElementObserver } from './dom/ElementObserver';
 export { Registry, setGlobalSignalHandler } from './registry';
-export { WindowManager } from './dom/WindowManager';
 
 export { BaseEntity } from './entities/BaseEntity';
 export { ButtonCore } from './entities/ButtonCore';
