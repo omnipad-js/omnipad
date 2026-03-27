@@ -21,12 +21,19 @@ export default defineConfig({
       fileName: 'omnipad-vue',
     },
     rollupOptions: {
-      external: ['vue', '@omnipad/core', '@omnipad/core/utils', /^@omnipad\/core\/.*/],
+      external: [
+        'vue',
+        '@omnipad/core',
+        '@omnipad/core/utils',
+        '@omnipad/core/dom',
+        /^@omnipad\/core\/.*/,
+      ],
       output: {
         globals: {
           vue: 'Vue',
           '@omnipad/core': 'OmniPadCore',
           '@omnipad/core/utils': 'OmniPadCoreUtils',
+          '@omnipad/core/dom': 'OmniPadCoreDom',
         },
         exports: 'named',
       },

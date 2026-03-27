@@ -8,7 +8,7 @@ import {
   type JoystickState,
   type LayoutBox,
 } from '@omnipad/core';
-import { supportsContainerQueries } from '@omnipad/core/utils';
+import { supportsContainerQueries } from '@omnipad/core/dom';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 import VirtualAxisBase from './VirtualAxisBase.vue';

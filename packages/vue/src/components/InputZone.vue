@@ -8,7 +8,8 @@ import {
   type InputZoneState,
   type LayoutBox,
 } from '@omnipad/core';
-import { resolveLayoutStyle, remap, supportsContainerQueries } from '@omnipad/core/utils';
+import { resolveLayoutStyle, remap } from '@omnipad/core/utils';
+import { supportsContainerQueries } from '@omnipad/core/dom';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { getComponent } from '../utils/componentRegistry';
 import VirtualLayerBase from './VirtualLayerBase.vue';

@@ -17,7 +17,8 @@ import {
   type ICoreEntity,
   type LayoutBox,
 } from '@omnipad/core';
-import { createCachedProvider, createPointerBridge, getObjectDiff } from '@omnipad/core/utils';
+import { createCachedProvider, getObjectDiff } from '@omnipad/core/utils';
+import { createPointerBridge } from '@omnipad/core/dom';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.

@@ -8,14 +8,13 @@ import {
   type LayoutBox,
   type TargetZoneConfig,
 } from '@omnipad/core';
+import { resolveLayoutStyle, remap } from '@omnipad/core/utils';
 import {
-  resolveLayoutStyle,
-  remap,
   supportsContainerQueries,
   dispatchKeyboardEvent,
   dispatchPointerEventAtPos,
   reclaimFocusAtPos,
-} from '@omnipad/core/utils';
+} from '@omnipad/core/dom';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { useWidgetConfig } from '../composables/useWidgetConfig';
 

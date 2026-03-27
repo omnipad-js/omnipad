@@ -32,9 +32,9 @@ const renderNodes = computed(() => {
 <template>
   <div class="omnipad-virtual-layer-base omnipad-prevent">
     <component
+      :is="item.component"
       v-for="item in renderNodes"
       :key="item.node.uid"
-      :is="item.component"
       :tree-node="item.node"
     />
 

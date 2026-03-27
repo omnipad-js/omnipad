@@ -1,7 +1,7 @@
 import './styles/index.css';
 
 import { setGlobalSignalHandler, ACTION_TYPES, CMP_TYPES } from '@omnipad/core';
-import { dispatchKeyboardEvent } from '@omnipad/core/utils';
+import { dispatchKeyboardEvent } from '@omnipad/core/dom';
 import { registerComponent } from './utils/componentRegistry';
 import InputZone from './components/InputZone.vue';
 import RootLayer from './components/RootLayer.vue';
