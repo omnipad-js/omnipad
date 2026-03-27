@@ -140,11 +140,11 @@ export class ActionEmitter {
    * Internal signal dispatcher.
    */
   private emitSignal(signalType: string, extraPayload: any = {}): void {
-    if (!this.targetId || !this.mapping) return;
+    if (!this.mapping) return;
 
     // 让注册表发送信号至目标
     Registry.getInstance().broadcastSignal({
-      targetStageId: this.targetId,
+      targetStageId: this.targetId || "",
       type: signalType,
       payload: {
         // 键盘字段
