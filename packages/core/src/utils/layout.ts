@@ -14,10 +14,10 @@ import { sanitizeDomString } from './security';
  * @param input - The raw length input.
  * @returns A sanitized ParsedLength.
  */
-export function parseLength(input: FlexibleLength | undefined): ParsedLength {
+export function parseLength(input: FlexibleLength | undefined): ParsedLength | undefined {
   // 1. 处理空值或无效值
-  if (input === undefined || input === null) {
-    return { value: 0, unit: 'px' };
+  if (input == null) {
+    return undefined;
   }
 
   // 2. 处理 ParsedLength 对象
@@ -66,8 +66,8 @@ export const sanitizeParsedLength = (parsed: ParsedLength): ParsedLength => {
 /**
  * Convert the ParsedLength back to a CSS string
  */
-export const lengthToCss = (parsed: ParsedLength): string => {
-  return `${parsed.value}${parsed.unit}`;
+export const lengthToCss = (parsed: ParsedLength | undefined): string | undefined => {
+  return parsed == null ? undefined : `${parsed.value}${parsed.unit}`;
 };
 
 /**
@@ -82,10 +82,23 @@ export function validateLayoutBox(raw: LayoutBox): LayoutBox {
     bottom: parseLength(raw.bottom),
     width: parseLength(raw.width),
     height: parseLength(raw.height),
-    anchor: raw.anchor || 'top-left',
-    zIndex: raw.zIndex ?? 0,
     // 关键：对选择器和类名进行脱毒处理 / Critical: Sanitize selector and class names
     stickySelector: sanitizeDomString(raw.stickySelector),
+  };
+}
+
+/**
+ * Compress layout properties into css strings.
+ */
+export function compressLayoutBox(raw: LayoutBox): LayoutBox {
+  return {
+    ...raw,
+    left: lengthToCss(raw.left as any),
+    top: lengthToCss(raw.top as any),
+    right: lengthToCss(raw.right as any),
+    bottom: lengthToCss(raw.bottom as any),
+    width: lengthToCss(raw.width as any),
+    height: lengthToCss(raw.height as any),
   };
 }
 
@@ -122,7 +135,7 @@ export const resolveLayoutStyle = (layout: LayoutBox): Record<string, string | n
     const rawValue = layout[field];
     if (rawValue != undefined) {
       const parsed = parseLength(rawValue as ParsedLength);
-      style[field] = lengthToCss(parsed);
+      if (parsed != null) style[field] = lengthToCss(parsed)!;
     }
   });
 
