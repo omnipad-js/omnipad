@@ -43,7 +43,7 @@ const containerStyle = computed(() => {
     :id="uid"
     ref="elementRef"
     class="omnipad-root-layer omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :style="containerStyle"
   >
     <VirtualLayerBase :nodes="treeNode?.children || []">

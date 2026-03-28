@@ -98,7 +98,7 @@ const onPointerCancel = (e: PointerEvent) => domEvents?.onPointerCancel?.(e);
     :id="uid"
     ref="elementRef"
     class="omnipad-target-zone omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :style="containerStyle"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"

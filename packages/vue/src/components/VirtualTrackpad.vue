@@ -74,7 +74,7 @@ defineExpose({
     :id="uid"
     ref="elementRef"
     class="omnipad-trackpad omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :layout="effectiveLayout"
     :label="effectiveConfig?.label"
     :is-active="state?.isPressed"

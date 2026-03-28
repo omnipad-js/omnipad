@@ -17,7 +17,7 @@
           "height": "100%"
         },
         "baseType": "root-layer",
-        "cssClasses": "red-team"
+        "cssClass": "red-team"
       }
     },
     {
@@ -104,7 +104,7 @@
           "anchor": "center"
         },
         "baseType": "button",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     },
     {
@@ -162,7 +162,7 @@
           "height": "100%"
         },
         "baseType": "root-layer",
-        "cssClasses": "blue-team"
+        "cssClass": "blue-team"
       }
     },
     {
@@ -204,7 +204,7 @@
           "anchor": "center"
         },
         "baseType": "input-zone",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     },
     {
@@ -225,7 +225,7 @@
           "anchor": "center"
         },
         "baseType": "button",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     },
     {

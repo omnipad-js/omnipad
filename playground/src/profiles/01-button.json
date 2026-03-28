@@ -74,7 +74,7 @@
           "anchor": "center"
         },
         "baseType": "button",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     }
   ]

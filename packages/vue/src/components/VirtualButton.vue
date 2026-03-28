@@ -69,7 +69,7 @@ defineExpose({
     :id="uid"
     ref="elementRef"
     class="omnipad-button omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :layout="effectiveLayout"
     :label="effectiveConfig?.label"
     :is-active="state?.isPressed"

@@ -103,7 +103,7 @@
           "anchor": "center"
         },
         "baseType": "button",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     },
     {
@@ -202,7 +202,7 @@
           "anchor": "center"
         },
         "baseType": "input-zone",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     },
     {
@@ -223,7 +223,7 @@
           "anchor": "center"
         },
         "baseType": "button",
-        "cssClasses": "round-button"
+        "cssClass": "round-button"
       }
     },
     {

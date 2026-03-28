@@ -57,7 +57,7 @@ export interface BaseConfig {
    *
    * For visual decoration only; must not include layout attributes such as top/left/width/height while the same properties are set in `layout: LayoutBox`.
    */
-  cssClasses?: string | string[];
+  cssClass?: string;
 }
 
 /**

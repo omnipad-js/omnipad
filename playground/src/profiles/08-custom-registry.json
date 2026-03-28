@@ -17,7 +17,7 @@
           "height": "100%"
         },
         "baseType": "root-layer",
-        "cssClasses": ["show-static-trackpad"],
+        "cssClass": "show-static-trackpad",
         "hasStaticTrackpad": true
       }
     },

@@ -170,7 +170,7 @@ const onPointerCancel = (e: PointerEvent) => domEvents?.onPointerCancel?.(e);
     :id="uid"
     ref="elementRef"
     class="omnipad-input-zone omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :style="containerStyle"
   >
     <!-- 基础层：VirtualLayerBase 处理静态 Children -->
