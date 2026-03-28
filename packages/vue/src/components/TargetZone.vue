@@ -50,7 +50,7 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
   CursorState,
   TargetZoneConfig
 >(
-  () => new TargetZoneCore(uid, initialConfig, props.treeNode?.type),
+  () => new TargetZoneCore(uid.value, initialConfig.value, props.treeNode?.type),
   reactiveConfig,
   {},
   {
@@ -98,7 +98,7 @@ const onPointerCancel = (e: PointerEvent) => domEvents?.onPointerCancel?.(e);
     :id="uid"
     ref="elementRef"
     class="omnipad-target-zone omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :style="containerStyle"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"

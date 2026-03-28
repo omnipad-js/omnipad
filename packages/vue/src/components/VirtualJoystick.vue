@@ -65,7 +65,7 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
   JoystickCore,
   JoystickState,
   JoystickConfig
->(() => new JoystickCore(uid, initialConfig, props.treeNode?.type), reactiveConfig);
+>(() => new JoystickCore(uid.value, initialConfig.value, props.treeNode?.type), reactiveConfig);
 
 const canUseNativeCQ = supportsContainerQueries();
 const baseRadius = ref({ x: 0, y: 0 });
@@ -99,7 +99,7 @@ defineExpose({
   <VirtualAxisBase
     ref="elementRef"
     class="omnipad-joystick omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :layout="effectiveLayout"
     :is-active="state?.isActive"
     :vector="state?.vector"

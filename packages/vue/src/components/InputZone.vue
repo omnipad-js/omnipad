@@ -46,7 +46,7 @@ const { uid, initialConfig, reactiveConfig } = useWidgetConfig<InputZoneConfig>(
 );
 const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef, bindDelegates } =
   useCoreEntity<InputZoneCore, InputZoneState, InputZoneConfig>(
-    () => new InputZoneCore(uid, initialConfig, props.treeNode?.type),
+    () => new InputZoneCore(uid.value, initialConfig.value, props.treeNode?.type),
     reactiveConfig,
     {
       requireDirectHit: true,
@@ -170,7 +170,7 @@ const onPointerCancel = (e: PointerEvent) => domEvents?.onPointerCancel?.(e);
     :id="uid"
     ref="elementRef"
     class="omnipad-input-zone omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :style="containerStyle"
   >
     <!-- 基础层：VirtualLayerBase 处理静态 Children -->

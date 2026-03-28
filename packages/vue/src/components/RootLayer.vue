@@ -29,7 +29,7 @@ const { uid, initialConfig, reactiveConfig } = useWidgetConfig<BaseConfig>(
 );
 
 const { effectiveConfig, effectiveLayout, elementRef } = useCoreEntity(
-  () => new RootLayerCore(uid, initialConfig, props.treeNode?.type),
+  () => new RootLayerCore(uid.value, initialConfig.value, props.treeNode?.type),
   reactiveConfig,
 );
 
@@ -43,7 +43,7 @@ const containerStyle = computed(() => {
     :id="uid"
     ref="elementRef"
     class="omnipad-root-layer omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :style="containerStyle"
   >
     <VirtualLayerBase :nodes="treeNode?.children || []">

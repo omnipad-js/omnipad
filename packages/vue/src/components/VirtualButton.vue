@@ -45,7 +45,7 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
   ButtonCore,
   ButtonState,
   ButtonConfig
->(() => new ButtonCore(uid, initialConfig, props.treeNode?.type), reactiveConfig);
+>(() => new ButtonCore(uid.value, initialConfig.value, props.treeNode?.type), reactiveConfig);
 
 // 转发交互
 const onPointerDown = (e: PointerEvent) => domEvents?.onPointerDown?.(e);
@@ -69,7 +69,7 @@ defineExpose({
     :id="uid"
     ref="elementRef"
     class="omnipad-button omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :layout="effectiveLayout"
     :label="effectiveConfig?.label"
     :is-active="state?.isPressed"

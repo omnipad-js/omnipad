@@ -66,7 +66,7 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
   DPadCore,
   DPadState,
   DPadConfig
->(() => new DPadCore(uid, initialConfig, props.treeNode?.type), reactiveConfig);
+>(() => new DPadCore(uid.value, initialConfig.value, props.treeNode?.type), reactiveConfig);
 
 const canUseNativeCQ = supportsContainerQueries();
 
@@ -104,7 +104,7 @@ defineExpose({
   <VirtualAxisBase
     ref="elementRef"
     class="omnipad-dpad omnipad-prevent"
-    :class="effectiveConfig?.cssClasses"
+    :class="effectiveConfig?.cssClass"
     :layout="effectiveLayout"
     :is-active="state?.isActive"
     :vector="state?.vector"
