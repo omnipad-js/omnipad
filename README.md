@@ -186,7 +186,7 @@ const forest = computed(() => parseProfileTrees(parseProfileJson(profileRaw)));
 Want to use an Xbox or PlayStation controller? Simply add a mapping table. OmniPad automatically handles controller polling. When you press a physical button, the corresponding virtual button on the screen will **synchronously trigger** its press animation, providing perfect haptic feedback.
 
 ```typescript
-import { GamepadManager } from '@omnipad/core';
+import { GamepadManager } from '@omnipad/core/dom';
 
 // Start global physical gamepad monitoring
 GamepadManager.getInstance().setConfig(forest.value.runtimeGamepadMappings);

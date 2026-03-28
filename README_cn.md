@@ -187,7 +187,7 @@ const forest = computed(() => parseProfileTrees(parseProfileJson(profileRaw)));
 想在网页里使用 Xbox 或 PlayStation 手柄？只需在配置中添加映射表，OmniPad 将自动接管手柄轮询。当你在实体手柄上按下按键时，屏幕上对应的虚拟按钮将**同步触发**按下动画，提供完美的交互回馈。
 
 ```typescript
-import { GamepadManager } from '@omnipad/core';
+import { GamepadManager } from '@omnipad/core/dom';
 
 // 启动全局实体手柄监控
 GamepadManager.getInstance().setConfig(forest.value.runtimeGamepadMappings);
