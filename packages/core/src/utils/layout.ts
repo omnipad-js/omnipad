@@ -6,6 +6,7 @@ import {
   ParsedLength,
   FlexibleLength,
 } from '../types';
+import { sanitizeDomString } from './security';
 
 /**
  * Convert the length input into a sanitized ParsedLength
@@ -68,6 +69,25 @@ export const sanitizeParsedLength = (parsed: ParsedLength): ParsedLength => {
 export const lengthToCss = (parsed: ParsedLength): string => {
   return `${parsed.value}${parsed.unit}`;
 };
+
+/**
+ * Validate a raw LayoutBox config.
+ */
+export function validateLayoutBox(raw: LayoutBox): LayoutBox {
+  return {
+    ...raw,
+    left: parseLength(raw.left),
+    top: parseLength(raw.top),
+    right: parseLength(raw.right),
+    bottom: parseLength(raw.bottom),
+    width: parseLength(raw.width),
+    height: parseLength(raw.height),
+    anchor: raw.anchor || 'top-left',
+    zIndex: raw.zIndex ?? 0,
+    // 关键：对选择器和类名进行脱毒处理 / Critical: Sanitize selector and class names
+    stickySelector: sanitizeDomString(raw.stickySelector),
+  };
+}
 
 /**
  * Converts a LayoutBox configuration into a CSS style object suitable for Vue/React.
