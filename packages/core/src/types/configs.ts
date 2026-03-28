@@ -41,7 +41,7 @@ export interface LayoutBox {
 export interface BaseConfig {
   /**
    * Config ID (CID) used in persistent storage.
-   * 
+   *
    * If omitted, a random UID will be generated during parsing.
    * If starts with '$', it points to a global static entity. (UID = CID)
    */
@@ -54,7 +54,7 @@ export interface BaseConfig {
   layout: LayoutBox;
   /**
    * Custom CSS class names or style tags.
-   * 
+   *
    * For visual decoration only; must not include layout attributes such as top/left/width/height while the same properties are set in `layout: LayoutBox`.
    */
   cssClasses?: string | string[];
