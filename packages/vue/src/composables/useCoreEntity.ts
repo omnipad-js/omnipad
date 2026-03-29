@@ -59,6 +59,10 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
   // 吸附模式 Provider
   let stickyProvider: StickyProvider | null;
+  const stickyUpdateTick = ref(0);
+  const triggerLayoutUpdate = () => {
+    stickyUpdateTick.value = (stickyUpdateTick.value % 65535) + 1;
+  };
 
   watch(
     // 1. 精确定义依赖源：只有这个字符串变了，才触发回调
@@ -68,6 +72,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
       // 2. 逻辑分流
       if (!newSelector) {
         stickyProvider = null;
+        triggerLayoutUpdate();
         return;
       }
 
@@ -97,6 +102,9 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
           (instance as any).reset();
         }
       });
+
+      // 发送吸附配置更改信号
+      triggerLayoutUpdate();
 
       // 5. 利用 watch 提供的 onCleanup 钩子注销观察
       onCleanup(() => {
@@ -189,11 +197,10 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
           cached.markDirty();
 
           // 如果存在吸附目标，顺便也把吸附目标的缓存清了
-          stickyProvider?.markDirty();
-
           if (stickyProvider) {
-            // 强制触发 watchEffect 里的 Rect 重新获取
-            stickyProvider.getRect();
+            stickyProvider.markDirty();
+            // 触发吸附模式更新信号
+            triggerLayoutUpdate();
           }
         });
 
@@ -235,7 +242,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
     const rawLayout = effectiveConfig.value?.layout as LayoutBox;
 
     // 如果没有配置吸附，直接返回
-    if (!stickyProvider) return rawLayout;
+    if (!stickyProvider || !stickyUpdateTick.value) return rawLayout;
 
     // 执行换算 (resolveStickyLayout 内部会调用 provider.getRect())
     const targetRect = stickyProvider.getRect();
