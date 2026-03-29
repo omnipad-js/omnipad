@@ -3,7 +3,7 @@
  * Validates selectors and class names.
  */
 
-const SAFE_SELECTOR_PATTERN = /^[a-zA-Z0-9\s._#\-*>+~]+$/;
+const SAFE_SELECTOR_PATTERN = /^[a-zA-Z0-9\s._#$\-*>+~]+$/;
 export const DANGEROUS_KEYWORDS = Object.freeze([
   'script',
   'onerror',
