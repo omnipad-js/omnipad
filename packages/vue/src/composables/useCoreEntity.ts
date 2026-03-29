@@ -15,8 +15,18 @@ import {
   type ICoreEntity,
   type LayoutBox,
 } from '@omnipad/core';
-import { createCachedProvider, getObjectDiff } from '@omnipad/core/utils';
-import { ElementObserver, WindowManager, createPointerBridge } from '@omnipad/core/dom';
+import {
+  createCachedProvider,
+  getObjectDiff,
+  resolveStickyLayout,
+  StickyProvider,
+} from '@omnipad/core/utils';
+import {
+  ElementObserver,
+  WindowManager,
+  createPointerBridge,
+  createWebStickyProvider,
+} from '@omnipad/core/dom';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.
@@ -47,15 +57,54 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   const effectiveConfig = ref<C>();
   const elementRef = ref<any>(null);
 
-  const bindDelegates = (delegates: Record<string, AnyFunction>) => {
-    if (!core.value) return;
+  // 吸附模式 Provider
+  let stickyProvider: StickyProvider | null;
 
-    if ('bindDelegate' in core.value) {
-      Object.entries(delegates).forEach(([key, fn]) => {
-        (core.value as any).bindDelegate(key, fn);
+  watch(
+    // 1. 精确定义依赖源：只有这个字符串变了，才触发回调
+    () => effectiveConfig.value?.layout?.stickySelector,
+
+    (newSelector, oldSelector, onCleanup) => {
+      // 2. 逻辑分流
+      if (!newSelector) {
+        stickyProvider = null;
+        return;
+      }
+
+      let updated: boolean = false;
+
+      // 3. 执行昂贵的初始化逻辑 (只在 selector 变化时执行一次)
+      if (!stickyProvider) {
+        stickyProvider = createWebStickyProvider(newSelector);
+        updated = true;
+      } else {
+        updated = stickyProvider.updateSelector(newSelector);
+      }
+
+      if (!updated) return;
+      const targetEl = stickyProvider.getTarget();
+      if (!targetEl) return;
+
+      // 4. 注册 Observer
+      const stickyKey = instance.uid + '-sticky';
+      ElementObserver.getInstance().observeResize(stickyKey, targetEl, () => {
+        // 这里的逻辑依然由单例池节流
+        stickyProvider?.markDirty();
+        (instance as any).markRectDirty();
       });
-    }
-  };
+      ElementObserver.getInstance().observeIntersect(stickyKey, targetEl, (isVisible) => {
+        if (!isVisible) {
+          (instance as any).reset();
+        }
+      });
+
+      // 5. 利用 watch 提供的 onCleanup 钩子注销观察
+      onCleanup(() => {
+        ElementObserver.getInstance().disconnect(stickyKey);
+      });
+    },
+    { immediate: true }, // 必须开启，以处理初始配置即存在吸附的情况
+  );
 
   // 监听外部 Props 配置变化
   let lastExternalConfig = { ...externalConfig.value };
@@ -77,6 +126,17 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
     },
     { deep: true },
   );
+
+  // 运行时注入依赖的入口函数
+  const bindDelegates = (delegates: Record<string, AnyFunction>) => {
+    if (!core.value) return;
+
+    if ('bindDelegate' in core.value) {
+      Object.entries(delegates).forEach(([key, fn]) => {
+        (core.value as any).bindDelegate(key, fn);
+      });
+    }
+  };
 
   onMounted(() => {
     core.value = instance;
@@ -124,7 +184,18 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
         // B. 注入逻辑层
         // 传入获取方法 cached.get 和 适配层清理缓存的方法 cached.markDirty
-        (instance as any).bindRectProvider(cached.get, cached.markDirty);
+        (instance as any).bindRectProvider(cached.get, () => {
+          // 清理组件自身的 Rect 缓存
+          cached.markDirty();
+
+          // 如果存在吸附目标，顺便也把吸附目标的缓存清了
+          stickyProvider?.markDirty();
+
+          if (stickyProvider) {
+            // 强制触发 watchEffect 里的 Rect 重新获取
+            stickyProvider.getRect();
+          }
+        });
 
         // C. 监听“自身”尺寸变化 (RO)
         observer.observeResize(instance.uid, domEl, () => {
@@ -148,6 +219,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   onUnmounted(() => {
     // 销毁观察器防止内存泄漏
     ElementObserver.getInstance().disconnect(instance.uid);
+    ElementObserver.getInstance().disconnect(instance.uid + '-sticky');
     // 销毁 Core
     if (core.value) {
       core.value.destroy(); // 内部会处理 Registry.unregister
@@ -160,8 +232,14 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
   // 根据有效配置的布局设定计算获得最终有效的布局
   const effectiveLayout = computed<LayoutBox>(() => {
-    if (!effectiveConfig.value?.layout) return {};
-    return effectiveConfig.value?.layout as LayoutBox;
+    const rawLayout = effectiveConfig.value?.layout as LayoutBox;
+
+    // 如果没有配置吸附，直接返回
+    if (!stickyProvider) return rawLayout;
+
+    // 执行换算 (resolveStickyLayout 内部会调用 provider.getRect())
+    const targetRect = stickyProvider.getRect();
+    return targetRect ? resolveStickyLayout(rawLayout, targetRect) : rawLayout;
   });
 
   return {
