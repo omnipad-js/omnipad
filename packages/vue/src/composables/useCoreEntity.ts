@@ -12,7 +12,13 @@ import {
   Registry,
   type AnyFunction,
   type BaseConfig,
+  type IConfigurable,
   type ICoreEntity,
+  type IDependencyBindable,
+  type IPointerHandler,
+  type IResettable,
+  type ISpatial,
+  type IStateful,
   type LayoutBox,
 } from '@omnipad/core';
 import { createCachedProvider, getObjectDiff, StickyProvider } from '@omnipad/core/utils';
@@ -91,11 +97,11 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
       ElementObserver.getInstance().observeResize(stickyKey, targetEl, () => {
         // 这里的逻辑依然由单例池节流
         stickyProvider?.markDirty();
-        (instance as any).markRectDirty();
+        (instance as unknown as ISpatial).markRectDirty();
       });
       ElementObserver.getInstance().observeIntersect(stickyKey, targetEl, (isVisible) => {
         if (!isVisible) {
-          (instance as any).reset();
+          (instance as unknown as IResettable).reset();
         }
       });
 
@@ -122,7 +128,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
       if (Object.keys(diff).length > 0) {
         // 2. 只把变动的部分推送给 Core
-        (core.value as any).updateConfig(diff as any);
+        (core.value as unknown as IConfigurable<C>).updateConfig(diff as C);
       }
 
       // 3. 更新快照，为下一次对比做准备
@@ -137,7 +143,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
     if ('bindDelegate' in core.value) {
       Object.entries(delegates).forEach(([key, fn]) => {
-        (core.value as any).bindDelegate(key, fn);
+        (core.value as unknown as IDependencyBindable).bindDelegate(key, fn);
       });
     }
   };
@@ -150,10 +156,14 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
     // 订阅逻辑层状态与配置变化
     if ('subscribeState' in instance) {
-      (instance as any).subscribeState((newState: S) => (state.value = newState));
+      (instance as unknown as IStateful<S>).subscribeState(
+        (newState: S) => (state.value = newState),
+      );
     }
     if ('subscribeConfig' in instance) {
-      (instance as any).subscribeConfig((newConfig: C) => (effectiveConfig.value = newConfig));
+      (instance as unknown as IConfigurable<C>).subscribeConfig(
+        (newConfig: C) => (effectiveConfig.value = newConfig),
+      );
     }
 
     // 初始时绑定的依赖方法
@@ -188,7 +198,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
         // B. 注入逻辑层
         // 传入获取方法 cached.get 和 适配层清理缓存的方法 cached.markDirty
-        (instance as any).bindRectProvider(cached.get, () => {
+        (instance as unknown as ISpatial).bindRectProvider(cached.get, () => {
           // 清理组件自身的 Rect 缓存
           cached.markDirty();
 
@@ -202,14 +212,14 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
         // C. 监听“自身”尺寸变化 (RO)
         observer.observeResize(instance.uid, domEl, () => {
-          (instance as any).markRectDirty();
+          (instance as unknown as ISpatial).markRectDirty();
         });
       }
 
       // 注册可见性观察 (IO)
       observer.observeIntersect(instance.uid, domEl, (isVisible) => {
         if (!isVisible) {
-          (instance as any).reset();
+          (instance as unknown as IResettable).reset();
         }
       });
     }
@@ -231,7 +241,9 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
 
   // 自动生成标准化 DOM 事件，在组件层根据需要绑定
   const domEvents: Record<string, any> =
-    'onPointerDown' in instance ? createPointerBridge(instance as any, domEventOptions) : {};
+    'onPointerDown' in instance
+      ? createPointerBridge(instance as unknown as IPointerHandler, domEventOptions)
+      : {};
 
   // 根据有效配置的布局设定计算获得最终有效的布局
   const effectiveLayout = computed<LayoutBox>(() => {
