@@ -8,7 +8,7 @@ import {
   type InputZoneState,
   type LayoutBox,
 } from '@omnipad/core';
-import { resolveLayoutStyle, remap } from '@omnipad/core/utils';
+import { resolveLayoutStyle, projectPercentToBox } from '@omnipad/core/utils';
 import { supportsContainerQueries } from '@omnipad/core/dom';
 import { useCoreEntity } from '../composables/useCoreEntity';
 import { getComponent } from '../utils/componentRegistry';
@@ -139,20 +139,18 @@ const canUseNativeCQ = supportsContainerQueries();
 const dynamicWrapperStyle = computed(() => {
   if (!state.value) return { display: 'none' };
   if (!state.value?.isDynamicActive) return { visibility: 'hidden' as const, opacity: 0 };
-  let cursorX, cursorY;
+
   const pos = state?.value?.dynamicPosition;
-  if (canUseNativeCQ) {
-    cursorX = `${pos.x}cqw`;
-    cursorY = `${pos.y}cqh`;
-  } else {
-    const rect = core?.value?.rect;
-    cursorX = `${remap(pos?.x || 0, 0, 100, 0, rect?.width || 0)}px`;
-    cursorY = `${remap(pos?.y || 0, 0, 100, 0, rect?.height || 0)}px`;
-  }
+  const getSize = () => {
+    const size = core?.value?.rect;
+    return { x: size?.width || 0, y: size?.height || 0 };
+  };
+  const res = projectPercentToBox(pos, getSize, canUseNativeCQ);
+
   return {
     zIndex: 100,
-    '--dynamic-widget-mount-x': cursorX,
-    '--dynamic-widget-mount-y': cursorY,
+    '--dynamic-widget-mount-x': res.x,
+    '--dynamic-widget-mount-y': res.y,
     visibility: 'visible' as const,
     opacity: 1,
     pointerEvents: 'auto' as const,

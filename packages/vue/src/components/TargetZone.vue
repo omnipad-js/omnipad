@@ -8,7 +8,7 @@ import {
   type LayoutBox,
   type TargetZoneConfig,
 } from '@omnipad/core';
-import { resolveLayoutStyle, remap } from '@omnipad/core/utils';
+import { resolveLayoutStyle, projectPercentToBox } from '@omnipad/core/utils';
 import {
   supportsContainerQueries,
   dispatchKeyboardEvent,
@@ -70,19 +70,17 @@ const canUseNativeCQ = supportsContainerQueries();
 // 光标位置样式
 const cursorStyle = computed(() => {
   if (!state.value) return { display: 'none' };
-  let cursorX, cursorY;
+
   const pos = state?.value?.position;
-  if (canUseNativeCQ) {
-    cursorX = `${pos.x}cqw`;
-    cursorY = `${pos.y}cqh`;
-  } else {
-    const rect = core?.value?.rect;
-    cursorX = `${remap(pos?.x || 0, 0, 100, 0, rect?.width || 0)}px`;
-    cursorY = `${remap(pos?.y || 0, 0, 100, 0, rect?.height || 0)}px`;
-  }
+  const getSize = () => {
+    const size = core?.value?.rect;
+    return { x: size?.width || 0, y: size?.height || 0 };
+  };
+  const res = projectPercentToBox(pos, getSize, canUseNativeCQ);
+
   return {
-    '--omnipad-virtual-cursor-x': cursorX,
-    '--omnipad-virtual-cursor-y': cursorY,
+    '--omnipad-virtual-cursor-x': res.x,
+    '--omnipad-virtual-cursor-y': res.y,
     opacity: state.value.isVisible ? 1 : 0,
   };
 });
