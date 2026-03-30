@@ -1,5 +1,6 @@
 import { EntityType } from '../types';
 import { BaseConfig, ConfigTreeNode } from '../types/configs';
+import { filterObjectByKeys, mergeObjects } from '../utils/object';
 
 /**
  * Extract filtered override configurations.
@@ -7,13 +8,7 @@ import { BaseConfig, ConfigTreeNode } from '../types/configs';
  * @param skipKeys Ignore key set
  */
 export function getOverrideProps(props: Record<string, any>, skipKeys: Set<string>) {
-  const result: Record<string, any> = {};
-  for (const key in props) {
-    if (props[key] !== undefined && !skipKeys.has(key)) {
-      result[key] = props[key];
-    }
-  }
-  return result;
+  return filterObjectByKeys(props, skipKeys);
 }
 
 /**
@@ -48,20 +43,19 @@ export function mergeWidgetConfig<T extends BaseConfig>(
   treeConfig: Record<string, any>,
   overrideProps: Record<string, any>,
 ): T {
-  return {
-    ...defaultProps,
-    ...treeConfig,
-    ...overrideProps,
-    id: uid,
-    baseType: requiredType,
-    parentId,
-    // 对 layout 进行特殊的深度合并
-    layout: {
-      ...(defaultProps.layout || {}),
-      ...(treeConfig.layout || {}),
-      ...(overrideProps.layout || {}),
-    },
-  } as T;
+  // 1. 先进行整体扁平属性的合并
+  const merged = mergeObjects<T>(defaultProps, treeConfig, overrideProps);
+
+  // 2. 注入固定身份信息
+  merged.id = uid;
+  merged.baseType = requiredType;
+  merged.parentId = parentId;
+
+  // 3. 特殊处理：Layout 深度合并
+  // 即使 businessProps 只传了 { width: 100 }，也要确保不会丢失 treeConfig 里的 { left: '10%' }
+  merged.layout = mergeObjects(defaultProps.layout, treeConfig.layout, overrideProps.layout);
+
+  return merged;
 }
 
 /**
