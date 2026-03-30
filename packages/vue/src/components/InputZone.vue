@@ -7,6 +7,8 @@ import {
   type InputZoneConfig,
   type InputZoneState,
   type LayoutBox,
+  filterNotDynamicChildren,
+  resolveDynamicWidget,
 } from '@omnipad/core';
 import { resolveLayoutStyle, projectPercentToBox } from '@omnipad/core/utils';
 import { supportsContainerQueries } from '@omnipad/core/dom';
@@ -54,8 +56,10 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef, bi
   );
 
 const fixedChildren = computed(() => {
-  const targetUid = props.treeNode?.config?.dynamicWidgetId;
-  return props.treeNode?.children?.filter((child) => child.uid !== targetUid) || [];
+  return filterNotDynamicChildren(
+    props.treeNode?.children,
+    props.treeNode?.config?.dynamicWidgetId,
+  );
 });
 
 // 唯一性校验与 VNode 过滤逻辑
@@ -69,30 +73,11 @@ const dynamicControlInfo = computed(() => {
     return true;
   });
 
-  const configTemplate = props.treeNode?.children?.find(
-    (child) => child.uid === props.treeNode?.config?.dynamicWidgetId,
+  return resolveDynamicWidget(
+    validSlotNodes,
+    props.treeNode?.children,
+    props.treeNode?.config?.dynamicWidgetId,
   );
-  const hasSlot = validSlotNodes.length > 0;
-
-  // 冲突与唯一性处理策略：
-  // 1. 若 Slot 内部有多个组件，只取第一个
-  if (validSlotNodes.length > 1) {
-    console.error(
-      `[OmniPad-Validation] InputZone ${uid} has multiple dynamic widgets in slot. Only the first one will be activated.`,
-    );
-  }
-
-  // 2. 若 Slot 和 Config 同时存在，Slot 胜出，Config 被忽略
-  if (hasSlot && configTemplate) {
-    console.warn(
-      `[OmniPad-Validation] InputZone ${uid} has both Slot and Config dynamic widgets. Config ignored.`,
-    );
-  }
-
-  return {
-    nodeToRender: hasSlot ? validSlotNodes[0] : configTemplate || null,
-    isFromSlot: hasSlot,
-  };
 });
 
 // --- 根据 Config 渲染的组件 ---
