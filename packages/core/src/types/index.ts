@@ -124,7 +124,7 @@ export type InputActionType = BuiltInActionType | (string & {});
  * Supported CSS units for layout calculation.
  * Using a constant array for runtime validation.
  */
-export const VALID_UNITS = ['px', '%', 'vh', 'vw', 'rem', 'em'] as const;
+export const VALID_UNITS = ['px', '%', 'vh', 'vw', 'vmin', 'vmax', 'rem', 'em'] as const;
 
 /**
  * Derived type for type safety in TS
