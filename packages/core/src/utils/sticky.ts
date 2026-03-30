@@ -79,6 +79,8 @@ export class StickyProvider {
 }
 
 /**
+ * @deprecated Use `/dom/flattenToHostLayout(layout, refRect)` instead.
+ *
  * Resolves a relative "Sticky" layout into absolute viewport coordinates.
  *
  * This function calculates the exact pixel positions required for `fixed` CSS positioning

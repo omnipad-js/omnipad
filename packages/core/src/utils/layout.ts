@@ -107,23 +107,23 @@ export function compressLayoutBox(raw: LayoutBox): LayoutBox {
  * Resolves a relative 'absolute' layout configuration into a 'fixed' pixel-based layout.
  *
  * **Transformation:**
- * - **Input:** A `layout` defined relative to the `targetRect` (similar to CSS `position: absolute`).
- * - **Output:** A `layout` defined in the same coordinate space as the `targetRect` (similar to CSS `position: fixed` or global coordinates).
+ * - **Input:** A `layout` defined relative to the `refRect` (similar to CSS `position: absolute`).
+ * - **Output:** A `layout` defined in the same coordinate space as the `refRect` (similar to CSS `position: fixed` or global coordinates).
  *
  * **Key Logic:**
- * 1. Converts dynamic units (like `%`) into `px` based on the `targetRect`'s dimensions.
- * 2. Adds the `targetRect`'s own offset (`left`/`top`) to the result, effectively
+ * 1. Converts dynamic units (like `%`) into `px` based on the `refRect`'s dimensions.
+ * 2. Adds the `refRect`'s own offset (`left`/`top`) to the result, effectively
  * "pinning" the layout to a fixed position in the parent/viewport coordinate system.
  * 3. Clears `right` and `bottom` to ensure the output is a normalized [left, top, width, height] box.
  *
  * @param layout - The relative layout (e.g., `{ left: '10%' }` of the target).
- * @param targetRect - The reference rect used as the "container" for calculation.
+ * @param refRect - The reference rect used as the "container" for calculation.
  * @param toPx - Optional converter for custom unit handling.
  * @returns A normalized `LayoutBox` with fixed pixel strings.
  */
 export function flattenRelativeLayout(
   layout: LayoutBox,
-  targetRect: AbstractRect,
+  refRect: AbstractRect,
   toPx?: (p: ParsedLength | undefined, base: number) => number,
 ): LayoutBox {
   // 1. 解析所有维度参数
@@ -145,18 +145,18 @@ export function flattenRelativeLayout(
 
   if (pL !== null && pR !== null && pW === null) {
     // 情况 A: left + right 决定宽度
-    finalLeft = targetRect.left + toPx(pL, targetRect.width);
-    const rightOffset = targetRect.right - toPx(pR, targetRect.width);
+    finalLeft = refRect.left + toPx(pL, refRect.width);
+    const rightOffset = refRect.right - toPx(pR, refRect.width);
     finalWidth = rightOffset - finalLeft;
   } else {
     // 情况 B: 标准优先级 (left > right)
-    finalWidth = pW ? toPx(pW, targetRect.width) : 0;
+    finalWidth = pW ? toPx(pW, refRect.width) : 0;
     if (pL !== null) {
-      finalLeft = targetRect.left + toPx(pL, targetRect.width);
+      finalLeft = refRect.left + toPx(pL, refRect.width);
     } else if (pR !== null) {
-      finalLeft = targetRect.right - toPx(pR, targetRect.width) - finalWidth;
+      finalLeft = refRect.right - toPx(pR, refRect.width) - finalWidth;
     } else {
-      finalLeft = targetRect.left; // 默认靠左
+      finalLeft = refRect.left; // 默认靠左
     }
   }
 
@@ -166,18 +166,18 @@ export function flattenRelativeLayout(
 
   if (pT !== null && pB !== null && pH === null) {
     // 情况 A: top + bottom 决定高度
-    finalTop = targetRect.top + toPx(pT, targetRect.height);
-    const bottomOffset = targetRect.bottom - toPx(pB, targetRect.height);
+    finalTop = refRect.top + toPx(pT, refRect.height);
+    const bottomOffset = refRect.bottom - toPx(pB, refRect.height);
     finalHeight = bottomOffset - finalTop;
   } else {
     // 情况 B: 标准优先级 (top > bottom)
-    finalHeight = pH ? toPx(pH, targetRect.height) : 0;
+    finalHeight = pH ? toPx(pH, refRect.height) : 0;
     if (pT !== null) {
-      finalTop = targetRect.top + toPx(pT, targetRect.height);
+      finalTop = refRect.top + toPx(pT, refRect.height);
     } else if (pB !== null) {
-      finalTop = targetRect.bottom - toPx(pB, targetRect.height) - finalHeight;
+      finalTop = refRect.bottom - toPx(pB, refRect.height) - finalHeight;
     } else {
-      finalTop = targetRect.top; // 默认靠顶
+      finalTop = refRect.top; // 默认靠顶
     }
   }
 
