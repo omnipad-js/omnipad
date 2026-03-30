@@ -68,12 +68,12 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
 >(() => new JoystickCore(uid.value, initialConfig.value, props.treeNode?.type), reactiveConfig);
 
 const canUseNativeCQ = supportsContainerQueries();
-const baseRadius = ref({ x: 0, y: 0 });
+const baseSize = ref({ x: 0, y: 0 });
 
 const stopBaseRect = watchEffect(() => {
   const rect = core.value?.rect;
   if (rect) {
-    baseRadius.value = { x: rect.width / 2, y: rect.height / 2 };
+    baseSize.value = { x: rect.width, y: rect.height };
   }
 });
 if (canUseNativeCQ) stopBaseRect();
@@ -104,7 +104,7 @@ defineExpose({
     :is-active="state?.isActive"
     :vector="state?.vector"
     show-stick
-    :base-radius="baseRadius"
+    :base-size="baseSize"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"

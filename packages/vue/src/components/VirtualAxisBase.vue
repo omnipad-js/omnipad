@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type LayoutBox, type Vec2 } from '@omnipad/core';
-import { resolveLayoutStyle } from '@omnipad/core/utils';
+import { projectVectorToBox, resolveLayoutStyle } from '@omnipad/core/utils';
 import { supportsContainerQueries } from '@omnipad/core/dom';
 
 const props = defineProps<{
@@ -9,7 +9,7 @@ const props = defineProps<{
   isActive?: boolean;
   vector?: Vec2;
   showStick?: boolean;
-  baseRadius?: Vec2; // 兼容：由父组件传进来的绝对像素半径
+  baseSize?: Vec2; // 兼容：由父组件传进来的绝对像素尺寸
 }>();
 
 const containerStyle = computed(() => {
@@ -20,24 +20,18 @@ const canUseNativeCQ = supportsContainerQueries();
 
 // 杆头位置样式
 const stickStyle = computed(() => {
-  const vx = props.vector?.x || 0;
-  const vy = props.vector?.y || 0;
-  const rx = props.baseRadius?.x || 0;
-  const ry = props.baseRadius?.y || 0;
+  const x = props.vector?.x || 0;
+  const y = props.vector?.y || 0;
+  const rx = props.baseSize?.x || 0;
+  const ry = props.baseSize?.y || 0;
 
-  // 物理偏移像素
-  const tx = canUseNativeCQ ? `${vx * 50}cqw` : `${vx * rx}px`;
-  const ty = canUseNativeCQ ? `${vy * 50}cqh` : `${vy * ry}px`;
-
-  // 杆头尺寸
-  const cx = canUseNativeCQ ? `100cqw` : `${rx * 2}px`;
-  const cy = canUseNativeCQ ? `100cqh` : `${ry * 2}px`;
+  const res = projectVectorToBox({ x, y }, { x: rx, y: ry }, canUseNativeCQ);
 
   return {
-    '--omnipad-axis-stick-container-x': tx,
-    '--omnipad-axis-stick-container-y': ty,
-    '--omnipad-axis-stick-width': cx,
-    '--omnipad-axis-stick-height': cy,
+    '--omnipad-axis-stick-container-x': res.x,
+    '--omnipad-axis-stick-container-y': res.y,
+    '--omnipad-axis-stick-width': res.width,
+    '--omnipad-axis-stick-height': res.height,
     // 松手时加一点回弹过渡，活动时取消过渡保证绝对跟手
     transition: props.isActive ? 'none' : 'transform 0.1s ease-out',
   };
@@ -105,8 +99,8 @@ const stickStyle = computed(() => {
   );
 
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 0;
+  top: 0;
   pointer-events: none;
 
   transform: translate3d(

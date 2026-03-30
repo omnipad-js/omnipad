@@ -70,13 +70,13 @@ const { core, state, domEvents, effectiveConfig, effectiveLayout, elementRef } =
 
 const canUseNativeCQ = supportsContainerQueries();
 
-// 兼容：实时提供 baseRadius 给基座
-const baseRadius = ref({ x: 0, y: 0 });
+// 兼容：实时提供 baseSize 给基座
+const baseSize = ref({ x: 0, y: 0 });
 // 监听元素尺寸变化并更新半径
 const stopBaseRect = watchEffect(() => {
   const rect = core.value?.rect;
   if (rect) {
-    baseRadius.value = { x: rect.width / 2, y: rect.height / 2 };
+    baseSize.value = { x: rect.width, y: rect.height };
   }
 });
 
@@ -109,7 +109,7 @@ defineExpose({
     :is-active="state?.isActive"
     :vector="state?.vector"
     :show-stick="effectiveConfig?.showStick"
-    :base-radius="baseRadius"
+    :base-size="baseSize"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
