@@ -6,7 +6,9 @@ import {
   ParsedLength,
   FlexibleLength,
   AbstractRect,
+  Vec2,
 } from '../types';
+import { clamp } from './math';
 import { sanitizeDomString } from './security';
 
 /**
@@ -254,4 +256,65 @@ export const resolveLayoutStyle = (layout: LayoutBox): Record<string, string | n
   }
 
   return style;
+};
+
+/**
+ * Projects a normalized input vector (-1.0 to 1.0) onto a CSS layout box.
+ * Ideal for components that move relative to a center point, such as joystick handles.
+ *
+ * @param vec - The input vector where (0,0) is center and 1.0 is the boundary.
+ * @param size - The actual pixel dimensions of the container.
+ * @param useNativeCQ - If true, uses Container Query units (cqw/cqh) for responsive scaling.
+ * @returns A CSS-compatible object with width, height, x, and y properties.
+ */
+export const projectVectorToBox = (
+  vec: Vec2,
+  size: Vec2,
+  useNativeCQ: boolean = false,
+): Record<string, string> => {
+  // 将区间从 [-1, 1] 映射到 [0, 2] / Map range from [-1, 1] to [0, 2]
+  const x = clamp(vec.x + 1, 0, 2);
+  const y = clamp(vec.y + 1, 0, 2);
+
+  if (useNativeCQ) {
+    return {
+      width: '100cqw',
+      height: '100cqh',
+      // 基于容器查询单位，x*50 得到 0% 到 100% cqw / Based on CQ units, x*50 yields 0% to 100% cqw
+      x: `${x * 50}cqw`,
+      y: `${y * 50}cqh`,
+    };
+  } else {
+    return {
+      width: `${size.x}px`,
+      height: `${size.y}px`,
+      // 物理像素换算：(x/2) * 尺寸 / Physical pixel conversion: (x/2) * size
+      x: `${(x * size.x) / 2}px`,
+      y: `${(y * size.y) / 2}px`,
+    };
+  }
+};
+
+/**
+ * Projects percentage coordinates (0-100) onto a CSS layout box.
+ * Suitable for absolute positioning requirements like virtual cursors or stage markers.
+ *
+ * @param percent - The coordinate point in percentages.
+ * @param getSize - Lazy getter for current physical dimensions of the container.
+ * @param useNativeCQ - If true, returns responsive Container Query units.
+ * @returns A CSS-compatible object with width, height, x, and y properties.
+ */
+export const projectPercentToBox = (
+  percent: Vec2,
+  getSize: () => Vec2,
+  useNativeCQ: boolean = false,
+): Record<string, string> => {
+  // 将 0-100% 转换为 -1.0 到 1.0 向量以便复用 projectVectorToBox 逻辑
+  // Convert 0-100% to -1.0 to 1.0 vector to reuse projectVectorToBox logic
+  const v = {
+    x: percent.x / 50 - 1,
+    y: percent.y / 50 - 1,
+  };
+
+  return projectVectorToBox(v, useNativeCQ ? v : getSize(), useNativeCQ);
 };
