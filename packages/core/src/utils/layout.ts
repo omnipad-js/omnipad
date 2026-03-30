@@ -5,6 +5,7 @@ import {
   CssUnit,
   ParsedLength,
   FlexibleLength,
+  AbstractRect,
 } from '../types';
 import { sanitizeDomString } from './security';
 
@@ -99,6 +100,97 @@ export function compressLayoutBox(raw: LayoutBox): LayoutBox {
     bottom: lengthToCss(raw.bottom as any),
     width: lengthToCss(raw.width as any),
     height: lengthToCss(raw.height as any),
+  };
+}
+
+/**
+ * Resolves a relative 'absolute' layout configuration into a 'fixed' pixel-based layout.
+ *
+ * **Transformation:**
+ * - **Input:** A `layout` defined relative to the `targetRect` (similar to CSS `position: absolute`).
+ * - **Output:** A `layout` defined in the same coordinate space as the `targetRect` (similar to CSS `position: fixed` or global coordinates).
+ *
+ * **Key Logic:**
+ * 1. Converts dynamic units (like `%`) into `px` based on the `targetRect`'s dimensions.
+ * 2. Adds the `targetRect`'s own offset (`left`/`top`) to the result, effectively
+ * "pinning" the layout to a fixed position in the parent/viewport coordinate system.
+ * 3. Clears `right` and `bottom` to ensure the output is a normalized [left, top, width, height] box.
+ *
+ * @param layout - The relative layout (e.g., `{ left: '10%' }` of the target).
+ * @param targetRect - The reference rect used as the "container" for calculation.
+ * @param toPx - Optional converter for custom unit handling.
+ * @returns A normalized `LayoutBox` with fixed pixel strings.
+ */
+export function flattenRelativeLayout(
+  layout: LayoutBox,
+  targetRect: AbstractRect,
+  toPx?: (p: ParsedLength | undefined, base: number) => number,
+): LayoutBox {
+  // 1. 解析所有维度参数
+  const pL = layout.left !== undefined ? parseLength(layout.left) : null;
+  const pR = layout.right !== undefined ? parseLength(layout.right) : null;
+  const pT = layout.top !== undefined ? parseLength(layout.top) : null;
+  const pB = layout.bottom !== undefined ? parseLength(layout.bottom) : null;
+  const pW = layout.width !== undefined ? parseLength(layout.width) : null;
+  const pH = layout.height !== undefined ? parseLength(layout.height) : null;
+
+  if (!toPx) {
+    toPx = (p: ParsedLength | undefined, base: number) =>
+      p ? (p.unit === '%' ? (p.value / 100) * base : p.value) : 0;
+  }
+
+  // --- 水平计算 (Horizontal) ---
+  let finalWidth: number;
+  let finalLeft: number;
+
+  if (pL !== null && pR !== null && pW === null) {
+    // 情况 A: left + right 决定宽度
+    finalLeft = targetRect.left + toPx(pL, targetRect.width);
+    const rightOffset = targetRect.right - toPx(pR, targetRect.width);
+    finalWidth = rightOffset - finalLeft;
+  } else {
+    // 情况 B: 标准优先级 (left > right)
+    finalWidth = pW ? toPx(pW, targetRect.width) : 0;
+    if (pL !== null) {
+      finalLeft = targetRect.left + toPx(pL, targetRect.width);
+    } else if (pR !== null) {
+      finalLeft = targetRect.right - toPx(pR, targetRect.width) - finalWidth;
+    } else {
+      finalLeft = targetRect.left; // 默认靠左
+    }
+  }
+
+  // --- 垂直计算 (Vertical) ---
+  let finalHeight: number;
+  let finalTop: number;
+
+  if (pT !== null && pB !== null && pH === null) {
+    // 情况 A: top + bottom 决定高度
+    finalTop = targetRect.top + toPx(pT, targetRect.height);
+    const bottomOffset = targetRect.bottom - toPx(pB, targetRect.height);
+    finalHeight = bottomOffset - finalTop;
+  } else {
+    // 情况 B: 标准优先级 (top > bottom)
+    finalHeight = pH ? toPx(pH, targetRect.height) : 0;
+    if (pT !== null) {
+      finalTop = targetRect.top + toPx(pT, targetRect.height);
+    } else if (pB !== null) {
+      finalTop = targetRect.bottom - toPx(pB, targetRect.height) - finalHeight;
+    } else {
+      finalTop = targetRect.top; // 默认靠顶
+    }
+  }
+
+  // 更新结果对象
+  return {
+    ...layout,
+    left: `${finalLeft}px`,
+    top: `${finalTop}px`,
+    width: pW || (pL && pR) ? `${finalWidth}px` : layout.width,
+    height: pH || (pT && pB) ? `${finalHeight}px` : layout.height,
+    // 清除 right 和 bottom，因为已经转换为了 fixed 坐标系的 top/left
+    right: undefined,
+    bottom: undefined,
   };
 }
 
