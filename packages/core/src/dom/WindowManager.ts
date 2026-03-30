@@ -43,7 +43,7 @@ export class WindowManager {
    */
   private handleGlobalReset = (): void => {
     if (import.meta.env?.DEV) {
-      console.debug('[OmniPad-Core] Safety reset triggered by environment change.');
+      console.debug('[OmniPad-DOM] Safety reset triggered by environment change.');
     }
     Registry.getInstance().resetAll();
     Registry.getInstance().markAllRectDirty();
@@ -93,7 +93,7 @@ export class WindowManager {
     this._isListening = true;
 
     if (import.meta.env?.DEV) {
-      console.log('[OmniPad-Core] Global WindowManager monitoring started.');
+      console.log('[OmniPad-DOM] Global WindowManager monitoring started.');
     }
   }
 
@@ -117,7 +117,7 @@ export class WindowManager {
         await document.exitFullscreen();
       }
     } catch (err) {
-      console.error(`[OmniPad-Core] Fullscreen toggle failed:`, err);
+      console.error(`[OmniPad-DOM] Fullscreen toggle failed:`, err);
     }
   }
 

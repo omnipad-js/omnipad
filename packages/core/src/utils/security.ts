@@ -28,7 +28,7 @@ export function sanitizeDomString(input: string | undefined, fallback: string = 
   // 2. 模式匹配：拦截分号(注入)、尖括号(HTML)、javascript: 等
   if (!SAFE_SELECTOR_PATTERN.test(trimmed)) {
     if (import.meta.env?.DEV) {
-      console.warn(`[OmniPad-Core] Unsafe DOM string blocked: "${trimmed}"`);
+      console.warn(`[OmniPad-Validation] Unsafe DOM string blocked: "${trimmed}"`);
     }
     return fallback;
   }
