@@ -10,7 +10,7 @@ export function filterObjectByKeys(
   excludeKeys: Set<string>,
 ): Record<string, any> {
   const result: Record<string, any> = {};
-  
+
   const keys = Object.keys(obj);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -40,24 +40,23 @@ export function getObjectDiff(
 ): Record<string, any> {
   const diff: Record<string, any> = {};
 
-  // 1. 安全检查
+  // If the previous state doesn't exist, the entire new object is considered a change
   if (!oldObj) return { ...newObj };
 
-  // 2. 只有在新对象中存在的键才需要对比（增量更新语义）
   const keys = Object.keys(newObj);
-
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     const newVal = newObj[key];
     const oldVal = oldObj[key];
 
-    // 简单的浅比较：如果引用不同或基本类型值不同
-    // 注意：如果涉及 layout 等深度嵌套对象，建议在业务层特殊处理或在此使用递归
+    // Handle nested objects (like LayoutBox) via structural comparison
     if (newVal !== oldVal) {
-      // 额外的深度一致性检查（可选，针对 layout 对象）
+      // For performance in this specific use case, we use JSON stringification
+      // to detect changes in nested layout properties.
       if (typeof newVal === 'object' && newVal !== null && oldVal !== null) {
         if (JSON.stringify(newVal) === JSON.stringify(oldVal)) continue;
       }
+      // Handle primitive types (string, number, boolean)
       diff[key] = newVal;
     }
   }
