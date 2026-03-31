@@ -20,6 +20,7 @@ import {
   flattenToHostLayout,
 } from '@omnipad/core/dom';
 import { useStickyLayout } from './useStickyLayout';
+import { createManualTrigger } from '../utils/createManualTrigger';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.
@@ -53,7 +54,9 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   // --- Sticky Mode Integration / 吸附模式集成 ---
 
   // 存储吸附目标的物理信息提供者 / Stores the physical information provider for the sticky target
-  const { stickyProvider, stickyUpdateTick } = useStickyLayout(core as any, effectiveConfig as any);
+  const layoutUpdateTicker = createManualTrigger();
+
+  const { stickyProvider } = useStickyLayout(core as any, effectiveConfig as any, layoutUpdateTicker.notify);
 
   // 监听外部 Props 配置变化
   let lastExternalConfig = { ...externalConfig.value };
@@ -184,7 +187,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
     const rawLayout = effectiveConfig.value?.layout as LayoutBox;
 
     // 如果没有配置吸附，直接返回
-    if (!stickyProvider.value || !stickyUpdateTick.value) return rawLayout;
+    if (!stickyProvider.value || !layoutUpdateTicker.depend()) return rawLayout;
 
     // 执行换算，将相对于吸附目标元素的布局拍平成相对共同父级（视口）的布局
     const targetRect = stickyProvider.value.getRect();

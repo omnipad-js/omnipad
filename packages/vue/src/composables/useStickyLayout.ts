@@ -1,4 +1,4 @@
-import { ref, shallowRef, watch, onUnmounted, Ref, ComputedRef } from 'vue';
+import { shallowRef, watch, onUnmounted, Ref, ComputedRef } from 'vue';
 import {
   type ICoreEntity,
   type ISpatial,
@@ -19,15 +19,10 @@ import { createWebStickyProvider, ElementObserver } from '@omnipad/core/dom';
 export function useStickyLayout<C extends BaseConfig>(
   core: ComputedRef<(ICoreEntity & ISpatial & IResettable) | undefined>,
   config: ComputedRef<C> | Ref<C>,
+  onUpdate: () => void,
 ) {
   // 1. 内部状态 / Internal State
   const stickyProvider = shallowRef<StickyProvider<Element> | null>(null);
-  const stickyUpdateTick = ref(0);
-
-  /** 触发更新计数器以强制驱动外部的 computed 重新计算 */
-  const triggerLayoutUpdate = () => {
-    stickyUpdateTick.value = (stickyUpdateTick.value % 65535) + 1;
-  };
 
   // 2. 实例化控制器 / Instantiate the Orchestrator
   // 注意：此处不直接在 setup 实例化，而是等待 core.value 就绪后再由监听器处理
@@ -45,7 +40,7 @@ export function useStickyLayout<C extends BaseConfig>(
         stickyController = new StickyController(
           ElementObserver.getInstance(),
           core.value,
-          triggerLayoutUpdate,
+          onUpdate,
         );
       }
 
@@ -76,11 +71,6 @@ export function useStickyLayout<C extends BaseConfig>(
      * 当前正在追踪的物理目标提供者
      * 用于外部调用 .getRect() 获取实时坐标
      */
-    stickyProvider,
-    /**
-     * 响应式计数器
-     * 必须在 effectiveLayout 的 computed 依赖中引用
-     */
-    stickyUpdateTick,
+    stickyProvider
   };
 }
