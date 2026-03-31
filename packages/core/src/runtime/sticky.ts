@@ -77,53 +77,94 @@ export class StickyProvider<T> {
   }
 }
 
+/**
+ * Orchestrates the "sticky" layout logic for an entity.
+ *
+ * It manages the lifecycle of a StickyProvider and synchronizes spatial
+ * updates (Resize/Intersection) between a physical DOM target and the
+ * logical Core entity.
+ *
+ * @template T - The type of the physical element (usually HTMLElement or Element).
+ */
 export class StickyController<T> {
-  private stickyKey: string;
-
+  /**
+   * Creates an instance of StickyController.
+   *
+   * @param observer - The unified observer singleton (RO/IO) to track the target.
+   * @param instance - The core entity instance which must support spatial awareness and resetting.
+   * @param onUpdate - Callback triggered when the layout needs to be re-synchronized (e.g., forcing a UI refresh).
+   */
   constructor(
     private observer: IElementObserver<T>,
     private instance: ICoreEntity & ISpatial & IResettable,
     private onUpdate: () => void,
-  ) {
-    this.stickyKey = this.instance.uid + '-sticky';
+  ) {}
+
+  /**
+   * Generates a unique identifier for this controller's target element's internal observer registrations.
+   */
+  public get uid(): string {
+    return this.instance.uid + '-sticky';
   }
 
-  // 纯逻辑：处理选择器变化的策略
+  /**
+   * Resolves the strategy for changing or initializing the sticky target.
+   *
+   * This method handles:
+   * 1. Teardown of old observers if the selector is removed.
+   * 2. Lazy initialization or hot-swapping of the StickyProvider.
+   * 3. Re-binding spatial and visibility observers to the new target.
+   *
+   * @param newSelector - The CSS selector of the target element to stick to.
+   * @param currentProvider - The current active StickyProvider instance, if any.
+   * @param factory - A factory function to create a new environment-specific StickyProvider (e.g., WebStickyProvider).
+   * @returns An object containing the resolved provider and a flag indicating if an update occurred.
+   */
   public handleSelectorChange(
     newSelector: string | undefined,
     currentProvider: StickyProvider<T> | null,
     factory: (s: string) => StickyProvider<T>,
-  ) {
+  ): { provider: StickyProvider<T> | null; updated: boolean } {
+    // Case 1: Sticky mode disabled
     if (!newSelector) {
-      this.observer.disconnect(this.stickyKey);
+      this.observer.disconnect(this.uid);
       return { provider: null, updated: true };
     }
 
     let provider = currentProvider;
     let updated = false;
 
+    // Case 2: Initialization or updating the provider
     if (!provider) {
       provider = factory(newSelector);
       updated = true;
     } else {
+      // StickyProvider.updateSelector handles internal diffing
       updated = provider.updateSelector(newSelector);
     }
 
     if (updated) {
       const target = provider.getTarget();
       if (target) {
-        // 核心只负责下达“观测”命令，不关心底层怎么 observe
-        this.observer.observeResize(this.stickyKey, target, () => {
-          // 这里的逻辑依然由单例池节流
+        // Bind spatial observers to the physical target
+        // Core only commands the "observation"; the implementation is delegated to the observer pool.
+
+        // 1. Monitor size/position changes
+        this.observer.observeResize(this.uid, target, () => {
+          // Invalidate caches in both provider and core logic
           provider?.markDirty();
           this.instance.markRectDirty();
         });
-        this.observer.observeIntersect(this.stickyKey, target, (isVisible) => {
+
+        // 2. Monitor visibility status
+        this.observer.observeIntersect(this.uid, target, (isVisible) => {
+          // Safety: Cut off input signals if the target element disappears (e.g., hidden by game logic)
           if (!isVisible) {
             this.instance.reset();
           }
         });
 
+        // Notify the adapter to perform an immediate sync
         this.onUpdate();
       }
     }
@@ -131,7 +172,11 @@ export class StickyController<T> {
     return { provider, updated };
   }
 
-  public onCleanUp() {
-    this.observer.disconnect(this.stickyKey);
+  /**
+   * Disconnects all observers and releases resources.
+   * Should be called when the host component is unmounted.
+   */
+  public onCleanUp(): void {
+    this.observer.disconnect(this.uid);
   }
 }

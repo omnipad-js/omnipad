@@ -1,6 +1,16 @@
-import { ref, onMounted, onUnmounted, ComputedRef, readonly, watch, computed } from 'vue';
+import {
+  ref,
+  onMounted,
+  onUnmounted,
+  ComputedRef,
+  readonly,
+  watch,
+  computed,
+  shallowRef,
+} from 'vue';
 import {
   Registry,
+  StickyController,
   StickyProvider,
   type AnyFunction,
   type BaseConfig,
@@ -51,61 +61,55 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   const effectiveConfig = ref<C>();
   const elementRef = ref<any>(null);
 
-  // 吸附模式 Provider
-  let stickyProvider: StickyProvider<Element> | null;
+  // --- Sticky Mode Integration / 吸附模式集成 ---
+
+  // 存储吸附目标的物理信息提供者 / Stores the physical information provider for the sticky target
+  const stickyProvider = shallowRef<StickyProvider<Element> | null>(null);
+
+  // 实例化吸附控制器，连接逻辑实体与物理观察者 / Instantiate the sticky controller, linking the logic entity with physical observers
+  const stickyController = new StickyController(
+    ElementObserver.getInstance(),
+    instance as any,
+    () => {
+      // 目标位置变动时，触发布局计算更新 / Trigger layout update when target position changes
+      triggerLayoutUpdate();
+    },
+  );
+  /**
+   * 响应式计数器：用于在 DOM 变动时强制驱动 computed 重新计算
+   * A reactive counter used to force computed re-evaluation when DOM changes occur
+   */
   const stickyUpdateTick = ref(0);
   const triggerLayoutUpdate = () => {
     stickyUpdateTick.value = (stickyUpdateTick.value % 65535) + 1;
   };
 
+  /**
+   * 监听吸附选择器的变化 / Monitor changes to the sticky selector
+   * 动态执行物理目标的查找、绑定以及旧目标的清理
+   * Dynamically handles target resolution, binding, and cleanup of old targets
+   */
   watch(
-    // 1. 精确定义依赖源：只有这个字符串变了，才触发回调
     () => effectiveConfig.value?.layout?.stickySelector,
 
     (newSelector, _, onCleanup) => {
-      // 2. 逻辑分流
-      if (!newSelector) {
-        stickyProvider = null;
-        triggerLayoutUpdate();
-        return;
-      }
+      // 执行选择器切换策略 / Execute selector change strategy
+      const result = stickyController.handleSelectorChange(
+        newSelector,
+        stickyProvider.value,
+        (s) => createWebStickyProvider(s), // 注入 Web 环境特有的工厂函数 / Inject web-specific factory
+      );
 
-      let updated: boolean = false;
+      // 更新当前的 Provider 引用 / Update the current provider reference
+      stickyProvider.value = result.provider;
 
-      // 3. 执行昂贵的初始化逻辑 (只在 selector 变化时执行一次)
-      if (!stickyProvider) {
-        stickyProvider = createWebStickyProvider(newSelector);
-        updated = true;
-      } else {
-        updated = stickyProvider.updateSelector(newSelector);
-      }
-
-      if (!updated) return;
-      const targetEl = stickyProvider?.getTarget();
-      if (!targetEl) return;
-
-      // 4. 注册 Observer
-      const stickyKey = instance.uid + '-sticky';
-      ElementObserver.getInstance().observeResize(stickyKey, targetEl, () => {
-        // 这里的逻辑依然由单例池节流
-        stickyProvider?.markDirty();
-        (instance as unknown as ISpatial).markRectDirty();
-      });
-      ElementObserver.getInstance().observeIntersect(stickyKey, targetEl, (isVisible: boolean) => {
-        if (!isVisible) {
-          (instance as unknown as IResettable).reset();
-        }
-      });
-
-      // 发送吸附配置更改信号
-      triggerLayoutUpdate();
-
-      // 5. 利用 watch 提供的 onCleanup 钩子注销观察
+      // 注册副作用清理：在选择器改变或组件卸载时断开观察者
+      // Register side-effect cleanup: Disconnect observers when selector changes or component unmounts
       onCleanup(() => {
-        ElementObserver.getInstance().disconnect(stickyKey);
+        stickyController.onCleanUp();
       });
     },
-    { immediate: true }, // 必须开启，以处理初始配置即存在吸附的情况
+    { immediate: true }, // 处理初始配置即存在吸附的情况 / Handle cases where sticky is present in initial config
   );
 
   // 监听外部 Props 配置变化
@@ -193,8 +197,8 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
           cached.markDirty();
 
           // 如果存在吸附目标，顺便也把吸附目标的缓存清了
-          if (stickyProvider) {
-            stickyProvider.markDirty();
+          if (stickyProvider.value) {
+            stickyProvider.value.markDirty();
             // 触发吸附模式更新信号
             triggerLayoutUpdate();
           }
@@ -222,7 +226,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   onUnmounted(() => {
     // 销毁观察器防止内存泄漏
     ElementObserver.getInstance().disconnect(instance.uid);
-    ElementObserver.getInstance().disconnect(instance.uid + '-sticky');
+    stickyController.onCleanUp();
     // 销毁 Core
     if (core.value) {
       core.value.destroy(); // 内部会处理 Registry.unregister
@@ -240,10 +244,10 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
     const rawLayout = effectiveConfig.value?.layout as LayoutBox;
 
     // 如果没有配置吸附，直接返回
-    if (!stickyProvider || !stickyUpdateTick.value) return rawLayout;
+    if (!stickyProvider.value || !stickyUpdateTick.value) return rawLayout;
 
     // 执行换算，将相对于吸附目标元素的布局拍平成相对共同父级（视口）的布局
-    const targetRect = stickyProvider.getRect();
+    const targetRect = stickyProvider.value.getRect();
     return targetRect ? flattenToHostLayout(rawLayout, targetRect) : rawLayout;
   });
 
