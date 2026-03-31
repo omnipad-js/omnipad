@@ -154,6 +154,7 @@ export class StickyController<T> {
           // Invalidate caches in both provider and core logic
           provider?.markDirty();
           this.instance.markRectDirty();
+          this.onUpdate();
         });
 
         // 2. Monitor visibility status

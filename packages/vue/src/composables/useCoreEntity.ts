@@ -1,17 +1,6 @@
-import {
-  ref,
-  onMounted,
-  onUnmounted,
-  ComputedRef,
-  readonly,
-  watch,
-  computed,
-  shallowRef,
-} from 'vue';
+import { ref, onMounted, onUnmounted, ComputedRef, readonly, watch, computed } from 'vue';
 import {
   Registry,
-  StickyController,
-  StickyProvider,
   type AnyFunction,
   type BaseConfig,
   type IConfigurable,
@@ -28,9 +17,9 @@ import {
   ElementObserver,
   WindowManager,
   createPointerBridge,
-  createWebStickyProvider,
   flattenToHostLayout,
 } from '@omnipad/core/dom';
+import { useStickyLayout } from './useStickyLayout';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.
@@ -64,53 +53,7 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   // --- Sticky Mode Integration / 吸附模式集成 ---
 
   // 存储吸附目标的物理信息提供者 / Stores the physical information provider for the sticky target
-  const stickyProvider = shallowRef<StickyProvider<Element> | null>(null);
-
-  // 实例化吸附控制器，连接逻辑实体与物理观察者 / Instantiate the sticky controller, linking the logic entity with physical observers
-  const stickyController = new StickyController(
-    ElementObserver.getInstance(),
-    instance as any,
-    () => {
-      // 目标位置变动时，触发布局计算更新 / Trigger layout update when target position changes
-      triggerLayoutUpdate();
-    },
-  );
-  /**
-   * 响应式计数器：用于在 DOM 变动时强制驱动 computed 重新计算
-   * A reactive counter used to force computed re-evaluation when DOM changes occur
-   */
-  const stickyUpdateTick = ref(0);
-  const triggerLayoutUpdate = () => {
-    stickyUpdateTick.value = (stickyUpdateTick.value % 65535) + 1;
-  };
-
-  /**
-   * 监听吸附选择器的变化 / Monitor changes to the sticky selector
-   * 动态执行物理目标的查找、绑定以及旧目标的清理
-   * Dynamically handles target resolution, binding, and cleanup of old targets
-   */
-  watch(
-    () => effectiveConfig.value?.layout?.stickySelector,
-
-    (newSelector, _, onCleanup) => {
-      // 执行选择器切换策略 / Execute selector change strategy
-      const result = stickyController.handleSelectorChange(
-        newSelector,
-        stickyProvider.value,
-        (s) => createWebStickyProvider(s), // 注入 Web 环境特有的工厂函数 / Inject web-specific factory
-      );
-
-      // 更新当前的 Provider 引用 / Update the current provider reference
-      stickyProvider.value = result.provider;
-
-      // 注册副作用清理：在选择器改变或组件卸载时断开观察者
-      // Register side-effect cleanup: Disconnect observers when selector changes or component unmounts
-      onCleanup(() => {
-        stickyController.onCleanUp();
-      });
-    },
-    { immediate: true }, // 处理初始配置即存在吸附的情况 / Handle cases where sticky is present in initial config
-  );
+  const { stickyProvider, stickyUpdateTick } = useStickyLayout(core as any, effectiveConfig as any);
 
   // 监听外部 Props 配置变化
   let lastExternalConfig = { ...externalConfig.value };
@@ -199,8 +142,6 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
           // 如果存在吸附目标，顺便也把吸附目标的缓存清了
           if (stickyProvider.value) {
             stickyProvider.value.markDirty();
-            // 触发吸附模式更新信号
-            triggerLayoutUpdate();
           }
         });
 
@@ -226,7 +167,6 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   onUnmounted(() => {
     // 销毁观察器防止内存泄漏
     ElementObserver.getInstance().disconnect(instance.uid);
-    stickyController.onCleanUp();
     // 销毁 Core
     if (core.value) {
       core.value.destroy(); // 内部会处理 Registry.unregister
