@@ -4,7 +4,7 @@ import { DPadConfig } from '../types/configs';
 import { DPadState } from '../types/state';
 import { AbstractPointerEvent, CMP_TYPES, EntityType } from '../types';
 import { ActionEmitter } from '../runtime/action';
-import { clamp, isVec2Equal, lerp } from '../utils/math';
+import { applyAxialDeadzone, clamp, isVec2Equal, lerp } from '../utils/math';
 
 const INITIAL_STATE: DPadState = {
   isActive: false,
@@ -12,6 +12,7 @@ const INITIAL_STATE: DPadState = {
   vector: { x: 0, y: 0 },
 };
 
+const DEFAULT_THRESHOLD = 0.15;
 const VECTOR_DIRTY_THRESHOLD = 0.002; // 向量脏检查阈值
 const GAMEPAD_SMOOTHING = 0.3; // 柄头位移脏检查阈值
 
@@ -102,7 +103,11 @@ export class DPadCore
       }
     }
 
-    const vector = { x: clamp(normX, -1, 1), y: clamp(normY, -1, 1) };
+    // 基础向量计算 / Basic vector calculation
+    const rawVector = { x: normX, y: normY };
+
+    // 应用轴向死区 / Apply axial deadzone
+    const vector = applyAxialDeadzone(rawVector, 1.0, this.config.threshold ?? DEFAULT_THRESHOLD);
 
     // 更新内部 vector 状态供适配层渲染浮标 / Update vector for floating stick rendering
     if (!isVec2Equal(vector, this.state.vector, VECTOR_DIRTY_THRESHOLD)) {
@@ -115,7 +120,7 @@ export class DPadCore
    * 将摇杆位置转换为 4/8 方向按键信号
    */
   private handleDigitalKeys(v: { x: number; y: number }) {
-    const threshold = this.config.threshold ?? 0.3;
+    const threshold = this.config.threshold ?? DEFAULT_THRESHOLD;
 
     // Y-axis
     if (v.y < -threshold) {
@@ -169,7 +174,7 @@ export class DPadCore
   // --- IProgrammatic Implementation ---
 
   public triggerVector(x: number, y: number): void {
-    const threshold = this.config.threshold ?? 0.3;
+    const threshold = this.config.threshold ?? DEFAULT_THRESHOLD;
 
     // D-Pad 通常关注最大偏移量，如果任一轴都没过阈值，视为回正
     // For a D-pad, the focus is typically on the maximum offset; if none of the axes exceed the threshold, it is considered to have returned to center.

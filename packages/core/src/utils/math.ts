@@ -201,10 +201,10 @@ export const applyRadialDeadzone = (v: Vec2, radius: number, deadzonePercent: nu
  * Applies an axial deadzone to a vector.
  * Independently processes X and Y axes. Useful for D-Pads or precision directional inputs.
  * @param v - Input vector.
- * @param threshold - The deadzone threshold value.
  * @param max - Maximum value for the axis.
+ * @param threshold - The deadzone threshold value.
  */
-export const applyAxialDeadzone = (v: Vec2, threshold: number, max: number): Vec2 => {
+export const applyAxialDeadzone = (v: Vec2, max: number, threshold: number): Vec2 => {
   return {
     x: getDeadzoneScalar(Math.abs(v.x), threshold, max) * Math.sign(v.x),
     y: getDeadzoneScalar(Math.abs(v.y), threshold, max) * Math.sign(v.y),

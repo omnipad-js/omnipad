@@ -16,6 +16,7 @@ const INITIAL_STATE: JoystickState = {
   vector: { x: 0, y: 0 },
 };
 
+const DEFAULT_THRESHOLD = 0.15;
 const VECTOR_DIRTY_THRESHOLD = 0.002; // 向量脏检查阈值
 const GAMEPAD_SMOOTHING = 0.3; // 柄头位移脏检查阈值
 
@@ -154,12 +155,11 @@ export class JoystickCore
       }
     }
 
-    // 1. 基础向量计算 / Basic vector calculation
+    // 基础向量计算 / Basic vector calculation
     const rawVector = { x: normX, y: normY };
 
-    // 2. 应用径向死区 / Apply radial deadzone
-    // 使用之前 math.ts 里的工具，输入半径为 1.0 的单位向量
-    const vector = applyRadialDeadzone(rawVector, 1.0, this.config.threshold || 0.15);
+    // 应用径向死区 / Apply radial deadzone
+    const vector = applyRadialDeadzone(rawVector, 1.0, this.config.threshold ?? DEFAULT_THRESHOLD);
 
     // 更新内部 vector 状态供适配层渲染浮标 / Update vector for floating stick rendering
     if (!isVec2Equal(vector, this.state.vector, VECTOR_DIRTY_THRESHOLD)) {
@@ -200,7 +200,7 @@ export class JoystickCore
    * 将摇杆位置转换为 4/8 方向按键信号
    */
   private handleDigitalKeys(v: { x: number; y: number }) {
-    const threshold = this.config.threshold ?? 0.3;
+    const threshold = this.config.threshold ?? DEFAULT_THRESHOLD;
 
     // Y-axis
     if (v.y < -threshold) {
@@ -265,8 +265,8 @@ export class JoystickCore
     this.stickEmitter.release(true);
   }
 
-  triggerVector(x: number, y: number): void {
-    const deadzone = this.config.threshold ?? 0.15;
+  public triggerVector(x: number, y: number): void {
+    const deadzone = this.config.threshold ?? DEFAULT_THRESHOLD;
     const magnitude = Math.hypot(x, y);
 
     // 如果手柄回弹到中心，立即切断，不需要平滑
