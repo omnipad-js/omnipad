@@ -1,0 +1,86 @@
+import { ref, shallowRef, watch, onUnmounted, Ref, ComputedRef } from 'vue';
+import {
+  type ICoreEntity,
+  type ISpatial,
+  type IResettable,
+  type BaseConfig,
+  StickyController,
+  StickyProvider,
+} from '@omnipad/core';
+import { createWebStickyProvider, ElementObserver } from '@omnipad/core/dom';
+
+/**
+ * A sub-composable to manage sticky layout logic.
+ * Handles the connection between a logic entity and a physical DOM target.
+ *
+ * @param core - Ref of the logic instance (must implement ISpatial and IResettable).
+ * @param config - Reactive config containing the layout.stickySelector.
+ */
+export function useStickyLayout<C extends BaseConfig>(
+  core: ComputedRef<(ICoreEntity & ISpatial & IResettable) | undefined>,
+  config: ComputedRef<C> | Ref<C>,
+) {
+  // 1. 内部状态 / Internal State
+  const stickyProvider = shallowRef<StickyProvider<Element> | null>(null);
+  const stickyUpdateTick = ref(0);
+
+  /** 触发更新计数器以强制驱动外部的 computed 重新计算 */
+  const triggerLayoutUpdate = () => {
+    stickyUpdateTick.value = (stickyUpdateTick.value % 65535) + 1;
+  };
+
+  // 2. 实例化控制器 / Instantiate the Orchestrator
+  // 注意：此处不直接在 setup 实例化，而是等待 core.value 就绪后再由监听器处理
+  let stickyController: StickyController<Element> | null = null;
+
+  // 3. 监听吸附选择器变化 / Monitor selector changes
+  watch(
+    () => config.value?.layout?.stickySelector,
+    (newSelector, _, onCleanup) => {
+      // 必须确保核心实例已就绪 / Ensure the logic core is available
+      if (!core.value) return;
+
+      // 懒加载初始化控制器 / Lazy-initialize the controller
+      if (!stickyController) {
+        stickyController = new StickyController(
+          ElementObserver.getInstance(),
+          core.value,
+          triggerLayoutUpdate,
+        );
+      }
+
+      // 执行选择器切换策略 / Perform selector switching strategy
+      const result = stickyController.handleSelectorChange(newSelector, stickyProvider.value, (s) =>
+        createWebStickyProvider(s),
+      );
+
+      // 更新当前的 Provider 引用 / Update the current provider reference
+      stickyProvider.value = result.provider;
+
+      // 注册清理逻辑 / Register cleanup for watch-effect
+      onCleanup(() => {
+        stickyController?.onCleanUp();
+      });
+    },
+    { immediate: true }, // 立即处理初始配置 / Handle initial config immediately
+  );
+
+  // 4. 组件卸载时的终极清理 / Final cleanup on unmount
+  onUnmounted(() => {
+    stickyController?.onCleanUp();
+    stickyProvider.value = null;
+  });
+
+  return {
+    /**
+     * 当前正在追踪的物理目标提供者
+     * 用于外部调用 .getRect() 获取实时坐标
+     */
+    stickyProvider,
+    /**
+     * 响应式计数器
+     * 必须在 effectiveLayout 的 computed 依赖中引用
+     */
+    stickyUpdateTick,
+  };
+}
