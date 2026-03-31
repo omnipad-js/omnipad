@@ -1,3 +1,4 @@
+import { IElementObserver } from '../types';
 import { createRafThrottler } from '../runtime/performance';
 
 /**
@@ -18,7 +19,7 @@ const ELEMENT_OBSERVER_KEY = Symbol.for('omnipad.element_observer.instance');
  * framework adapters (like Vue or React) where DOM references may become unstable
  * during unmounting.
  */
-export class ElementObserver {
+export class ElementObserver implements IElementObserver<Element> {
   // RO 资源
   private _ro: ResizeObserver;
   private _roRegistry = new Map<string, Element>();
@@ -62,13 +63,6 @@ export class ElementObserver {
     return globalObj[ELEMENT_OBSERVER_KEY];
   }
 
-  /**
-   * Starts observing size changes for a specific element.
-   *
-   * @param uid - The unique entity ID associated with the observation.
-   * @param el - The target DOM element to observe.
-   * @param cb - Callback triggered when the element's size changes.
-   */
   public observeResize(uid: string, el: Element, cb: () => void) {
     this.unobserveResize(uid); // 避免重复注册
     this._roRegistry.set(uid, el);
@@ -76,11 +70,6 @@ export class ElementObserver {
     this._ro.observe(el);
   }
 
-  /**
-   * Stops observing size changes for the entity identified by the UID.
-   *
-   * @param uid - The unique entity ID to unregister.
-   */
   public unobserveResize(uid: string) {
     const el = this._roRegistry.get(uid);
     if (el) {
@@ -90,13 +79,6 @@ export class ElementObserver {
     }
   }
 
-  /**
-   * Starts observing visibility (intersection) changes for a specific element.
-   *
-   * @param uid - The unique entity ID associated with the observation.
-   * @param el - The target DOM element to observe.
-   * @param cb - Callback triggered when visibility enters or exits the viewport.
-   */
   public observeIntersect(uid: string, el: Element, cb: (isIntersecting: boolean) => void) {
     this.unobserveIntersect(uid);
     this._ioRegistry.set(uid, el);
@@ -104,11 +86,6 @@ export class ElementObserver {
     this._io.observe(el);
   }
 
-  /**
-   * Stops observing intersection changes for the entity identified by the UID.
-   *
-   * @param uid - The unique entity ID to unregister.
-   */
   public unobserveIntersect(uid: string) {
     const el = this._ioRegistry.get(uid);
     if (el) {
@@ -118,12 +95,6 @@ export class ElementObserver {
     }
   }
 
-  /**
-   * Disconnects all observers (RO and IO) associated with a specific UID.
-   * Usually called during component destruction for thorough cleanup.
-   *
-   * @param uid - The unique entity ID to fully disconnect.
-   */
   public disconnect(uid: string) {
     this.unobserveResize(uid);
     this.unobserveIntersect(uid);

@@ -212,6 +212,7 @@ export type AnyFunction = (...args: any[]) => void;
 
 // Export sub-modules
 export * from './configs';
+export * from './elementObserver';
 export * from './gamepad';
 export * from './keys';
 export * from './registry';
