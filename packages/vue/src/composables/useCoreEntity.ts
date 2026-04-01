@@ -7,20 +7,14 @@ import {
   type ICoreEntity,
   type IDependencyBindable,
   type IPointerHandler,
-  type IResettable,
-  type ISpatial,
   type IStateful,
   type LayoutBox,
 } from '@omnipad/core';
-import { createCachedProvider, getObjectDiff } from '@omnipad/core/utils';
-import {
-  ElementObserver,
-  WindowManager,
-  createPointerBridge,
-  flattenToHostLayout,
-} from '@omnipad/core/dom';
+import { getObjectDiff } from '@omnipad/core/utils';
+import { WindowManager, createPointerBridge, flattenToHostLayout } from '@omnipad/core/dom';
 import { useStickyLayout } from './useStickyLayout';
 import { createManualTrigger } from '../utils/createManualTrigger';
+import { useSpatialObserver } from './useSpatialObserver';
 
 /**
  * Bridges a Vue component with its corresponding Headless Core logic entity.
@@ -51,12 +45,18 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   const effectiveConfig = ref<C>();
   const elementRef = ref<any>(null);
 
-  // --- Sticky Mode Integration / 吸附模式集成 ---
-
   // 存储吸附目标的物理信息提供者 / Stores the physical information provider for the sticky target
   const layoutUpdateTicker = createManualTrigger();
 
-  const { stickyProvider } = useStickyLayout(core as any, effectiveConfig as any, layoutUpdateTicker.notify);
+  // 集成吸附模式模块
+  const { stickyProvider } = useStickyLayout(
+    core as any,
+    effectiveConfig as any,
+    layoutUpdateTicker.notify,
+  );
+
+  // 集成空间观察模块
+  useSpatialObserver(core as any, elementRef, stickyProvider);
 
   // 监听外部 Props 配置变化
   let lastExternalConfig = { ...externalConfig.value };
@@ -111,65 +111,12 @@ export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
       bindDelegates(initialDelegates);
     }
 
-    // 提取真实的 DOM 元素
-    let domEl: Element | null = null;
-
-    if (elementRef.value) {
-      if (elementRef.value instanceof Element) {
-        // 场景 A: ref 绑定在原生 HTML 标签上 (如 <div>)
-        domEl = elementRef.value;
-      } else if (elementRef.value.$el instanceof Element) {
-        // 场景 B: ref 绑定在 Vue 组件上
-        // 组件的根 DOM 节点存储在 .$el 属性中
-        domEl = elementRef.value.$el;
-      }
-    }
-
-    // 尺寸监听 (ISpatial 接口对接)
-    if (domEl instanceof Element) {
-      const observer = ElementObserver.getInstance();
-
-      if ('bindRectProvider' in instance) {
-        // A. 创建缓存闭包
-        const cached = createCachedProvider(() => {
-          const r = domEl!.getBoundingClientRect();
-          return r;
-        });
-
-        // B. 注入逻辑层
-        // 传入获取方法 cached.get 和 适配层清理缓存的方法 cached.markDirty
-        (instance as unknown as ISpatial).bindRectProvider(cached.get, () => {
-          // 清理组件自身的 Rect 缓存
-          cached.markDirty();
-
-          // 如果存在吸附目标，顺便也把吸附目标的缓存清了
-          if (stickyProvider.value) {
-            stickyProvider.value.markDirty();
-          }
-        });
-
-        // C. 监听“自身”尺寸变化 (RO)
-        observer.observeResize(instance.uid, domEl, () => {
-          (instance as unknown as ISpatial).markRectDirty();
-        });
-      }
-
-      // 注册可见性观察 (IO)
-      observer.observeIntersect(instance.uid, domEl, (isVisible: boolean) => {
-        if (!isVisible) {
-          (instance as unknown as IResettable).reset();
-        }
-      });
-    }
-
     // 只要有任何一个组件被挂载到页面上，自动启动全局视口监听
     // 内部的 _isListening 会保证它只绑定一次原生事件
     WindowManager.getInstance().init();
   });
 
   onUnmounted(() => {
-    // 销毁观察器防止内存泄漏
-    ElementObserver.getInstance().disconnect(instance.uid);
     // 销毁 Core
     if (core.value) {
       core.value.destroy(); // 内部会处理 Registry.unregister
