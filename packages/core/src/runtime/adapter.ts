@@ -1,6 +1,26 @@
-import { EntityType } from '../types';
+import { AnyFunction, EntityType, IDependencyBindable } from '../types';
 import { BaseConfig, ConfigTreeNode } from '../types/configs';
 import { filterObjectByKeys, mergeObjects } from '../utils/object';
+
+/**
+ * Binds a map of delegate functions to a core entity instance.
+ *
+ * @param entity - The target entity instance.
+ * @param delegates - A key-value map of functions to bind.
+ */
+export function bindEntityDelegates(entity: any, delegates?: Record<string, AnyFunction>): void {
+  if (!entity || !delegates) return;
+
+  // 检查实体是否实现了 IDependencyBindable 接口
+  if ('bindDelegate' in entity && typeof entity.bindDelegate === 'function') {
+    Object.entries(delegates).forEach(([key, fn]) => {
+      // 只有当值为函数时才执行绑定 / Only bind if the value is a function
+      if (typeof fn === 'function') {
+        (entity as unknown as IDependencyBindable).bindDelegate(key, fn);
+      }
+    });
+  }
+}
 
 /**
  * Filters out a specific dynamic child node from the tree by its ID (UID).
