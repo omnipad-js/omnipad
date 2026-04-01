@@ -47,7 +47,7 @@ const { uid, core, state, domEvents, effectiveConfig, effectiveLayout, elementRe
     },
   });
 
-const fixedChildren = computed(() => {
+const fixedChildren = computed<ConfigTreeNode[]>(() => {
   return filterNotDynamicChildren(
     props.treeNode?.children,
     props.treeNode?.config?.dynamicWidgetId,
@@ -55,7 +55,10 @@ const fixedChildren = computed(() => {
 });
 
 // 唯一性校验与 VNode 过滤逻辑
-const dynamicControlInfo = computed(() => {
+const dynamicControlInfo = computed<{
+  nodeToRender: VNode | ConfigTreeNode | null;
+  isFromSlot: boolean;
+}>(() => {
   const slotNodes = slots.dynamicWidget?.() || [];
 
   // 过滤掉注释和纯文本，只留下真正的组件或 HTML 元素
