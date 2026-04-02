@@ -20,10 +20,10 @@ const BASE_INTERNAL_PROPS = Object.freeze(['treeNode', 'widgetId', 'parentId']);
  * 3. Configuration merging (Props override JSON config).
  *
  * @template T - The specific configuration type extending BaseConfig.
- * @param defaultType - The fallback component type if not specified in config.
+ * @param requiredType - The fallback component type if not specified in config.
  * @param props - The raw properties passed to the Vue component.
  * @param defaultProps - Default values to fill if both config and props are missing.
- * @returns An object containing the finalized `uid` and the reactive `config`.
+ * @param extraSkipProps - Specify additional props to ignore to prevent the corresponding config from being updated.
  */
 export function useWidgetConfig<T extends BaseConfig>(
   requiredType: EntityType,

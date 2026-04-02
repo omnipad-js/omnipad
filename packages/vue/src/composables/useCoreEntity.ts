@@ -17,10 +17,11 @@ import { WindowManager, createPointerBridge } from '@omnipad/core/dom';
  *
  * @template T - The Core class type (e.g., JoystickCore).
  * @template S - The State interface type (e.g., JoystickState).
+ * @template C - The Config interface type (e.g., JoystickConfig).
  * @param createCore - A factory function that returns a new instance of the Core class.
+ * @param externalConfig - A computed config ref for reactive update.
  * @param domEventOptions - Options for Pointer Event bridge.
  * @param initialDelegates - Optional registry of callbacks to inject into the core at startup.
- * @returns Ref objects for the core instance, reactive state, DOM element, and bridge helpers.
  */
 export function useCoreEntity<T extends ICoreEntity, S, C extends BaseConfig>(
   createCore: () => T,

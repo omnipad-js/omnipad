@@ -8,12 +8,22 @@ import { createManualTrigger } from '../utils/createManualTrigger';
 import { flattenToHostLayout } from '@omnipad/core/dom';
 import { useSpatialObserver } from './useSpatialObserver';
 
+/**
+ * A facade hook which bridges a Vue component with its corresponding Headless Core logic entity.
+ *
+ * @template T - The Core class type (e.g., JoystickCore).
+ * @template S - The State interface type (e.g., JoystickState).
+ * @template C - The Config interface type (e.g., JoystickConfig).
+ * @param requiredType - The fallback component type if not specified in config.
+ * @param props - The raw properties passed to the Vue component.
+ */
 export function useWidgetSetup<T extends ICoreEntity, S, C extends BaseConfig>(
   requiredType: EntityType,
   props: Record<string, any>,
   options: {
     defaultProps?: Record<string, any>;
     domEventOptions?: Record<string, any>;
+    extraSkipProps?: string[];
     initialDelegates?: Record<string, any>;
   } = {},
 ) {
@@ -22,6 +32,7 @@ export function useWidgetSetup<T extends ICoreEntity, S, C extends BaseConfig>(
     requiredType,
     props,
     options.defaultProps,
+    options.extraSkipProps,
   );
 
   // 2. [逻辑层] 根据类型实例化 Core 并处理生命周期绑定

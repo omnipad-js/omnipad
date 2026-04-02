@@ -15,6 +15,7 @@ import { createWebStickyProvider, ElementObserver } from '@omnipad/core/dom';
  *
  * @param core - Ref of the logic instance (must implement ISpatial and IResettable).
  * @param config - Reactive config containing the layout.stickySelector.
+ * @param onUpdate - Callback triggered when the layout needs to be re-synchronized (e.g., forcing a UI refresh).
  */
 export function useStickyLayout<C extends BaseConfig>(
   core: ComputedRef<(ICoreEntity & ISpatial & IResettable) | undefined>,
